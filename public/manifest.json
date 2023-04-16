@@ -1,0 +1,16 @@
+{
+  "background_color": "black",
+  "description": "Moons of Terra",
+  "display": "fullscreen",
+  "icons": [
+    {
+      "src": "logo.png",
+      "sizes": "3586x3586",
+      "type": "image/png"
+    }
+  ],
+  "name": "Moons of Terra",
+  "short_name": "Moons of Terra",
+  "start_url": "index.html",
+  "orientation": "landscape-primary"
+}
