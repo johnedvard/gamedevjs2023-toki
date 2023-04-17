@@ -7,13 +7,16 @@ export class Boot extends Phaser.Scene {
     this.preloadSpineAnimations();
   }
 
-  preloadSpineAnimations() {}
+  preloadSpineAnimations() {
+    this.load.image('hero', 'spine/hero.png');
+    this.load.spine('hero', 'spine/hero.json', ['spine/hero.atlas'], true);
+  }
 
   create(): void {
     this.setPixelArtFilterOnAssets();
     this.createAnimations();
     // TODO (johnedvard) start desired scene based on env build variable?
-    this.scene.start(SceneKey.MainMenu);
+    this.scene.start(SceneKey.Level);
     // this.scene.start(SceneKey.NewGameIntro);
     // this.scene.start(SceneKey.Preload);
   }

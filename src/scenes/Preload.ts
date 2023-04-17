@@ -15,7 +15,6 @@ export class Preload extends Phaser.Scene {
 
   async startMainMenu() {
     this.isStartMainMenu = true;
-    console.log('do some animation');
     setTimeout(() => {
       this.scene.start(SceneKey.MainMenu);
     }, 300);

@@ -8,12 +8,16 @@ import { Preload } from '~/scenes/Preload';
 import { MainMenu } from '~/scenes/MainMenu';
 import { NewGameIntro } from '~/scenes/NewGameIntro';
 import { UserInterface } from '~/scenes/UserInterface';
+import { Level } from './scenes/Level';
+import { SceneInput } from './scenes/SceneInput';
 
 const addScenes = (game: Game) => {
   game.scene.add(SceneKey.Preload, Preload);
   game.scene.add(SceneKey.MainMenu, MainMenu);
   game.scene.add(SceneKey.NewGameIntro, NewGameIntro);
   game.scene.add(SceneKey.UserInterface, UserInterface);
+  game.scene.add(SceneKey.Level, Level);
+  game.scene.add(SceneKey.SceneInput, SceneInput);
   game.scene.add(SceneKey.Boot, Boot, true);
 };
 
@@ -29,8 +33,8 @@ export class Toki {
       physics: {
         default: 'matter',
         matter: {
-          // debug: true, // TODO (johnedvard) remove debug if production
-          gravity: { y: 0 },
+          debug: true, // TODO (johnedvard) remove debug if production
+          gravity: { y: 20 },
         },
       },
       input: {
@@ -52,5 +56,6 @@ export class Toki {
       },
     });
     addScenes(game);
+    game.scene.start(SceneKey.SceneInput);
   }
 }

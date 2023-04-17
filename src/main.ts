@@ -1,3 +1,4 @@
+import '~/styles.scss';
 import { Toki } from './Game';
 
 const init = () => {

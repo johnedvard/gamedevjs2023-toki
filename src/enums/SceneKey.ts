@@ -6,4 +6,5 @@ export enum SceneKey {
   UserInterface = 'UserInterface',
   Boot = 'Boot',
   Settings = 'Settings',
+  SceneInput = 'SceneInput',
 }

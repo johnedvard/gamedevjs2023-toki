@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg width="2560px" height="1440px" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;">
+    <rect id="level1" x="0" y="0" width="2560" height="1440" style="fill:none;"/>
+    <clipPath id="_clip1">
+        <rect id="level11" serif:id="level1" x="0" y="0" width="2560" height="1440"/>
+    </clipPath>
+    <g clip-path="url(#_clip1)">
+        <circle id="start" cx="106.066" cy="519.105" r="30.661" style="fill:none;"/>
+        <path id="ground--collision-" serif:id="ground {collision}" d="M-37.349,461.629C-37.349,461.629 224.47,794.89 634.289,799.751C821.383,801.97 1000.12,553.977 1216.27,616.748C1441.59,682.178 1748.44,717.55 1859.6,667.397C1970.09,617.548 2583.39,484.289 2630.12,531.446" style="fill:none;"/>
+        <circle id="goal" cx="1871.22" cy="607.211" r="30.661" style="fill:none;"/>
+    </g>
+</svg>
