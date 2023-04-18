@@ -3,5 +3,6 @@ export enum ControllerEvent {
   primaryAttack = 'controllerPrimaryAttack',
   secondaryAttack = 'controllerSecondaryAttack',
   inventory = 'inventory',
-  velocity = 'velocity',
+  move = 'move',
+  jump = 'jump',
 }

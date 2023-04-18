@@ -37,7 +37,7 @@ export class SceneInput extends Scene {
           emit(ControllerEvent.action);
           break;
         case 'Space':
-          emit(ControllerEvent.primaryAttack);
+          emit(ControllerEvent.jump);
           break;
         case 'KeyI':
           emit(ControllerEvent.inventory);
@@ -53,7 +53,7 @@ export class SceneInput extends Scene {
           emit(ControllerEvent.action);
           break;
         case gamepadIndex.south:
-          emit(ControllerEvent.primaryAttack);
+          emit(ControllerEvent.jump);
           break;
         case gamepadIndex.north:
           emit(ControllerEvent.inventory);
@@ -81,7 +81,7 @@ export class SceneInput extends Scene {
     if (keyboard.up.isDown || keyboard.KeyW.isDown) velocity.y = -1;
     if (keyboard.down.isDown || keyboard.KeyS.isDown) velocity.y = 1;
 
-    emit(ControllerEvent.velocity, { velocity });
+    emit(ControllerEvent.move, { velocity });
   };
 
   updateGamepadControls = (): void => {
@@ -102,7 +102,7 @@ export class SceneInput extends Scene {
 
     const isDeadzone = Math.abs(velocity.x) <= deadZone || Math.abs(velocity.y) <= deadZone;
     if (!isDeadzone) {
-      emit(ControllerEvent.velocity, { velocity });
+      emit(ControllerEvent.move, { velocity });
     }
   };
 }

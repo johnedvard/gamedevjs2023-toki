@@ -20,7 +20,10 @@ export const createPathsFromSvg = (svgDoc: Document): SvgPath[] => {
     if (el.getAttribute('id') === 'tree-area') return;
     const jsonPath = svgToPhaserPath(el.getAttribute('d'));
     const path = new Phaser.Curves.Path(jsonPath);
-    svgPaths.push({ path, svgPathEl: el, strokeWidth: getStrokeWidth(el) });
+    const color: number = rgbTohex(el.style.stroke);
+    const fill: number = rgbTohex(el.style.fill);
+    console.log('el.style.fill', el.style.fill);
+    svgPaths.push({ path, svgPathEl: el, strokeWidth: getStrokeWidth(el), color, fill });
   });
   return svgPaths;
 };
@@ -29,8 +32,8 @@ export const createCollisionBoxesFromPaths = (scene: Scene, svgPaths: SvgPath[])
   const boxes = [];
   svgPaths.forEach(({ path, svgPathEl }) => {
     if (!svgPathEl.getAttribute('serif:id')?.match('{collision}')) return;
-    const allPoints = path.getPoints(30);
-    const offset = 5;
+    const allPoints = path.getPoints(20);
+    const offset = 25;
     for (let i = 0; i < allPoints.length - 1; i++) {
       const p0 = allPoints[i];
       const p1 = allPoints[i + 1];
@@ -39,6 +42,9 @@ export const createCollisionBoxesFromPaths = (scene: Scene, svgPaths: SvgPath[])
         scene.matter.add.fromVertices((p1.x + p0.x) / 2, (p1.y + p0.y) / 2, [p0, l0, l1, p1], {
           isStatic: true,
           label: BodyTypeLabel.collisionWall,
+          ignoreGravity: true,
+          friction: 0,
+          frictionStatic: 0,
         })
       );
     }
@@ -62,7 +68,7 @@ export const getStrokeWidth = (svgPathEl: SVGElement) => {
   let strokeWidht = 6;
   if (!svgPathEl) return 6;
   try {
-    strokeWidht = parseFloat(svgPathEl.getAttribute('style').split('stroke-width:')[1].split('px;')[0]);
+    strokeWidht = parseFloat(svgPathEl.style.strokeWidth);
   } catch (err) {
   } finally {
     return strokeWidht;

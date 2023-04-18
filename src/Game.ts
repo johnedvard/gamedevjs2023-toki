@@ -33,8 +33,8 @@ export class Toki {
       physics: {
         default: 'matter',
         matter: {
-          debug: true, // TODO (johnedvard) remove debug if production
-          gravity: { y: 20 },
+          // debug: true, // TODO (johnedvard) remove debug if production
+          gravity: { y: 5 },
         },
       },
       input: {

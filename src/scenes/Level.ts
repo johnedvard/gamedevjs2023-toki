@@ -55,13 +55,13 @@ export class Level extends Phaser.Scene {
   updateLandscape() {
     if (!this.svgPaths) return;
     this.graphics.clear();
-    this.svgPaths.forEach(({ path, svgPathEl, strokeWidth }) => {
-      const color: number = rgbTohex(svgPathEl.style.stroke);
-      const fill: number = rgbTohex(svgPathEl.style.fill);
+    this.svgPaths.forEach(({ path, strokeWidth, color, fill }) => {
       if (color != null) this.graphics.lineStyle(strokeWidth, color, 1);
-      else this.graphics.lineStyle(1, 0, 1);
+      else this.graphics.lineStyle(0, 0, 0);
       if (fill != null) this.graphics.fillStyle(fill, 1);
       else this.graphics.fillStyle(0, 0);
+      // TODO (johnedvard) figure out why fillPath doesn't work
+      this.graphics.fillPoints(path.getPoints());
       path.draw(this.graphics);
     });
   }

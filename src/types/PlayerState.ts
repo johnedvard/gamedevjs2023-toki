@@ -1,1 +1,1 @@
-export type PlayerState = 'idle' | 'walk';
+export type PlayerState = 'idle' | 'walk' | 'jump';

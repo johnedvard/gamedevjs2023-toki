@@ -17,6 +17,7 @@ export class Player {
   speed = 8;
   scale = 0.5;
   state: PlayerState;
+  direction = 1;
 
   constructor(private scene: Scene, { pos }: TProps) {
     this.initSpineObject(pos);
@@ -54,14 +55,26 @@ export class Player {
     }
   }
 
+  private isOnGround() {
+    const allObjectsInProximity = this.scene.matter.intersectBody(this.body);
+    for (let obj of allObjectsInProximity) {
+      const other = <MatterJS.BodyType>obj;
+      if (other.label === BodyTypeLabel.collisionWall) return true;
+    }
+
+    return false;
+  }
+
   private createBody(pos: Phaser.Math.Vector2) {
     const startPosX = pos.x;
     const startPosY = pos.y;
+
     this.body = this.scene.matter.add.circle(startPosX, startPosY, this.bodyRadius, {
       frictionAir: 0.1,
       label: BodyTypeLabel.player,
-      mass: 14,
+      mass: 10,
     });
+
     this.body.onCollideActiveCallback = function () {
       // prevent the body from rotating when we collide, keeps the overHead point fixed
       this.angle = 0;
@@ -70,18 +83,27 @@ export class Player {
 
   private setDirection(direction: number) {
     this.spineObject.scaleX = this.scale * direction;
+    this.direction = direction;
   }
-  private onControllerVelocity = ({ velocity }: { velocity: Phaser.Math.Vector2 }) => {
+
+  private onMove = ({ velocity }: { velocity: Phaser.Math.Vector2 }) => {
     if (velocity.x !== 0) {
       this.setState('walk');
-      this.scene.matter.setVelocity(this.body, velocity.x * this.speed, 0);
+      this.scene.matter.setVelocity(this.body, velocity.x * this.speed, this.body.velocity.y);
       this.setDirection(velocity.x > 0 ? 1 : -1);
     } else {
       this.setState('idle');
     }
   };
 
+  private onJump = () => {
+    if (!this.isOnGround()) return;
+    this.scene.matter.setVelocity(this.body, this.body.velocity.x, -30);
+    this.setState('jump');
+  };
+
   private listenForEvents() {
-    on(ControllerEvent.velocity, this.onControllerVelocity);
+    on(ControllerEvent.move, this.onMove);
+    on(ControllerEvent.jump, this.onJump);
   }
 }
