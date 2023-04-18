@@ -52,6 +52,19 @@ export const createCollisionBoxesFromPaths = (scene: Scene, svgPaths: SvgPath[])
   scene.matter.bounds.create(boxes);
 };
 
+export const addTextFromSvg = (scene: Scene, svgDoc: Document) => {
+  const textelements = svgDoc.querySelectorAll('text');
+
+  for (let el of textelements) {
+    // TODO (johnedvard) deal with attributes not containing 'px'
+    const x = ~~el.getAttribute('x').split('px')[0];
+    const y = ~~el.getAttribute('y').split('px')[0];
+    const fontSize = ~~el.style.fontSize.split('px')[0];
+    const bitmapText = scene.add.bitmapText(x, y, 'atari', el.innerHTML, fontSize).setAlpha(1).setOrigin(0.2, 0.6);
+    bitmapText.setTint(0x000000);
+  }
+};
+
 // See https://stackoverflow.com/a/3627747/1471485
 export const rgbTohex = (rgb: string) => {
   if (!rgb || rgb === 'none') return null;

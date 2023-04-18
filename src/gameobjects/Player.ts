@@ -11,6 +11,7 @@ type TProps = {
 };
 export class Player {
   body: MatterJS.BodyType;
+  proximityCircle: MatterJS.BodyType;
   bodyRadius = 30;
   spineObject: SpineGameObject;
   spineOffset = new Phaser.Math.Vector2(0, 25);
@@ -35,6 +36,7 @@ export class Player {
 
   update(time: number, delta: number) {
     this.updateSpineObject();
+    this.updateProximityCircle();
   }
 
   updateSpineObject() {
@@ -56,7 +58,7 @@ export class Player {
   }
 
   private isOnGround() {
-    const allObjectsInProximity = this.scene.matter.intersectBody(this.body);
+    const allObjectsInProximity = this.scene.matter.intersectBody(this.proximityCircle);
     for (let obj of allObjectsInProximity) {
       const other = <MatterJS.BodyType>obj;
       if (other.label === BodyTypeLabel.collisionWall) return true;
@@ -75,10 +77,20 @@ export class Player {
       mass: 10,
     });
 
+    this.proximityCircle = this.scene.matter.add.circle(startPosX, startPosY, this.bodyRadius + 15, {
+      isSensor: true,
+      label: BodyTypeLabel.proximity,
+    });
+
     this.body.onCollideActiveCallback = function () {
       // prevent the body from rotating when we collide, keeps the overHead point fixed
       this.angle = 0;
     };
+  }
+
+  private updateProximityCircle() {
+    const { x, y } = this.body.position;
+    this.scene.matter.body.setPosition(this.proximityCircle, new Phaser.Math.Vector2(x, y), false);
   }
 
   private setDirection(direction: number) {

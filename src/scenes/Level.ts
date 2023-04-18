@@ -3,6 +3,7 @@ import { Player } from '~/gameobjects/Player';
 import { LevelState } from '~/types/LevelState';
 import { SvgPath } from '~/types/SvgPath';
 import {
+  addTextFromSvg,
   createCollisionBoxesFromPaths,
   createPathsFromSvg,
   getPosFromSvg,
@@ -46,6 +47,7 @@ export class Level extends Phaser.Scene {
     const svgDoc: Document = parser.parseFromString(svgText, 'image/svg+xml');
     this.svgPaths = createPathsFromSvg(svgDoc);
     createCollisionBoxesFromPaths(scene, this.svgPaths);
+    addTextFromSvg(scene, svgDoc);
 
     const start = getPosFromSvg(svgDoc, 'start');
     const goal = getPosFromSvg(svgDoc, 'goal');
