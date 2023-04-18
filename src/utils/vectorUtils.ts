@@ -20,30 +20,53 @@ export const createPathsFromSvg = (svgDoc: Document): SvgPath[] => {
     if (el.getAttribute('id') === 'tree-area') return;
     const jsonPath = svgToPhaserPath(el.getAttribute('d'));
     const path = new Phaser.Curves.Path(jsonPath);
-    svgPaths.push({ path, svgPathEl: el });
+    svgPaths.push({ path, svgPathEl: el, strokeWidth: getStrokeWidth(el) });
   });
   return svgPaths;
 };
 
 export const createCollisionBoxesFromPaths = (scene: Scene, svgPaths: SvgPath[]) => {
+  const boxes = [];
   svgPaths.forEach(({ path, svgPathEl }) => {
     if (!svgPathEl.getAttribute('serif:id')?.match('{collision}')) return;
-    const allPoints = path.getPoints(20);
+    const allPoints = path.getPoints(30);
     const offset = 5;
     for (let i = 0; i < allPoints.length - 1; i++) {
       const p0 = allPoints[i];
       const p1 = allPoints[i + 1];
       const { l0, l1 } = getParallellLine(p0, p1, offset);
-
-      scene.matter.add.fromVertices(
-        (p1.x + p0.x) / 2,
-        (p1.y + p0.y) / 2,
-        [p0, l0, l1, p1],
-        { isStatic: true, label: BodyTypeLabel.collisionWall },
-        false
+      boxes.push(
+        scene.matter.add.fromVertices((p1.x + p0.x) / 2, (p1.y + p0.y) / 2, [p0, l0, l1, p1], {
+          isStatic: true,
+          label: BodyTypeLabel.collisionWall,
+        })
       );
     }
   });
+  scene.matter.bounds.create(boxes);
+};
+
+// See https://stackoverflow.com/a/3627747/1471485
+export const rgbTohex = (rgb: string) => {
+  if (!rgb || rgb === 'none') return null;
+  return parseInt(
+    `0x${rgb
+      .match(/^rgb\((\d+),\s*(\d+),\s*(\d+)\)$/)
+      .slice(1)
+      .map((n) => parseInt(n, 10).toString(16).padStart(2, '0'))
+      .join('')}`
+  );
+};
+
+export const getStrokeWidth = (svgPathEl: SVGElement) => {
+  let strokeWidht = 6;
+  if (!svgPathEl) return 6;
+  try {
+    strokeWidht = parseFloat(svgPathEl.getAttribute('style').split('stroke-width:')[1].split('px;')[0]);
+  } catch (err) {
+  } finally {
+    return strokeWidht;
+  }
 };
 
 const getParallellLine = (

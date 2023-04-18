@@ -28,7 +28,7 @@ export class Toki {
       canvas: getCanvas(),
       width: 2560, // 16:9 ratio
       height: 1440,
-      backgroundColor: '#4E584A',
+      backgroundColor: '#565A75',
       // pixelArt: true,
       physics: {
         default: 'matter',
