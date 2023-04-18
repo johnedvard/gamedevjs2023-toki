@@ -3,4 +3,5 @@ export enum DepthGroup {
   back,
   player,
   front,
+  box,
 }

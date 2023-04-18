@@ -1,0 +1,40 @@
+{
+"skeleton": {
+	"hash": "Y1mEY+B6JiU",
+	"spine": "4.1.20",
+	"x": -82,
+	"y": -82,
+	"width": 164,
+	"height": 164,
+	"images": "../../AffinityDesigner/gamedevjs2023-toki/",
+	"audio": ""
+},
+"bones": [
+	{ "name": "root" }
+],
+"slots": [
+	{ "name": "Box", "bone": "root", "attachment": "Box" }
+],
+"skins": [
+	{
+		"name": "default",
+		"attachments": {
+			"Box": {
+				"Box": {
+					"type": "mesh",
+					"uvs": [ 1, 1, 0, 1, 0, 0, 1, 0 ],
+					"triangles": [ 1, 2, 3, 1, 3, 0 ],
+					"vertices": [ 82, -82, -82, -82, -82, 82, 82, 82 ],
+					"hull": 4,
+					"edges": [ 0, 2, 2, 4, 4, 6, 0, 6 ],
+					"width": 164,
+					"height": 164
+				}
+			}
+		}
+	}
+],
+"animations": {
+	"idle": {}
+}
+}

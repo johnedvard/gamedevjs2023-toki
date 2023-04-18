@@ -61,7 +61,7 @@ export class Player {
     const allObjectsInProximity = this.scene.matter.intersectBody(this.proximityCircle);
     for (let obj of allObjectsInProximity) {
       const other = <MatterJS.BodyType>obj;
-      if (other.label === BodyTypeLabel.collisionWall) return true;
+      if (other.label === BodyTypeLabel.collisionWall || other.label === BodyTypeLabel.box) return true;
     }
 
     return false;
@@ -81,11 +81,6 @@ export class Player {
       isSensor: true,
       label: BodyTypeLabel.proximity,
     });
-
-    this.body.onCollideActiveCallback = function () {
-      // prevent the body from rotating when we collide, keeps the overHead point fixed
-      this.angle = 0;
-    };
   }
 
   private updateProximityCircle() {

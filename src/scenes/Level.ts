@@ -1,14 +1,14 @@
 import { GameObjects, Scene } from 'phaser';
+import { Box } from '~/gameobjects/Box';
 import { Player } from '~/gameobjects/Player';
 import { LevelState } from '~/types/LevelState';
 import { SvgPath } from '~/types/SvgPath';
 import {
-  addTextFromSvg,
+  createTextFromSvg,
   createCollisionBoxesFromPaths,
   createPathsFromSvg,
-  getPosFromSvg,
-  getStrokeWidth,
-  rgbTohex,
+  getPosFromSvgCircle,
+  createBoxesFromSvg,
 } from '~/utils/vectorUtils';
 
 const parser = new DOMParser();
@@ -17,6 +17,7 @@ export class Level extends Phaser.Scene {
   player: Player;
   graphics: GameObjects.Graphics;
   svgPaths: SvgPath[];
+  boxes: Box[];
 
   preload(): void {
     this.matter.add.mouseSpring(); // TODO (johnedvard) remove if production. Enable through option in debug menu
@@ -28,6 +29,7 @@ export class Level extends Phaser.Scene {
 
   update(time: number, delta: number): void {
     this.player?.update(time, delta);
+    this.boxes.forEach((b) => b.update(time, delta));
     this.updateLandscape();
   }
 
@@ -47,10 +49,11 @@ export class Level extends Phaser.Scene {
     const svgDoc: Document = parser.parseFromString(svgText, 'image/svg+xml');
     this.svgPaths = createPathsFromSvg(svgDoc);
     createCollisionBoxesFromPaths(scene, this.svgPaths);
-    addTextFromSvg(scene, svgDoc);
+    createTextFromSvg(scene, svgDoc);
+    this.boxes = createBoxesFromSvg(scene, svgDoc);
 
-    const start = getPosFromSvg(svgDoc, 'start');
-    const goal = getPosFromSvg(svgDoc, 'goal');
+    const start = getPosFromSvgCircle(svgDoc, 'start');
+    const goal = getPosFromSvgCircle(svgDoc, 'goal');
 
     return { start, goal };
   }

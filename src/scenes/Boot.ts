@@ -10,6 +10,8 @@ export class Boot extends Phaser.Scene {
   preloadSpineAnimations() {
     this.load.image('hero', 'spine/hero.png');
     this.load.spine('hero', 'spine/hero.json', ['spine/hero.atlas'], true);
+    this.load.image('box', 'spine/box.png');
+    this.load.spine('box', 'spine/box.json', ['spine/box.atlas'], true);
   }
 
   create(): void {

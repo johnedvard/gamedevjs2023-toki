@@ -2,15 +2,32 @@ import { Scene } from 'phaser';
 import svgToPhaserPath from 'svg-to-phaser-path';
 
 import { BodyTypeLabel } from '~/enums/BodyTypeLabel';
+import { Box } from '~/gameobjects/Box';
 import { SvgPath } from '~/types/SvgPath';
 
-export const getPosFromSvg = (svgDoc: Document, key: string): Phaser.Math.Vector2 => {
+export const getPosFromSvgCircle = (svgDoc: Document, key: string): Phaser.Math.Vector2 => {
   const circleElement = svgDoc.querySelector(`#${key}`);
 
   const cx = circleElement.getAttribute('cx');
   const cy = circleElement.getAttribute('cy');
   if (!cx || !cy) return null;
   return new Phaser.Math.Vector2(~~cx, ~~cy);
+};
+
+export const getPosFromSvgRect = (svgEl: SVGElement): Phaser.Math.Vector2 => {
+  let x = svgEl.getAttribute('x');
+  let y = svgEl.getAttribute('y');
+  if (x.match('px')) x = x.split('px')[0];
+  if (y.match('px')) y = y.split('px')[0];
+  if (!x || !y) return null;
+  return new Phaser.Math.Vector2(~~x, ~~y);
+};
+export const getHeightFromSvgRect = (svgEl: SVGElement): number => {
+  let height = svgEl.getAttribute('height');
+
+  if (height.match('px')) height = height.split('px')[0];
+  if (!height) return 0;
+  return ~~height;
 };
 export const createPathsFromSvg = (svgDoc: Document): SvgPath[] => {
   const svgPaths: SvgPath[] = [];
@@ -22,7 +39,6 @@ export const createPathsFromSvg = (svgDoc: Document): SvgPath[] => {
     const path = new Phaser.Curves.Path(jsonPath);
     const color: number = rgbTohex(el.style.stroke);
     const fill: number = rgbTohex(el.style.fill);
-    console.log('el.style.fill', el.style.fill);
     svgPaths.push({ path, svgPathEl: el, strokeWidth: getStrokeWidth(el), color, fill });
   });
   return svgPaths;
@@ -52,7 +68,7 @@ export const createCollisionBoxesFromPaths = (scene: Scene, svgPaths: SvgPath[])
   scene.matter.bounds.create(boxes);
 };
 
-export const addTextFromSvg = (scene: Scene, svgDoc: Document) => {
+export const createTextFromSvg = (scene: Scene, svgDoc: Document) => {
   const textelements = svgDoc.querySelectorAll('text');
 
   for (let el of textelements) {
@@ -65,6 +81,17 @@ export const addTextFromSvg = (scene: Scene, svgDoc: Document) => {
   }
 };
 
+export const createBoxesFromSvg = (scene: Scene, svgDoc: Document): Box[] => {
+  const rectElements = svgDoc.querySelectorAll('rect');
+  const boxes = [];
+  for (let el of rectElements) {
+    if (!el.getAttribute('serif:id')?.match('{box}')) continue;
+    const pos = getPosFromSvgRect(el);
+    const height = getHeightFromSvgRect(el);
+    boxes.push(new Box(scene, { pos, height, width: height }));
+  }
+  return boxes;
+};
 // See https://stackoverflow.com/a/3627747/1471485
 export const rgbTohex = (rgb: string) => {
   if (!rgb || rgb === 'none') return null;
