@@ -5,7 +5,7 @@ import { ControllerEvent } from '~/enums/ControllerEvent';
 import { DepthGroup } from '~/enums/DepthGroup';
 import { PlayerState } from '~/types/PlayerState';
 import { on } from '~/utils/eventEmitterUtils';
-import { updateAim } from '~/utils/playerUtils';
+import { startActionRoutine, updateAim } from '~/utils/playerUtils';
 
 type TProps = {
   pos: Phaser.Math.Vector2;
@@ -22,6 +22,7 @@ export class Player {
   state: PlayerState;
   direction = 1;
   aimConstraintBone: spine.Bone;
+  aimBeamDistance = 500;
 
   constructor(private scene: Scene, { pos }: TProps) {
     this.initSpineObject(pos);
@@ -139,8 +140,48 @@ export class Player {
   };
 
   private onAction = ({ pos }: { pos: Phaser.Math.Vector2 }) => {
-    console.log('pos', pos);
-    // shoot beam from player toward pos
+    const { x, y } = this.body.position;
+
+    // Make up for scrollX and scrollY since input scene doesn't support that
+    const aimedPos = new Phaser.Math.Vector2(
+      pos.x + this.scene.cameras.main.scrollX,
+      pos.y + this.scene.cameras.main.scrollY
+    );
+    const startPos = new Phaser.Math.Vector2(x, y);
+    const direction = aimedPos.clone().subtract(startPos).normalize();
+    const maxDist = this.aimBeamDistance;
+    let endPos = new Phaser.Math.Vector2(direction.x * maxDist, direction.y * maxDist).add(startPos);
+
+    const line = new Phaser.Geom.Line(startPos.x, startPos.y, endPos.x, endPos.y);
+    // TODO sort bodies closest to the player first
+    var bodies = this.scene.matter.world.getAllBodies().filter((b) => {
+      return b.label !== BodyTypeLabel.proximity && b.label !== BodyTypeLabel.player;
+    });
+
+    for (var i = 0; i < bodies.length; i++) {
+      var body = bodies[i];
+      var vertices = body.vertices;
+
+      // loop through all edges of the body and check if the line segment intersects with each edge
+      for (var j = 0; j < vertices.length; j++) {
+        var v1 = vertices[j];
+        var v2 = vertices[(j + 1) % vertices.length];
+        var intersection = Phaser.Geom.Intersects.LineToLine(line, new Phaser.Geom.Line(v1.x, v1.y, v2.x, v2.y));
+
+        if (intersection) {
+          const distanceToBox = new Phaser.Math.Vector2(
+            body.position.x - startPos.x,
+            body.position.y - startPos.y
+          ).length();
+
+          endPos = new Phaser.Math.Vector2(direction.x * distanceToBox, direction.y * distanceToBox).add(startPos);
+          // TODO improve stasis
+          body.isStatic = true;
+          break;
+        }
+      }
+    }
+    startActionRoutine(this.scene, startPos, endPos);
   };
 
   private listenForEvents() {
