@@ -23,8 +23,9 @@ export class Box {
     const startPosX = pos.x;
     const startPosY = pos.y;
 
-    this.body = this.scene.matter.add.rectangle(startPosX, startPosY, this.width - 5, this.height - 5, {
-      frictionAir: 0.1,
+    this.body = this.scene.matter.add.rectangle(startPosX, startPosY, this.width - 1, this.height - 1, {
+      frictionAir: 0.05,
+      friction: 0.5,
       label: BodyTypeLabel.box,
       mass: 10,
     });

@@ -5,6 +5,7 @@ import { ControllerEvent } from '~/enums/ControllerEvent';
 import { DepthGroup } from '~/enums/DepthGroup';
 import { PlayerState } from '~/types/PlayerState';
 import { on } from '~/utils/eventEmitterUtils';
+import { updateAim } from '~/utils/playerUtils';
 
 type TProps = {
   pos: Phaser.Math.Vector2;
@@ -12,7 +13,7 @@ type TProps = {
 export class Player {
   body: MatterJS.BodyType;
   proximityCircle: MatterJS.BodyType;
-  bodyRadius = 30;
+  bodyRadius = 35;
   spineObject: SpineGameObject;
   spineOffset = new Phaser.Math.Vector2(0, 25);
   speed = 8;
@@ -31,12 +32,14 @@ export class Player {
       .spine(pos.x, pos.y, 'hero', 'idle', true)
       .setDepth(DepthGroup.player)
       .setScale(this.scale);
+
     this.spineObject.timeScale = 1.3;
   };
 
   update(time: number, delta: number) {
     this.updateSpineObject();
     this.updateProximityCircle();
+    updateAim(this.scene, this.body, this.bodyRadius * 2, this.getAimConstraintBone());
   }
 
   updateSpineObject() {
@@ -57,6 +60,11 @@ export class Player {
     }
   }
 
+  private getAimConstraintBone(): spine.Bone {
+    const skeleton = this.spineObject.skeleton;
+    return skeleton.findBone('weapon-aim');
+  }
+
   private isOnGround() {
     const allObjectsInProximity = this.scene.matter.intersectBody(this.proximityCircle);
     for (let obj of allObjectsInProximity) {
@@ -75,6 +83,7 @@ export class Player {
       frictionAir: 0.1,
       label: BodyTypeLabel.player,
       mass: 10,
+      friction: 0.5,
     });
 
     this.proximityCircle = this.scene.matter.add.circle(startPosX, startPosY, this.bodyRadius + 15, {
