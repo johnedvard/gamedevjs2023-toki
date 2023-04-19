@@ -14,11 +14,26 @@ export class SceneInput extends Scene {
   create(data: any) {
     this.createKeyboardControl();
     this.createGamepadControl();
+    this.createMouseControl();
   }
   update(time: number, delta: number): void {
     this.updateKeyboardControls();
     this.updateGamepadControls();
   }
+
+  createMouseControl = () => {
+    this.input.mouse.disableContextMenu();
+    this.handleMouseControl();
+  };
+
+  handleMouseControl = () => {
+    this.input.on('pointerdown', (pointer: Phaser.Input.Pointer) => {
+      if (pointer.primaryDown) {
+        const pos = new Phaser.Math.Vector2(pointer.worldX, pointer.worldY);
+        emit(ControllerEvent.action, { pos });
+      }
+    });
+  };
 
   createKeyboardControl = () => {
     const keyboard: Record<string, Phaser.Input.Keyboard.Key> = this.input.keyboard.createCursorKeys();
@@ -34,7 +49,8 @@ export class SceneInput extends Scene {
     this.input.keyboard.on('keydown', (evt: KeyboardEvent) => {
       switch (evt?.code) {
         case 'KeyE':
-          emit(ControllerEvent.action);
+          const pos = new Phaser.Math.Vector2(this.input.activePointer.worldX, this.input.activePointer.worldY);
+          emit(ControllerEvent.action, { pos });
           break;
         case 'Space':
           emit(ControllerEvent.jump);

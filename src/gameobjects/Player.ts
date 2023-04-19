@@ -14,17 +14,20 @@ export class Player {
   body: MatterJS.BodyType;
   proximityCircle: MatterJS.BodyType;
   bodyRadius = 35;
+  container: Phaser.GameObjects.Container; // used for camera to follow
   spineObject: SpineGameObject;
   spineOffset = new Phaser.Math.Vector2(0, 25);
   speed = 8;
   scale = 0.5;
   state: PlayerState;
   direction = 1;
+  aimConstraintBone: spine.Bone;
 
   constructor(private scene: Scene, { pos }: TProps) {
     this.initSpineObject(pos);
     this.createBody(pos);
     this.listenForEvents();
+    this.cameraFollow();
   }
 
   initSpineObject = (pos: Phaser.Math.Vector2) => {
@@ -34,12 +37,15 @@ export class Player {
       .setScale(this.scale);
 
     this.spineObject.timeScale = 1.3;
+    this.aimConstraintBone = this.getAimConstraintBone();
   };
 
   update(time: number, delta: number) {
     this.updateSpineObject();
     this.updateProximityCircle();
-    updateAim(this.scene, this.body, this.bodyRadius * 2, this.getAimConstraintBone());
+    this.updateContainer();
+
+    updateAim(this.scene, this.aimConstraintBone);
   }
 
   updateSpineObject() {
@@ -58,6 +64,12 @@ export class Player {
         break;
       default:
     }
+  }
+
+  private cameraFollow() {
+    this.scene.cameras.main.startFollow(this.container, false, 0.1, 0.1);
+    this.scene.cameras.main.setZoom(1);
+    this.scene.cameras.main.setDeadzone(400, 200);
   }
 
   private getAimConstraintBone(): spine.Bone {
@@ -90,15 +102,23 @@ export class Player {
       isSensor: true,
       label: BodyTypeLabel.proximity,
     });
+
+    this.container = this.scene.add.container(startPosX, startPosY, []);
   }
 
+  private updateContainer() {
+    const { x, y } = this.body.position;
+    this.container.setX(x);
+    this.container.setY(y);
+  }
   private updateProximityCircle() {
     const { x, y } = this.body.position;
     this.scene.matter.body.setPosition(this.proximityCircle, new Phaser.Math.Vector2(x, y), false);
   }
 
   private setDirection(direction: number) {
-    this.spineObject.scaleX = this.scale * direction;
+    if (direction === this.direction) return;
+    this.spineObject.setScale(this.scale * direction, this.spineObject.scaleY);
     this.direction = direction;
   }
 
@@ -118,8 +138,15 @@ export class Player {
     this.setState('jump');
   };
 
+  private onAction = ({ pos }: { pos: Phaser.Math.Vector2 }) => {
+    console.log('pos', pos);
+    // shoot beam from player toward pos
+  };
+
   private listenForEvents() {
+    // TODO (johnedvard) handle player input events in a different file
     on(ControllerEvent.move, this.onMove);
     on(ControllerEvent.jump, this.onJump);
+    on(ControllerEvent.action, this.onAction);
   }
 }

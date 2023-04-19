@@ -32,7 +32,7 @@
                 <text x="805.929px" y="602.985px" style="font-family:'Arial-BoldMT', 'Arial', sans-serif;font-weight:700;font-size:24px;">Space</text>
             </g>
         </g>
-        <path id="ground--collision-" serif:id="ground {collision}" d="M-37.349,461.629C-37.349,461.629 224.47,794.89 634.289,799.751C821.383,801.97 1000.12,553.977 1216.27,616.748C1441.59,682.178 1748.44,717.55 1859.6,667.397C1970.09,617.548 2583.39,484.289 2630.12,531.446" style="fill:none;stroke:#0f0f1b;stroke-width:15px;stroke-miterlimit:1;"/>
+        <path id="ground--collision-" serif:id="ground {collision}" d="M334.74,-157.591C312.838,-175.257 283.124,-134.154 360.457,-65.999C437.789,2.157 420.015,-102.397 392.25,-199.214C364.485,-296.03 81.24,-115.665 -14.685,-49.698C-110.609,16.269 -99.331,385.77 -37.349,461.629C24.632,537.488 224.47,794.89 634.289,799.751C821.383,801.97 1000.12,553.977 1216.27,616.748C1441.59,682.178 1748.44,717.55 1859.6,667.397C1970.09,617.548 2583.39,484.289 2630.12,531.446" style="fill:none;stroke:#0f0f1b;stroke-width:15px;stroke-miterlimit:1;"/>
         <circle id="goal" cx="1871.22" cy="607.211" r="30.661" style="fill:#f0e;"/>
         <rect id="_-box-" serif:id="{box}" x="1093.38" y="517.89" width="79.317" height="79.317" style="fill:none;stroke:#0f0f1b;stroke-width:5px;stroke-miterlimit:1;"/>
         <rect id="_-box-1" serif:id="{box}" x="1093.38" y="432.348" width="79.317" height="79.317" style="fill:none;stroke:#0f0f1b;stroke-width:5px;stroke-miterlimit:1;"/>
