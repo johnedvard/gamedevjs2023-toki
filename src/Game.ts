@@ -8,6 +8,8 @@ import { Preload } from '~/scenes/Preload';
 import { MainMenu } from '~/scenes/MainMenu';
 import { NewGameIntro } from '~/scenes/NewGameIntro';
 import { UserInterface } from '~/scenes/UserInterface';
+import liff from '@line/liff';
+
 import { Level } from './scenes/Level';
 import { SceneInput } from './scenes/SceneInput';
 
@@ -23,6 +25,10 @@ const addScenes = (game: Game) => {
 
 export class Toki {
   constructor() {
+    liff.init({
+      liffId: '1660932987-A6gW1Lvr', // Use own liffId
+    });
+
     const game = new Game({
       type: Phaser.WEBGL,
       canvas: getCanvas(),
