@@ -41,14 +41,13 @@ export const startActionRoutine = (scene: Scene, startPos: Phaser.Math.Vector2, 
 
 /**
  *
- * @returns the closest point on the line that intersects with an object. kIf no intersection is detected, return the original @see endPos
+ * @returns the closest object on the line that intersects with it. If no intersection is detected, return null
  */
-export const getClosestEndPos = (
+export const getClosestBody = (
   scene: Scene,
   startPos: Phaser.Math.Vector2,
-  endPos: Phaser.Math.Vector2,
-  direction: Phaser.Math.Vector2
-) => {
+  endPos: Phaser.Math.Vector2
+): MatterJS.BodyType | null => {
   const line = new Phaser.Geom.Line(startPos.x, startPos.y, endPos.x, endPos.y); // ray-cast
   var bodies = scene.matter.world
     .getAllBodies()
@@ -74,14 +73,24 @@ export const getClosestEndPos = (
       var intersection = Phaser.Geom.Intersects.LineToLine(line, new Phaser.Geom.Line(v1.x, v1.y, v2.x, v2.y));
 
       if (intersection) {
-        const distanceToBox = new Phaser.Math.Vector2(
-          body.position.x - startPos.x,
-          body.position.y - startPos.y
-        ).length();
-        // return the point where the line intersects with an edge
-        return new Phaser.Math.Vector2(direction.x * distanceToBox, direction.y * distanceToBox).add(startPos);
+        return body;
       }
     }
   }
-  return endPos;
+  return null;
+};
+
+/**
+ * @returns the closest point on the line that intersects with an object. kIf no intersection is detected, return the original @see endPos
+ */
+export const getClosestEndPos = (
+  body: MatterJS.BodyType,
+  startPos: Phaser.Math.Vector2,
+  endPos: Phaser.Math.Vector2,
+  direction: Phaser.Math.Vector2
+): Phaser.Math.Vector2 => {
+  if (!body) return endPos;
+  const distanceToBox = new Phaser.Math.Vector2(body.position.x - startPos.x, body.position.y - startPos.y).length();
+  // return the point where the line intersects with an edge
+  return new Phaser.Math.Vector2(direction.x * distanceToBox, direction.y * distanceToBox).add(startPos);
 };

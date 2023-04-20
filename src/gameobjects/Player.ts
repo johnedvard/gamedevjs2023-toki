@@ -5,7 +5,7 @@ import { ControllerEvent } from '~/enums/ControllerEvent';
 import { DepthGroup } from '~/enums/DepthGroup';
 import { PlayerState } from '~/types/PlayerState';
 import { on } from '~/utils/eventEmitterUtils';
-import { getClosestEndPos, startActionRoutine, updateAim } from '~/utils/playerUtils';
+import { getClosestBody, getClosestEndPos, startActionRoutine, updateAim } from '~/utils/playerUtils';
 
 type TProps = {
   pos: Phaser.Math.Vector2;
@@ -151,8 +151,9 @@ export class Player {
     const direction = aimedPos.clone().subtract(startPos).normalize();
     let endPos = new Phaser.Math.Vector2(direction.x * maxDist, direction.y * maxDist).add(startPos);
 
-    endPos = getClosestEndPos(this.scene, startPos, endPos, direction);
-    // TODO sort bodies closest to the player first
+    const closestBody = getClosestBody(this.scene, startPos, endPos);
+    // TODO (johnedvard) Add some particle effects to the endPos if we found a body
+    endPos = getClosestEndPos(closestBody, startPos, endPos, direction);
 
     startActionRoutine(this.scene, startPos, endPos);
   };
