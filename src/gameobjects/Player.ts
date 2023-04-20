@@ -5,7 +5,7 @@ import { ControllerEvent } from '~/enums/ControllerEvent';
 import { DepthGroup } from '~/enums/DepthGroup';
 import { PlayerState } from '~/types/PlayerState';
 import { on } from '~/utils/eventEmitterUtils';
-import { startActionRoutine, updateAim } from '~/utils/playerUtils';
+import { getClosestEndPos, startActionRoutine, updateAim } from '~/utils/playerUtils';
 
 type TProps = {
   pos: Phaser.Math.Vector2;
@@ -22,6 +22,7 @@ export class Player {
   state: PlayerState;
   direction = 1;
   aimConstraintBone: spine.Bone;
+  weaponBone: spine.Bone;
   aimBeamDistance = 500;
 
   constructor(private scene: Scene, { pos }: TProps) {
@@ -38,7 +39,9 @@ export class Player {
       .setScale(this.scale);
 
     this.spineObject.timeScale = 1.3;
-    this.aimConstraintBone = this.getAimConstraintBone();
+    const skeleton = this.spineObject.skeleton;
+    this.aimConstraintBone = skeleton.findBone('weapon-aim');
+    this.weaponBone = skeleton.findBone('weapon-ik');
   };
 
   update(time: number, delta: number) {
@@ -71,11 +74,6 @@ export class Player {
     this.scene.cameras.main.startFollow(this.container, false, 0.1, 0.1);
     this.scene.cameras.main.setZoom(1);
     this.scene.cameras.main.setDeadzone(400, 200);
-  }
-
-  private getAimConstraintBone(): spine.Bone {
-    const skeleton = this.spineObject.skeleton;
-    return skeleton.findBone('weapon-aim');
   }
 
   private isOnGround() {
@@ -140,47 +138,22 @@ export class Player {
   };
 
   private onAction = ({ pos }: { pos: Phaser.Math.Vector2 }) => {
-    const { x, y } = this.body.position;
+    const x = this.weaponBone.worldX + this.scene.cameras.main.scrollX;
+    const y = -this.weaponBone.worldY + this.scene.cameras.main.height + this.scene.cameras.main.scrollY; // spine y coordinates are opposite of Phaser's
 
-    // Make up for scrollX and scrollY since input scene doesn't support that
+    // Make up for scrollX and scrollY since the InputScene doesn't support that
     const aimedPos = new Phaser.Math.Vector2(
       pos.x + this.scene.cameras.main.scrollX,
       pos.y + this.scene.cameras.main.scrollY
     );
     const startPos = new Phaser.Math.Vector2(x, y);
-    const direction = aimedPos.clone().subtract(startPos).normalize();
     const maxDist = this.aimBeamDistance;
+    const direction = aimedPos.clone().subtract(startPos).normalize();
     let endPos = new Phaser.Math.Vector2(direction.x * maxDist, direction.y * maxDist).add(startPos);
 
-    const line = new Phaser.Geom.Line(startPos.x, startPos.y, endPos.x, endPos.y);
+    endPos = getClosestEndPos(this.scene, startPos, endPos, direction);
     // TODO sort bodies closest to the player first
-    var bodies = this.scene.matter.world.getAllBodies().filter((b) => {
-      return b.label !== BodyTypeLabel.proximity && b.label !== BodyTypeLabel.player;
-    });
 
-    for (var i = 0; i < bodies.length; i++) {
-      var body = bodies[i];
-      var vertices = body.vertices;
-
-      // loop through all edges of the body and check if the line segment intersects with each edge
-      for (var j = 0; j < vertices.length; j++) {
-        var v1 = vertices[j];
-        var v2 = vertices[(j + 1) % vertices.length];
-        var intersection = Phaser.Geom.Intersects.LineToLine(line, new Phaser.Geom.Line(v1.x, v1.y, v2.x, v2.y));
-
-        if (intersection) {
-          const distanceToBox = new Phaser.Math.Vector2(
-            body.position.x - startPos.x,
-            body.position.y - startPos.y
-          ).length();
-
-          endPos = new Phaser.Math.Vector2(direction.x * distanceToBox, direction.y * distanceToBox).add(startPos);
-          // TODO improve stasis
-          body.isStatic = true;
-          break;
-        }
-      }
-    }
     startActionRoutine(this.scene, startPos, endPos);
   };
 
