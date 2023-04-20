@@ -12,6 +12,7 @@ import liff from '@line/liff';
 
 import { Level } from './scenes/Level';
 import { SceneInput } from './scenes/SceneInput';
+import { NearConnection } from './near/nearConnection';
 
 const addScenes = (game: Game) => {
   game.scene.add(SceneKey.Preload, Preload);
@@ -29,6 +30,12 @@ export class Toki {
       liffId: '1660932987-A6gW1Lvr', // Use own liffId
     });
 
+    const nearConnection = new NearConnection();
+    nearConnection.initContract().then(() => {
+      if (!nearConnection.walletConnection.isSignedIn) nearConnection.login();
+      console.log('logged in as: ', nearConnection.accountId);
+    });
+    // nearConnection.ready().then(() => nearConnection.login());
     const game = new Game({
       type: Phaser.WEBGL,
       canvas: getCanvas(),
