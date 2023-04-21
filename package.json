@@ -20,8 +20,6 @@
   "dependencies": {
     "@esbuild-plugins/node-globals-polyfill": "^0.2.3",
     "@esbuild-plugins/node-modules-polyfill": "^0.2.2",
-    "@line/lbd-sdk-js": "^1.4.4",
-    "@line/liff": "^2.22.0",
     "near-api-js": "^2.1.0",
     "phaser": "^3.60.0",
     "svg-to-phaser-path": "^0.2.0"

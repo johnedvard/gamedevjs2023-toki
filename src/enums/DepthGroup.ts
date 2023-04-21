@@ -2,6 +2,7 @@
 export enum DepthGroup {
   back,
   player,
-  front,
+  spinningBar,
   box,
+  front,
 }

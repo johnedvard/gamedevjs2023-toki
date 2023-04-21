@@ -12,6 +12,8 @@ export class Boot extends Phaser.Scene {
     this.load.spine('hero', 'spine/hero.json', ['spine/hero.atlas'], true);
     this.load.image('box', 'spine/box.png');
     this.load.spine('box', 'spine/box.json', ['spine/box.atlas'], true);
+    this.load.image('spinningBar', 'spine/spinningBar.png');
+    this.load.spine('spinningBar', 'spine/spinningBar.json', ['spine/spinningBar.atlas'], true);
   }
 
   create(): void {

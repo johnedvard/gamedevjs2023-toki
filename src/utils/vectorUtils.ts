@@ -3,11 +3,11 @@ import svgToPhaserPath from 'svg-to-phaser-path';
 
 import { BodyTypeLabel } from '~/enums/BodyTypeLabel';
 import { Box } from '~/gameobjects/Box';
+import { SpinningBar } from '~/gameobjects/SpinningBar';
 import { SvgPath } from '~/types/SvgPath';
 
-export const getPosFromSvgCircle = (svgDoc: Document, key: string): Phaser.Math.Vector2 => {
-  const circleElement = svgDoc.querySelector(`#${key}`);
-
+export const getPosFromSvgCircle = (circleElement: SVGElement): Phaser.Math.Vector2 => {
+  if (!circleElement) return new Phaser.Math.Vector2(0, 0);
   const cx = circleElement.getAttribute('cx');
   const cy = circleElement.getAttribute('cy');
   if (!cx || !cy) return null;
@@ -79,6 +79,16 @@ export const createTextFromSvg = (scene: Scene, svgDoc: Document) => {
     const bitmapText = scene.add.bitmapText(x, y, 'atari', el.innerHTML, fontSize).setAlpha(1).setOrigin(0.2, 0.6);
     bitmapText.setTint(0x000000);
   }
+};
+export const createSpinningBarsFromSvg = (scene: Scene, svgDoc: Document): SpinningBar[] => {
+  const spinningObjectEls = svgDoc.querySelectorAll('circle');
+  const bars = [];
+  for (let el of spinningObjectEls) {
+    if (!el.getAttribute('serif:id')?.match('{spinningBar}')) continue;
+    const pos = getPosFromSvgCircle(el);
+    bars.push(new SpinningBar(scene, { pos }));
+  }
+  return bars;
 };
 
 export const createBoxesFromSvg = (scene: Scene, svgDoc: Document): Box[] => {

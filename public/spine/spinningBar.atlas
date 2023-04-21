@@ -1,0 +1,6 @@
+spinningBar.png
+size:90,299
+filter:Linear,Linear
+pma:true
+SpinningBar
+bounds:2,2,86,295

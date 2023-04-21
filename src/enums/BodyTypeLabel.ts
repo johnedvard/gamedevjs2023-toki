@@ -4,6 +4,7 @@
 export enum BodyTypeLabel {
   player = 'player',
   box = 'box',
+  spinningBar = 'spinningBar',
   collisionWall = 'collisionWalll',
   proximity = 'proximity',
 }

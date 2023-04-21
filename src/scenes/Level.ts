@@ -1,6 +1,7 @@
 import { GameObjects, Scene } from 'phaser';
 import { Box } from '~/gameobjects/Box';
 import { Player } from '~/gameobjects/Player';
+import { SpinningBar } from '~/gameobjects/SpinningBar';
 import { LevelState } from '~/types/LevelState';
 import { SvgPath } from '~/types/SvgPath';
 import {
@@ -9,6 +10,7 @@ import {
   createPathsFromSvg,
   getPosFromSvgCircle,
   createBoxesFromSvg,
+  createSpinningBarsFromSvg,
 } from '~/utils/vectorUtils';
 
 const parser = new DOMParser();
@@ -18,10 +20,11 @@ export class Level extends Phaser.Scene {
   graphics: GameObjects.Graphics;
   svgPaths: SvgPath[];
   boxes: Box[];
+  spinningBars: SpinningBar[];
 
   preload(): void {
-    // this.matter.add.mouseSpring(); // TODO (johnedvard) remove if production. Enable through option in debug menu
-    this.loadLevel('level1');
+    this.matter.add.mouseSpring(); // TODO (johnedvard) remove if production. Enable through option in debug menu
+    this.loadLevel('level0');
     this.graphics = this.add.graphics();
   }
 
@@ -30,6 +33,7 @@ export class Level extends Phaser.Scene {
   update(time: number, delta: number): void {
     this.player?.update(time, delta);
     this.boxes.forEach((b) => b.update(time, delta));
+    this.spinningBars.forEach((b) => b.update(time, delta));
     this.updateLandscape();
   }
 
@@ -51,9 +55,10 @@ export class Level extends Phaser.Scene {
     createCollisionBoxesFromPaths(scene, this.svgPaths);
     createTextFromSvg(scene, svgDoc);
     this.boxes = createBoxesFromSvg(scene, svgDoc);
+    this.spinningBars = createSpinningBarsFromSvg(scene, svgDoc);
 
-    const start = getPosFromSvgCircle(svgDoc, 'start');
-    const goal = getPosFromSvgCircle(svgDoc, 'goal');
+    const start = getPosFromSvgCircle(svgDoc.querySelector(`#start`));
+    const goal = getPosFromSvgCircle(svgDoc.querySelector(`#goal`));
 
     return { start, goal };
   }

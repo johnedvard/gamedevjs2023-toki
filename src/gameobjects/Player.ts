@@ -36,7 +36,8 @@ export class Player {
     this.spineObject = this.scene.add
       .spine(pos.x, pos.y, 'hero', 'idle', true)
       .setDepth(DepthGroup.player)
-      .setScale(this.scale);
+      .setScale(this.scale)
+      .setSkinByName('blue');
 
     this.spineObject.timeScale = 1.3;
     const skeleton = this.spineObject.skeleton;

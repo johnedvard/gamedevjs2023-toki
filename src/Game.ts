@@ -8,7 +8,6 @@ import { Preload } from '~/scenes/Preload';
 import { MainMenu } from '~/scenes/MainMenu';
 import { NewGameIntro } from '~/scenes/NewGameIntro';
 import { UserInterface } from '~/scenes/UserInterface';
-import liff from '@line/liff';
 
 import { Level } from './scenes/Level';
 import { SceneInput } from './scenes/SceneInput';
@@ -26,15 +25,8 @@ const addScenes = (game: Game) => {
 
 export class Toki {
   constructor() {
-    liff.init({
-      liffId: '1660932987-A6gW1Lvr', // Use own liffId
-    });
-
     const nearConnection = new NearConnection();
-    nearConnection.initContract().then(() => {
-      if (!nearConnection.walletConnection.isSignedIn) nearConnection.login();
-      console.log('logged in as: ', nearConnection.accountId);
-    });
+    nearConnection.initContract();
     // nearConnection.ready().then(() => nearConnection.login());
     const game = new Game({
       type: Phaser.WEBGL,
@@ -46,7 +38,7 @@ export class Toki {
       physics: {
         default: 'matter',
         matter: {
-          // debug: true, // TODO (johnedvard) remove debug if production
+          debug: true, // TODO (johnedvard) remove debug if production
           gravity: { y: 5 },
         },
       },

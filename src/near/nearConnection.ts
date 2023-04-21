@@ -1,14 +1,8 @@
-import 'near-api-js/dist/near-api-js.min.js';
 import { connect, keyStores, WalletConnection, Contract } from 'near-api-js';
 import { getConfig } from './nearConfig';
 import { on } from '~/utils/eventEmitterUtils';
 import { NearEvent } from '~/enums/NearEvent';
 
-// const nearApi: any = {};
-export const HANG_BY_A_THREAD_SERIES_TESTNET = '2036';
-export const IPFS_BASE_PATH = 'https://ipfs.fleek.co/ipfs/';
-export const PARAS_COLLECTION_API =
-  'https://api-v3-marketplace-testnet.paras.id/token-series?collection_id=hang-by-a-thread-by-johnonymtestnet';
 export const APP_PREFIX = 'toki';
 
 export class NearConnection {
@@ -85,13 +79,7 @@ export class NearConnection {
       priceInYoctoNear
     );
   }
-  getNftCollections() {
-    return fetch(PARAS_COLLECTION_API)
-      .then((res) => res.json())
-      .then((res) => {
-        return res.data.results.filter((data) => data.metadata.copies > 0 && !data.is_non_mintable);
-      });
-  }
+
   listenForGameEvents() {
     on(NearEvent.buyNft, ({ token_series_id, priceInYoctoNear }) =>
       this.nft_buy({ token_series_id, priceInYoctoNear })
