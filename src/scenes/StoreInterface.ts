@@ -2,7 +2,7 @@ import { GameObjects, Scene } from 'phaser';
 
 import { DepthGroup } from '~/enums/DepthGroup';
 import { GameEvent } from '~/enums/GameEvent';
-import { equipSkin, getEquippedSkin, getSkins, isSignedIn, login } from '~/near/nearConnection';
+import { equipSkin, getEquippedSkin, getSkins, isSignedIn, login, nftTokensForOwner } from '~/near/nearConnection';
 import { emit } from '~/utils/eventEmitterUtils';
 import { getSkinMapping } from '~/utils/playerUtils';
 
@@ -34,7 +34,9 @@ export class StoreInterface extends Scene {
   create(data: any) {
     this.initSpineObjects();
     this.initSlots();
-    this.getData();
+    this.getNfts().then((res) => {
+      console.log('res', res);
+    });
     this.initSelectButtonTextLabel();
     this.initHitAreas();
 
@@ -193,5 +195,9 @@ export class StoreInterface extends Scene {
         }
       }
     }
+  }
+
+  getNfts() {
+    return nftTokensForOwner();
   }
 }

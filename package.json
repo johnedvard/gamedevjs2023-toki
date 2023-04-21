@@ -6,7 +6,9 @@
   "author": "johnedvard",
   "scripts": {
     "start": "vite",
-    "build": "tsc && vite build",
+    "start:mainnet": "vite --mode mainnet",
+    "build:testnet": "tsc && vite build --mode testnet",
+    "build:mainnet": "tsc && vite build --mode mainnet",
     "preview": "vite preview",
     "server": "tsc server/main.ts && node server/main.js"
   },

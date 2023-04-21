@@ -30,7 +30,7 @@ export const initContract = async () => {
     // View methods are read only. They don't modify the state, but usually return some value.
     viewMethods: ['nft_tokens_for_owner', 'nft_tokens_by_series', 'get_skins', 'get_equipped_skin'],
     // Change methods can modify the state. But you don't receive the returned value when called.
-    changeMethods: ['equip_skin'],
+    changeMethods: ['buy_nft', 'equip_skin'],
   });
 
   return walletConnection;
@@ -45,7 +45,7 @@ export const login = () => {
   // user's behalf.
   // This works by creating a new access key for the user's account and storing
   // the private key in localStorage.
-  walletConnection.requestSignIn({ contractId: nearConfig.contractName, methodNames: [] });
+  walletConnection.requestSignIn({ contractId: nearConfig.contractName });
 };
 
 export const getSkins = () => {
@@ -58,15 +58,17 @@ export const getEquippedSkin = () => {
   return contract['get_equipped_skin']();
 };
 
-export const nft_tokens_for_owner = (account_id: string) => {
+export const nftTokensForOwner = (account_id?: string) => {
+  if (!account_id) account_id = accountId;
+  console.log('account_id', account_id);
   return contract['nft_tokens_for_owner']({ account_id });
 };
 
-export const nft_tokens_by_series = (token_series_id: string) => {
+export const nftTokensBySeries = (token_series_id: string) => {
   return contract['nft_tokens_by_series']({ token_series_id });
 };
 
-export const nft_buy = ({ token_series_id, priceInYoctoNear }) => {
+export const nftBuy = ({ token_series_id, priceInYoctoNear }) => {
   return contract['nft_buy'](
     {
       owner_id: accountId,
