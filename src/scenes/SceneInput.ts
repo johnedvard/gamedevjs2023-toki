@@ -58,6 +58,9 @@ export class SceneInput extends Scene {
         case 'KeyI':
           emit(ControllerEvent.inventory);
           break;
+        case 'KeyW':
+          emit(ControllerEvent.up);
+          break;
       }
     });
   };
@@ -73,6 +76,9 @@ export class SceneInput extends Scene {
           break;
         case gamepadIndex.north:
           emit(ControllerEvent.inventory);
+          break;
+        case gamepadIndex.up:
+          emit(ControllerEvent.up);
           break;
       }
     });

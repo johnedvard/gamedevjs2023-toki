@@ -1,0 +1,74 @@
+{
+"skeleton": {
+	"hash": "mLnzlijFcas",
+	"spine": "4.1.20",
+	"x": -862,
+	"y": -456,
+	"width": 1766.61,
+	"height": 964.53,
+	"images": "../../AffinityDesigner/gamedevjs2023-toki/",
+	"audio": ""
+},
+"bones": [
+	{ "name": "root" },
+	{ "name": "close-button", "parent": "root", "length": 77.01, "x": 809.61, "y": 413.53 },
+	{ "name": "button", "parent": "root", "length": 175.79, "y": -258.47 },
+	{ "name": "button-inside", "parent": "button", "length": 72.33, "rotation": 1.33, "x": -0.23, "y": 18.48 },
+	{ "name": "button-outside", "parent": "button", "length": 40.36, "x": 4.82, "y": 75.66 }
+],
+"slots": [
+	{ "name": "storeInterface/frame", "bone": "root", "attachment": "storeInterface/frame" },
+	{ "name": "storeInterface/close button", "bone": "close-button", "attachment": "storeInterface/close button" },
+	{ "name": "storeInterface/button", "bone": "button", "attachment": "storeInterface/button" }
+],
+"skins": [
+	{
+		"name": "default",
+		"attachments": {
+			"storeInterface/button": {
+				"storeInterface/button": {
+					"type": "mesh",
+					"uvs": [ 1, 1, 0, 1, 0, 0, 1, 0, 0.05837, 0.19366, 0.06098, 0.76106, 0.94876, 0.78169, 0.95137, 0.19366 ],
+					"triangles": [ 7, 4, 3, 5, 4, 7, 6, 5, 7, 5, 2, 4, 6, 7, 3, 5, 6, 0, 0, 6, 3, 3, 4, 2, 5, 1, 2, 1, 5, 0 ],
+					"vertices": [ 1, 4, 317.18, -156.66, 1, 1, 4, -326.82, -156.66, 1, 1, 4, -326.82, 6.34, 1, 1, 4, 317.18, 6.34, 1, 1, 3, -283.36, 38.55, 1, 1, 3, -283.83, -53.95, 1, 1, 3, 287.66, -70.61, 1, 1, 3, 291.57, 25.18, 1 ],
+					"hull": 4,
+					"edges": [ 0, 2, 2, 4, 4, 6, 0, 6 ],
+					"width": 644,
+					"height": 163
+				}
+			},
+			"storeInterface/close button": {
+				"storeInterface/close button": { "width": 190, "height": 190 }
+			},
+			"storeInterface/frame": {
+				"storeInterface/frame": { "y": 0.5, "width": 1724, "height": 913 }
+			}
+		}
+	}
+],
+"animations": {
+	"button-hover": {
+		"bones": {
+			"button-inside": {
+				"scale": [
+					{},
+					{ "time": 0.6667, "x": 1.034, "y": 1.201 },
+					{ "time": 1.3333 }
+				]
+			}
+		}
+	},
+	"close-button-hover": {
+		"bones": {
+			"close-button": {
+				"rotate": [
+					{},
+					{ "time": 0.6667, "value": 180 },
+					{ "time": 1.3333, "value": 360 }
+				]
+			}
+		}
+	},
+	"idle": {}
+}
+}

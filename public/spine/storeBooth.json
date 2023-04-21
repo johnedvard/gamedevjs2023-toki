@@ -1,0 +1,31 @@
+{
+"skeleton": {
+	"hash": "Rdvc3faBTK0",
+	"spine": "4.1.20",
+	"x": -121,
+	"y": -142,
+	"width": 242,
+	"height": 285,
+	"images": "../../AffinityDesigner/gamedevjs2023-toki/",
+	"audio": ""
+},
+"bones": [
+	{ "name": "root" }
+],
+"slots": [
+	{ "name": "store-booth", "bone": "root", "attachment": "store-booth" }
+],
+"skins": [
+	{
+		"name": "default",
+		"attachments": {
+			"store-booth": {
+				"store-booth": { "y": 0.5, "width": 242, "height": 285 }
+			}
+		}
+	}
+],
+"animations": {
+	"idle": {}
+}
+}

@@ -5,4 +5,5 @@ export enum ControllerEvent {
   inventory = 'inventory',
   move = 'move',
   jump = 'jump',
+  up = 'up',
 }

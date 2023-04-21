@@ -1,0 +1,11 @@
+storeInterface.png
+size:1920,917
+filter:Linear,Linear
+pma:true
+storeInterface/button
+bounds:1728,271,644,163
+rotate:90
+storeInterface/close button
+bounds:1728,79,190,190
+storeInterface/frame
+bounds:2,2,1724,913

@@ -1,88 +1,79 @@
 import { connect, keyStores, WalletConnection, Contract } from 'near-api-js';
 import { getConfig } from './nearConfig';
-import { on } from '~/utils/eventEmitterUtils';
-import { NearEvent } from '~/enums/NearEvent';
 
 export const APP_PREFIX = 'toki';
 
-export class NearConnection {
-  walletConnection;
-  contract;
-  accountId;
-  userName;
-  ready; //promise
-  nearConfig = getConfig();
-  resolveContract;
+let walletConnection: WalletConnection;
+let contract: Contract;
+let accountId: string;
+let nearConfig = getConfig();
 
-  constructor() {
-    this.listenForGameEvents();
-    this.ready = new Promise((resolve) => {
-      this.resolveContract = resolve;
-    });
-  }
+export const isSignedIn = () => {
+  return walletConnection && walletConnection.isSignedIn();
+};
 
-  isSignedIn() {
-    return this && this.walletConnection && this.walletConnection.isSignedIn();
-  }
+// Initialize contract & set global variables
+export const initContract = async () => {
+  // Initialize connection to the NEAR testnet
+  const keyStore = new keyStores.BrowserLocalStorageKeyStore();
+  const near = await connect({ ...nearConfig, keyStore });
 
-  // Initialize contract & set global variables
-  async initContract() {
-    // Initialize connection to the NEAR testnet
-    const keyStore = new keyStores.BrowserLocalStorageKeyStore();
-    const near = await connect({ ...this.nearConfig, keyStore });
+  // Initializing Wallet based Account. It can work with NEAR testnet wallet that
+  // is hosted at https://wallet.testnet.near.org
+  walletConnection = new WalletConnection(near, APP_PREFIX);
 
-    // Initializing Wallet based Account. It can work with NEAR testnet wallet that
-    // is hosted at https://wallet.testnet.near.org
-    this.walletConnection = new WalletConnection(near, APP_PREFIX);
+  // Getting the Account ID. If still unauthorized, it's just empty string
+  accountId = walletConnection.getAccountId();
 
-    // Getting the Account ID. If still unauthorized, it's just empty string
-    this.accountId = this.walletConnection.getAccountId();
+  // Initializing our contract APIs by contract name and configuration
+  contract = await new Contract(walletConnection.account(), nearConfig.contractName, {
+    // View methods are read only. They don't modify the state, but usually return some value.
+    viewMethods: ['nft_tokens_for_owner', 'nft_tokens_by_series', 'get_skins', 'get_equipped_skin'],
+    // Change methods can modify the state. But you don't receive the returned value when called.
+    changeMethods: ['nft_buy', 'equip_skin'],
+  });
 
-    // Initializing our contract APIs by contract name and configuration
-    this.contract = await new Contract(this.walletConnection.account(), this.nearConfig.contractName, {
-      // View methods are read only. They don't modify the state, but usually return some value.
-      viewMethods: ['nft_tokens_for_owner', 'nft_tokens_by_series'],
-      // Change methods can modify the state. But you don't receive the returned value when called.
-      changeMethods: ['nft_buy'],
-    });
-    this.resolveContract();
-    return this.walletConnection;
-  }
+  return walletConnection;
+};
 
-  logout() {
-    this.walletConnection.signOut();
-    // reload page
-  }
-  login() {
-    // Allow the current app to make calls to the specified contract on the
-    // user's behalf.
-    // This works by creating a new access key for the user's account and storing
-    // the private key in localStorage.
-    this.walletConnection.requestSignIn(this.nearConfig.contractName);
-  }
+export const logout = () => {
+  walletConnection.signOut();
+  // reload page
+};
+export const login = () => {
+  // Allow the current app to make calls to the specified contract on the
+  // user's behalf.
+  // This works by creating a new access key for the user's account and storing
+  // the private key in localStorage.
+  walletConnection.requestSignIn({ contractId: nearConfig.contractName });
+};
 
-  nft_tokens_for_owner(account_id) {
-    return this.contract.nft_tokens_for_owner({ account_id });
-  }
+export const getSkins = () => {
+  return contract['get_skins']();
+};
+export const equipSkin = (skin: string) => {
+  return contract['equip_skin']({ skin });
+};
+export const getEquippedSkin = () => {
+  return contract['get_equipped_skin']();
+};
 
-  nft_tokens_by_series(token_series_id) {
-    return this.contract.nft_tokens_by_series({ token_series_id });
-  }
-  nft_buy({ token_series_id, priceInYoctoNear }) {
-    return this.contract.nft_buy(
-      {
-        owner_id: this.accountId,
-        receiver_id: this.accountId,
-        token_series_id,
-      },
-      '300000000000000',
-      priceInYoctoNear
-    );
-  }
+export const nft_tokens_for_owner = (account_id: string) => {
+  return contract['nft_tokens_for_owner']({ account_id });
+};
 
-  listenForGameEvents() {
-    on(NearEvent.buyNft, ({ token_series_id, priceInYoctoNear }) =>
-      this.nft_buy({ token_series_id, priceInYoctoNear })
-    );
-  }
-}
+export const nft_tokens_by_series = (token_series_id: string) => {
+  return contract['nft_tokens_by_series']({ token_series_id });
+};
+
+export const nft_buy = ({ token_series_id, priceInYoctoNear }) => {
+  return contract['nft_buy'](
+    {
+      owner_id: accountId,
+      receiver_id: accountId,
+      token_series_id,
+    },
+    '300000000000000',
+    priceInYoctoNear
+  );
+};

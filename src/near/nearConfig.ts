@@ -1,4 +1,4 @@
-const CONTARCT_NAME_TESTNET = 'paras-token-v2.testnet';
+const CONTARCT_NAME_TESTNET = 'dev-1682002125136-89661302505865';
 export const getConfig = () => {
   return {
     networkId: 'testnet',

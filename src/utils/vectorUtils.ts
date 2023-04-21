@@ -4,6 +4,7 @@ import svgToPhaserPath from 'svg-to-phaser-path';
 import { BodyTypeLabel } from '~/enums/BodyTypeLabel';
 import { Box } from '~/gameobjects/Box';
 import { SpinningBar } from '~/gameobjects/SpinningBar';
+import { StoreBooth } from '~/gameobjects/StoreBooth';
 import { SvgPath } from '~/types/SvgPath';
 
 export const getPosFromSvgCircle = (circleElement: SVGElement): Phaser.Math.Vector2 => {
@@ -89,6 +90,11 @@ export const createSpinningBarsFromSvg = (scene: Scene, svgDoc: Document): Spinn
     bars.push(new SpinningBar(scene, { pos }));
   }
   return bars;
+};
+
+export const createStoreBoothFromSvg = (scene: Scene, svgDoc: Document): StoreBooth => {
+  const pos = getPosFromSvgCircle(svgDoc.querySelector(`#storeBooth`));
+  return new StoreBooth(scene, { pos });
 };
 
 export const createBoxesFromSvg = (scene: Scene, svgDoc: Document): Box[] => {

@@ -2,6 +2,7 @@ import { GameObjects, Scene } from 'phaser';
 import { Box } from '~/gameobjects/Box';
 import { Player } from '~/gameobjects/Player';
 import { SpinningBar } from '~/gameobjects/SpinningBar';
+import { StoreBooth } from '~/gameobjects/StoreBooth';
 import { LevelState } from '~/types/LevelState';
 import { SvgPath } from '~/types/SvgPath';
 import {
@@ -11,6 +12,7 @@ import {
   getPosFromSvgCircle,
   createBoxesFromSvg,
   createSpinningBarsFromSvg,
+  createStoreBoothFromSvg,
 } from '~/utils/vectorUtils';
 
 const parser = new DOMParser();
@@ -21,6 +23,7 @@ export class Level extends Phaser.Scene {
   svgPaths: SvgPath[];
   boxes: Box[];
   spinningBars: SpinningBar[];
+  storeBooth: StoreBooth;
 
   preload(): void {
     this.matter.add.mouseSpring(); // TODO (johnedvard) remove if production. Enable through option in debug menu
@@ -32,6 +35,7 @@ export class Level extends Phaser.Scene {
 
   update(time: number, delta: number): void {
     this.player?.update(time, delta);
+    this.storeBooth?.update(time, delta);
     this.boxes.forEach((b) => b.update(time, delta));
     this.spinningBars.forEach((b) => b.update(time, delta));
     this.updateLandscape();
@@ -56,6 +60,7 @@ export class Level extends Phaser.Scene {
     createTextFromSvg(scene, svgDoc);
     this.boxes = createBoxesFromSvg(scene, svgDoc);
     this.spinningBars = createSpinningBarsFromSvg(scene, svgDoc);
+    this.storeBooth = createStoreBoothFromSvg(scene, svgDoc);
 
     const start = getPosFromSvgCircle(svgDoc.querySelector(`#start`));
     const goal = getPosFromSvgCircle(svgDoc.querySelector(`#goal`));

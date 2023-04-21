@@ -11,7 +11,9 @@ import { UserInterface } from '~/scenes/UserInterface';
 
 import { Level } from './scenes/Level';
 import { SceneInput } from './scenes/SceneInput';
-import { NearConnection } from './near/nearConnection';
+import { StoreInterface } from './scenes/StoreInterface';
+import { initSceneHandler } from './sceneHandler';
+import { initContract, isSignedIn, login } from './near/nearConnection';
 
 const addScenes = (game: Game) => {
   game.scene.add(SceneKey.Preload, Preload);
@@ -20,14 +22,13 @@ const addScenes = (game: Game) => {
   game.scene.add(SceneKey.UserInterface, UserInterface);
   game.scene.add(SceneKey.Level, Level);
   game.scene.add(SceneKey.SceneInput, SceneInput);
+  game.scene.add(SceneKey.StoreInterface, StoreInterface);
   game.scene.add(SceneKey.Boot, Boot, true);
 };
 
 export class Toki {
   constructor() {
-    const nearConnection = new NearConnection();
-    nearConnection.initContract();
-    // nearConnection.ready().then(() => nearConnection.login());
+    initContract();
     const game = new Game({
       type: Phaser.WEBGL,
       canvas: getCanvas(),
@@ -61,6 +62,7 @@ export class Toki {
       },
     });
     addScenes(game);
+    initSceneHandler(game);
     game.scene.start(SceneKey.SceneInput);
   }
 }
