@@ -18,15 +18,13 @@ export class StoreInterface extends Scene {
   selectButton: Phaser.Geom.Rectangle;
   selectBtnGraphics: Phaser.GameObjects.Graphics;
 
-  create(data: any) {
-    // Add UI elements
-    console.log('Create store UI. Fetch skins from NEAR');
-    this.initSpineObjects();
-    this.initHitAreas();
-    if (!isSignedIn()) {
-      login();
-    }
+  selectButtonText: string;
+  selectBitmap: GameObjects.BitmapText;
 
+  create(data: any) {
+    this.initSpineObjects();
+    this.initSelectButtonTextLabel();
+    this.initHitAreas();
     this.getData();
     this.sys.events.on('stop', function (data) {
       // perform any other necessary actions here
@@ -46,6 +44,24 @@ export class StoreInterface extends Scene {
 
     this.selectBtnGraphics.clear();
     this.selectBtnGraphics.fillRectShape(this.selectButton);
+  }
+
+  private initSelectButtonTextLabel() {
+    let originX = -0.25;
+    let originY = 0.2;
+    if (!isSignedIn()) {
+      this.selectButtonText = 'Login';
+      originX = -1.2;
+      originY = 0.2;
+    } else {
+      this.selectButtonText = 'Select skin';
+    }
+    this.selectBitmap = this.add
+      .bitmapText(this.selectButtonPos.x, this.selectButtonPos.y, 'atari', this.selectButtonText, 40)
+      .setAlpha(1)
+      .setOrigin(originX, originY)
+      .setDepth(DepthGroup.front);
+    this.selectBitmap.setTint(0x000000);
   }
 
   private initHitAreas() {
@@ -87,7 +103,11 @@ export class StoreInterface extends Scene {
       this.spineFrame.play('idle', true, true);
     });
     this.selectBtnGraphics.on('pointerup', (pointer) => {
-      emit(GameEvent.closeStore);
+      if (isSignedIn()) {
+        emit(GameEvent.closeStore);
+      } else {
+        login();
+      }
     });
   }
 
