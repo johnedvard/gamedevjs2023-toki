@@ -3,9 +3,11 @@ import { BodyTypeLabel } from '~/enums/BodyTypeLabel';
 import { ControllerEvent } from '~/enums/ControllerEvent';
 
 import { DepthGroup } from '~/enums/DepthGroup';
+import { GameEvent } from '~/enums/GameEvent';
+import { getEquippedSkin } from '~/near/nearConnection';
 import { PlayerState } from '~/types/PlayerState';
 import { on } from '~/utils/eventEmitterUtils';
-import { getClosestBody, getClosestEndPos, startActionRoutine, updateAim } from '~/utils/playerUtils';
+import { getClosestBody, getClosestEndPos, getSkinMapping, startActionRoutine, updateAim } from '~/utils/playerUtils';
 
 type TProps = {
   pos: Phaser.Math.Vector2;
@@ -43,6 +45,9 @@ export class Player {
     const skeleton = this.spineObject.skeleton;
     this.aimConstraintBone = skeleton.findBone('weapon-aim');
     this.weaponBone = skeleton.findBone('weapon-ik');
+    getEquippedSkin().then((skin) => {
+      this.spineObject.setSkinByName(getSkinMapping(skin));
+    });
   };
 
   update(time: number, delta: number) {
@@ -159,10 +164,15 @@ export class Player {
     startActionRoutine(this.scene, startPos, endPos);
   };
 
+  private onSkinChanged = ({ skinName }: { skinName: string }) => {
+    if (skinName) this.spineObject.setSkinByName(skinName);
+  };
+
   private listenForEvents() {
     // TODO (johnedvard) handle player input events in a different file
     on(ControllerEvent.move, this.onMove);
     on(ControllerEvent.jump, this.onJump);
     on(ControllerEvent.action, this.onAction);
+    on(GameEvent.changeSkin, this.onSkinChanged);
   }
 }

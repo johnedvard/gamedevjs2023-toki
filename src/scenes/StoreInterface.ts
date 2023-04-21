@@ -2,11 +2,14 @@ import { GameObjects, Scene } from 'phaser';
 
 import { DepthGroup } from '~/enums/DepthGroup';
 import { GameEvent } from '~/enums/GameEvent';
-import { getEquippedSkin, getSkins, isSignedIn, login } from '~/near/nearConnection';
+import { equipSkin, getEquippedSkin, getSkins, isSignedIn, login } from '~/near/nearConnection';
 import { emit } from '~/utils/eventEmitterUtils';
+import { getSkinMapping } from '~/utils/playerUtils';
 
 export class StoreInterface extends Scene {
   spineFrame: SpineGameObject;
+  skinSlots: SpineGameObject[] = [];
+  playerSkins: SpineGameObject[] = [];
   closeButtonPos = new Phaser.Math.Vector2(1994, 203);
   closeButtonRadius = 100;
   closeButton: Phaser.Geom.Circle;
@@ -21,14 +24,25 @@ export class StoreInterface extends Scene {
   selectButtonText: string;
   selectBitmap: GameObjects.BitmapText;
 
+  skinNum = 3;
+  skinNames = ['blue', 'green', 'red'];
+  nearSkinNames = ['skin-003-blue', 'skin-002-green', 'skin-001-red'];
+  equippedSkin = this.nearSkinNames[0];
+  isInitialized = false;
+  selectedSkin;
+
   create(data: any) {
     this.initSpineObjects();
+    this.initSlots();
+    this.getData();
     this.initSelectButtonTextLabel();
     this.initHitAreas();
-    this.getData();
-    this.sys.events.on('stop', function (data) {
+
+    this.sys.events.on('stop', (data) => {
+      console.log('destroy');
       // perform any other necessary actions here
     });
+    this.isInitialized = true;
   }
 
   update(time: number, delta: number) {
@@ -45,6 +59,8 @@ export class StoreInterface extends Scene {
     this.selectBtnGraphics.clear();
     this.selectBtnGraphics.fillRectShape(this.selectButton);
   }
+
+  private initSlots() {}
 
   private initSelectButtonTextLabel() {
     let originX = -0.25;
@@ -104,6 +120,11 @@ export class StoreInterface extends Scene {
     });
     this.selectBtnGraphics.on('pointerup', (pointer) => {
       if (isSignedIn()) {
+        if (this.selectedSkin && this.selectedSkin != this.equippedSkin) {
+          equipSkin(this.selectedSkin);
+          const skinName = getSkinMapping(this.selectedSkin);
+          emit(GameEvent.changeSkin, { skinName });
+        }
         emit(GameEvent.closeStore);
       } else {
         login();
@@ -112,14 +133,65 @@ export class StoreInterface extends Scene {
   }
 
   private initSpineObjects() {
+    this.skinSlots.length = 0;
+    this.playerSkins.length = 0;
     this.spineFrame = this.add
       .spine(this.cameras.main.width / 2, this.cameras.main.height / 2, 'storeInterface', 'idle', true)
       .setScale(1)
       .setDepth(DepthGroup.front);
+
+    const startX = 848;
+    const startY = 608;
+    const size = 400;
+    const margin = 40;
+    console.log('this.skinSlots', this.skinSlots.length);
+    for (let i = 0; i < this.skinNum; i++) {
+      const skinSlot = this.add
+        .spine(startX + i * (size + margin), startY, 'skinSlot', 'idle', true)
+        .setScale(1)
+        .setDepth(DepthGroup.front)
+        .setInteractive();
+      skinSlot.on('pointerup', (pointer) => {
+        let index = 0;
+        this.skinSlots.forEach((s, i) => {
+          if (s === skinSlot) index = i;
+          s.play('idle', true, true);
+        });
+        this.playerSkins.forEach((p) => p.play('idle', true, true));
+        skinSlot.play('selected', true, true);
+        this.playerSkins[index].play('walk', true, true);
+        this.selectedSkin = this.nearSkinNames[index];
+      });
+      skinSlot.on('pointerover', (pointer) => {});
+      this.skinSlots.push(skinSlot);
+
+      const playerSkin = this.add
+        .spine(startX + i * (size + margin), startY + 40, 'hero', 'idle', true)
+        .setScale(1)
+        .setDepth(DepthGroup.front)
+        .setInteractive()
+        .setSkinByName(this.skinNames[i]);
+      this.playerSkins.push(playerSkin);
+    }
   }
 
   async getData() {
     console.log(await getSkins());
-    console.log(await getEquippedSkin());
+    const equippedSkin = await getEquippedSkin();
+    console.log('equippedSkin', equippedSkin);
+    if (equippedSkin) {
+      this.equippedSkin = equippedSkin;
+      console.log('this.equippedSkin', this.equippedSkin);
+      const index = this.nearSkinNames.findIndex((value) => value === this.equippedSkin);
+      console.log('index', index);
+      if (index != -1) {
+        if (this.playerSkins[index]) {
+          this.playerSkins[index].play('walk', true, true);
+        }
+        if (this.skinSlots[index]) {
+          this.skinSlots[index].play('selected', true, true);
+        }
+      }
+    }
   }
 }

@@ -1,4 +1,5 @@
-const CONTARCT_NAME_TESTNET = 'dev-1682002125136-89661302505865';
+// const CONTARCT_NAME_TESTNET = 'dev-1682002125136-89661302505865'; Chandra
+const CONTARCT_NAME_TESTNET = 'dev-1682082438921-24114632800033';
 export const getConfig = () => {
   return {
     networkId: 'testnet',

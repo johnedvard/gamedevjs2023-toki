@@ -1,0 +1,89 @@
+{
+"skeleton": {
+	"hash": "MqB9WMwgmPo",
+	"spine": "4.1.20",
+	"x": -221.15,
+	"y": -224.76,
+	"width": 438,
+	"height": 454,
+	"images": "../../AffinityDesigner/gamedevjs2023-toki/",
+	"audio": ""
+},
+"bones": [
+	{ "name": "root" },
+	{ "name": "slot-selected", "parent": "root", "length": 40.69, "x": -2.15, "y": 2.24 },
+	{ "name": "bottom-right", "parent": "slot-selected", "length": 52.55, "x": 157.66, "y": -176.31 },
+	{ "name": "upper-right", "parent": "slot-selected", "length": 44.08, "x": 171.22, "y": 167.83 },
+	{ "name": "upper-left", "parent": "slot-selected", "length": 69.53, "rotation": 1.4, "x": -162.75, "y": 167.83 },
+	{ "name": "bottom-left", "parent": "slot-selected", "length": 74.61, "rotation": 1.3, "x": -169.53, "y": -183.09 }
+],
+"slots": [
+	{ "name": "storeInterface/slot1", "bone": "root", "attachment": "storeInterface/slot1" },
+	{ "name": "storeInterface/slot selected", "bone": "slot-selected", "attachment": "storeInterface/slot selected" }
+],
+"skins": [
+	{
+		"name": "default",
+		"attachments": {
+			"storeInterface/slot1": {
+				"storeInterface/slot1": { "x": 0.5, "y": 0.5, "width": 369, "height": 369 }
+			},
+			"storeInterface/slot selected": {
+				"storeInterface/slot selected": {
+					"type": "mesh",
+					"uvs": [ 1, 0.27222, 1, 0.72031, 1, 1, 0.7361, 1, 0.29486, 1, 0, 1, 0, 0.75766, 0, 0.29462, 0, 0, 0.31034, 0, 0.74384, 0, 1, 0, 0.74384, 0.26848, 0.75159, 0.72778, 0.31421, 0.76886, 0.29486, 0.29462 ],
+					"triangles": [ 4, 14, 3, 14, 4, 6, 4, 5, 6, 14, 6, 15, 3, 13, 2, 13, 1, 2, 3, 14, 13, 1, 13, 0, 13, 14, 15, 6, 7, 15, 15, 9, 12, 9, 15, 8, 15, 7, 8, 15, 12, 13, 13, 12, 0, 0, 12, 11, 12, 10, 11, 12, 9, 10 ],
+					"vertices": [ 3, 3, 47.78, -64.42, 0.98903, 4, 380.06, -73.71, 0.00714, 5, 394.94, 277.6, 0.00383, 1, 2, 61.34, 76.29, 1, 1, 2, 61.34, -50.69, 1, 1, 2, -54.25, -50.69, 1, 1, 5, 78.66, -45.71, 1, 1, 5, -50.46, -42.77, 1, 1, 5, -47.96, 67.22, 1, 1, 4, -58.05, -73.2, 1, 1, 4, -54.79, 60.52, 1, 1, 4, 81.1, 57.21, 1, 1, 3, -64.42, 59.17, 1, 1, 3, 47.78, 59.17, 1, 2, 3, -64.42, -62.73, 0.99714, 5, 282.81, 281.85, 0.00286, 1, 2, -47.47, 72.9, 1, 1, 5, 89.52, 59.01, 1, 1, 4, 71.06, -76.35, 1 ],
+					"hull": 12,
+					"edges": [ 20, 22, 0, 22, 0, 2, 2, 4, 4, 6, 6, 8, 8, 10, 10, 12, 12, 14, 14, 16, 16, 18, 18, 20 ],
+					"width": 438,
+					"height": 454
+				}
+			}
+		}
+	}
+],
+"animations": {
+	"idle": {
+		"slots": {
+			"storeInterface/slot selected": {
+				"attachment": [
+					{}
+				]
+			}
+		}
+	},
+	"selected": {
+		"bones": {
+			"bottom-left": {
+				"translate": [
+					{},
+					{ "time": 0.6667, "x": 16.95, "y": 20.34 },
+					{ "time": 1.3333 }
+				]
+			},
+			"bottom-right": {
+				"translate": [
+					{},
+					{ "time": 0.6667, "x": -10.3, "y": 13.24 },
+					{ "time": 1.3333 }
+				]
+			},
+			"upper-left": {
+				"translate": [
+					{},
+					{ "time": 0.6667, "x": 16.18, "y": -14.71 },
+					{ "time": 1.3333 }
+				]
+			},
+			"upper-right": {
+				"translate": [
+					{},
+					{ "time": 0.6667, "x": -14.71, "y": -17.65 },
+					{ "time": 1.3333 }
+				]
+			}
+		}
+	}
+}
+}

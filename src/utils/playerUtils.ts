@@ -94,3 +94,10 @@ export const getClosestEndPos = (
   // return the point where the line intersects with an edge
   return new Phaser.Math.Vector2(direction.x * distanceToBox, direction.y * distanceToBox).add(startPos);
 };
+
+export const getSkinMapping = (nearSkin: string) => {
+  if (nearSkin.match('red')) return 'red';
+  if (nearSkin.match('blue')) return 'blue';
+  if (nearSkin.match('green')) return 'green';
+  return nearSkin;
+};

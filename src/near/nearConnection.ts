@@ -30,7 +30,7 @@ export const initContract = async () => {
     // View methods are read only. They don't modify the state, but usually return some value.
     viewMethods: ['nft_tokens_for_owner', 'nft_tokens_by_series', 'get_skins', 'get_equipped_skin'],
     // Change methods can modify the state. But you don't receive the returned value when called.
-    changeMethods: ['nft_buy', 'equip_skin'],
+    changeMethods: ['equip_skin'],
   });
 
   return walletConnection;
@@ -45,14 +45,14 @@ export const login = () => {
   // user's behalf.
   // This works by creating a new access key for the user's account and storing
   // the private key in localStorage.
-  walletConnection.requestSignIn({ contractId: nearConfig.contractName });
+  walletConnection.requestSignIn({ contractId: nearConfig.contractName, methodNames: [] });
 };
 
 export const getSkins = () => {
   return contract['get_skins']();
 };
 export const equipSkin = (skin: string) => {
-  return contract['equip_skin']({ skin });
+  return contract['equip_skin']({ skin: skin, account_id: accountId });
 };
 export const getEquippedSkin = () => {
   return contract['get_equipped_skin']();
