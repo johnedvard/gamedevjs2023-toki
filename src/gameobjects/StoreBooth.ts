@@ -11,6 +11,10 @@ type TProps = {
 export class StoreBooth {
   body: MatterJS.BodyType;
   spineObject: SpineGameObject;
+  overlordSpine: SpineGameObject;
+  speechBubble: SpineGameObject;
+  overlordOffset = new Phaser.Math.Vector2(90, 0);
+  speechBubbleOffset = new Phaser.Math.Vector2(-60, -220);
   width = 246;
   height = 299;
 
@@ -28,9 +32,28 @@ export class StoreBooth {
       isStatic: true,
       label: BodyTypeLabel.store,
     });
+    this.body.onCollideCallback = ({ bodyA, bodyB }) => {
+      console.log('collision', bodyA, bodyB);
+      if (bodyB?.label === BodyTypeLabel.player) {
+        this.speechBubble.play('idle', true, true);
+      }
+    };
+    this.body.onCollideEndCallback = ({ bodyA, bodyB }) => {
+      console.log('collision', bodyA, bodyB);
+      if (bodyB?.label === BodyTypeLabel.player) {
+        this.speechBubble.play('hidden', true, true);
+      }
+    };
   }
   private initSpineObject(pos: Phaser.Math.Vector2) {
     this.spineObject = this.scene.add.spine(pos.x, pos.y, 'storeBooth', 'idle', true).setDepth(DepthGroup.store);
+    this.overlordSpine = this.scene.add
+      .spine(pos.x + this.overlordOffset.x, pos.y, 'overlord', 'idle', true)
+      .setDepth(DepthGroup.store)
+      .setScale(0.25);
+    this.speechBubble = this.scene.add
+      .spine(pos.x + this.speechBubbleOffset.x, pos.y + this.speechBubbleOffset.y, 'storeSpeechBubble', 'hidden', true)
+      .setDepth(DepthGroup.store);
   }
 
   private onOpenStore = () => {
