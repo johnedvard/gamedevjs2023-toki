@@ -1,10 +1,20 @@
+const mode = import.meta.env.VITE_MODE || 'testnet';
+
 import { GameObjects, Scene } from 'phaser';
 
 import { DepthGroup } from '~/enums/DepthGroup';
 import { GameEvent } from '~/enums/GameEvent';
-import { equipSkin, getEquippedSkin, getSkins, isSignedIn, login, nftTokensForOwner } from '~/near/nearConnection';
+import {
+  equipSkin,
+  getEquippedSkinName,
+  getNftSeriesId,
+  isSignedIn,
+  login,
+  nftBuy,
+  nftTokensForOwner,
+} from '~/near/nearConnection';
+import { NftSeriesId } from '~/types/NftSeriesId';
 import { emit } from '~/utils/eventEmitterUtils';
-import { getSkinMapping } from '~/utils/playerUtils';
 
 export class StoreInterface extends Scene {
   spineFrame: SpineGameObject;
@@ -25,18 +35,33 @@ export class StoreInterface extends Scene {
   selectBitmap: GameObjects.BitmapText;
 
   skinNum = 3;
-  skinNames = ['blue', 'green', 'red'];
-  nearSkinNames = ['skin-003-blue', 'skin-002-green', 'skin-001-red'];
-  equippedSkin = this.nearSkinNames[0];
+  skins: { name: string; isOwned: boolean; seriesId: NftSeriesId; price: string; nearPrice: string }[] = [
+    { name: 'blue', isOwned: true, seriesId: undefined, price: undefined, nearPrice: undefined },
+    {
+      name: 'green',
+      isOwned: false,
+      seriesId: getNftSeriesId('tokiGreen'),
+      price: '1050000000000000000000000',
+      nearPrice: '1',
+    },
+    {
+      name: 'red',
+      isOwned: false,
+      seriesId: getNftSeriesId('tokiRed'),
+      price: '1050000000000000000000000',
+      nearPrice: '1',
+    },
+  ];
+
+  equippedSkinName = '';
+  selectedSkinName = '';
   isInitialized = false;
-  selectedSkin;
 
   create(data: any) {
+    this.equippedSkinName = getEquippedSkinName();
+    this.selectedSkinName = getEquippedSkinName();
     this.initSpineObjects();
-    this.initSlots();
-    this.getNfts().then((res) => {
-      console.log('res', res);
-    });
+    this.getNftsAndUpdateOwnership();
     this.initSelectButtonTextLabel();
     this.initHitAreas();
 
@@ -62,15 +87,12 @@ export class StoreInterface extends Scene {
     this.selectBtnGraphics.fillRectShape(this.selectButton);
   }
 
-  private initSlots() {}
-
   private initSelectButtonTextLabel() {
     let originX = -0.25;
     let originY = 0.2;
     if (!isSignedIn()) {
       this.selectButtonText = 'Login';
       originX = -1.2;
-      originY = 0.2;
     } else {
       this.selectButtonText = 'Select skin';
     }
@@ -122,12 +144,16 @@ export class StoreInterface extends Scene {
     });
     this.selectBtnGraphics.on('pointerup', (pointer) => {
       if (isSignedIn()) {
-        if (this.selectedSkin && this.selectedSkin != this.equippedSkin) {
-          equipSkin(this.selectedSkin);
-          const skinName = getSkinMapping(this.selectedSkin);
-          emit(GameEvent.changeSkin, { skinName });
+        const selectedSkin = this.skins.find((s) => s.name === this.selectedSkinName);
+        if (!selectedSkin.isOwned) {
+          nftBuy({ token_series_id: selectedSkin.seriesId, priceInYoctoNear: selectedSkin.price });
+          this.selectBitmap.setText('Buying NFT');
+          this.selectBitmap.setOrigin(-0.35, this.selectBitmap.originY);
+        } else {
+          equipSkin(this.selectedSkinName);
+          emit(GameEvent.changeSkin, { skinName: this.selectedSkinName });
+          emit(GameEvent.closeStore);
         }
-        emit(GameEvent.closeStore);
       } else {
         login();
       }
@@ -146,13 +172,17 @@ export class StoreInterface extends Scene {
     const startY = 608;
     const size = 400;
     const margin = 40;
-    console.log('this.skinSlots', this.skinSlots.length);
+
     for (let i = 0; i < this.skinNum; i++) {
       const skinSlot = this.add
         .spine(startX + i * (size + margin), startY, 'skinSlot', 'idle', true)
         .setScale(1)
         .setDepth(DepthGroup.front)
         .setInteractive();
+      const selectedSkinNameIndex = this.skins.findIndex((s) => s.name === this.selectedSkinName);
+      if (selectedSkinNameIndex === i) {
+        skinSlot.play('selected', true, true);
+      }
       skinSlot.on('pointerup', (pointer) => {
         let index = 0;
         this.skinSlots.forEach((s, i) => {
@@ -161,8 +191,18 @@ export class StoreInterface extends Scene {
         });
         this.playerSkins.forEach((p) => p.play('idle', true, true));
         skinSlot.play('selected', true, true);
+        const skin = this.skins[index];
         this.playerSkins[index].play('walk', true, true);
-        this.selectedSkin = this.nearSkinNames[index];
+        this.selectedSkinName = skin.name;
+        if (isSignedIn()) {
+          if (!skin.isOwned) {
+            this.selectBitmap.setText(`Buy for ${skin.nearPrice} NEAR`);
+            this.selectBitmap.setOrigin(-0.1, this.selectBitmap.originY);
+          } else {
+            this.selectBitmap.setText(`Select skin`);
+            this.selectBitmap.setOrigin(-0.25, this.selectBitmap.originY);
+          }
+        }
       });
       skinSlot.on('pointerover', (pointer) => {});
       this.skinSlots.push(skinSlot);
@@ -172,20 +212,19 @@ export class StoreInterface extends Scene {
         .setScale(1)
         .setDepth(DepthGroup.front)
         .setInteractive()
-        .setSkinByName(this.skinNames[i]);
+        .setSkinByName(this.skins[i].name);
       this.playerSkins.push(playerSkin);
     }
   }
 
   async getData() {
-    console.log(await getSkins());
-    const equippedSkin = await getEquippedSkin();
-    console.log('equippedSkin', equippedSkin);
-    if (equippedSkin) {
-      this.equippedSkin = equippedSkin;
-      console.log('this.equippedSkin', this.equippedSkin);
-      const index = this.nearSkinNames.findIndex((value) => value === this.equippedSkin);
-      console.log('index', index);
+    const equippedSkinName = getEquippedSkinName();
+
+    if (equippedSkinName) {
+      this.equippedSkinName = equippedSkinName;
+
+      const index = this.skins.findIndex((s) => s.name === this.equippedSkinName);
+
       if (index != -1) {
         if (this.playerSkins[index]) {
           this.playerSkins[index].play('walk', true, true);
@@ -197,7 +236,25 @@ export class StoreInterface extends Scene {
     }
   }
 
-  getNfts() {
-    return nftTokensForOwner();
+  private updateNftOwnership(tokens: any[]) {
+    console.log('NFTs:', tokens);
+    tokens.forEach((token) => {
+      if (token.token_id && token.token_id.split(':')[0]) {
+        const tokenSeriesId = token.token_id.split(':')[0];
+        this.skins.forEach((s) => {
+          if (s.seriesId === tokenSeriesId) s.isOwned = true;
+        });
+      }
+    });
+  }
+
+  async getNftsAndUpdateOwnership() {
+    nftTokensForOwner()
+      .then((tokens) => {
+        this.updateNftOwnership(tokens);
+      })
+      .catch((err) => {
+        console.error(err);
+      });
   }
 }

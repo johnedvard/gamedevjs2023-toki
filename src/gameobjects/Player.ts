@@ -4,10 +4,10 @@ import { ControllerEvent } from '~/enums/ControllerEvent';
 
 import { DepthGroup } from '~/enums/DepthGroup';
 import { GameEvent } from '~/enums/GameEvent';
-import { getEquippedSkin } from '~/near/nearConnection';
+import { getEquippedSkinName } from '~/near/nearConnection';
 import { PlayerState } from '~/types/PlayerState';
 import { on } from '~/utils/eventEmitterUtils';
-import { getClosestBody, getClosestEndPos, getSkinMapping, startActionRoutine, updateAim } from '~/utils/playerUtils';
+import { getClosestBody, getClosestEndPos, startActionRoutine, updateAim } from '~/utils/playerUtils';
 
 type TProps = {
   pos: Phaser.Math.Vector2;
@@ -45,9 +45,7 @@ export class Player {
     const skeleton = this.spineObject.skeleton;
     this.aimConstraintBone = skeleton.findBone('weapon-aim');
     this.weaponBone = skeleton.findBone('weapon-ik');
-    getEquippedSkin().then((skin) => {
-      this.spineObject.setSkinByName(getSkinMapping(skin));
-    });
+    this.spineObject.setSkinByName(getEquippedSkinName());
   };
 
   update(time: number, delta: number) {

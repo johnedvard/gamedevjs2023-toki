@@ -35,7 +35,7 @@ export class StoreBooth {
 
   private onOpenStore = () => {
     const allObjectsInProximity = this.scene.matter.intersectBody(this.body);
-    console.log('got event', allObjectsInProximity);
+
     for (let obj of allObjectsInProximity) {
       const other = <MatterJS.BodyType>obj;
       if (other.label === BodyTypeLabel.player) {
