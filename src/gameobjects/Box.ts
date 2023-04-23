@@ -1,6 +1,8 @@
 import { Scene } from 'phaser';
 import { BodyTypeLabel } from '~/enums/BodyTypeLabel';
 import { DepthGroup } from '~/enums/DepthGroup';
+import { GameEvent } from '~/enums/GameEvent';
+import { on } from '~/utils/eventEmitterUtils';
 
 type TProps = {
   pos: Phaser.Math.Vector2;
@@ -18,6 +20,7 @@ export class Box {
     this.width = width;
     this.createBody(pos);
     this.initSpineObject(pos);
+    this.listenForEvents();
   }
   private createBody(pos: Phaser.Math.Vector2) {
     const startPosX = pos.x;
@@ -45,4 +48,14 @@ export class Box {
   update(time: number, delta: number) {
     this.updateSpineObject();
   }
+
+  onTimeLock = ({ body }: { body: MatterJS.BodyType }) => {
+    if (body === this.body) {
+      this.body.isStatic = !this.body.isStatic;
+      const attachment: spine.Attachment = this.spineObject.getAttachmentByName('SpinningBar', 'SpinningBar');
+    }
+  };
+  listenForEvents = () => {
+    on(GameEvent.timeLock, this.onTimeLock);
+  };
 }

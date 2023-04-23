@@ -6,7 +6,7 @@ import { DepthGroup } from '~/enums/DepthGroup';
 import { GameEvent } from '~/enums/GameEvent';
 import { getEquippedSkinName } from '~/near/nearConnection';
 import { PlayerState } from '~/types/PlayerState';
-import { on } from '~/utils/eventEmitterUtils';
+import { emit, on } from '~/utils/eventEmitterUtils';
 import { getClosestBody, getClosestEndPos, startActionRoutine, updateAim } from '~/utils/playerUtils';
 
 type TProps = {
@@ -156,6 +156,8 @@ export class Player {
     let endPos = new Phaser.Math.Vector2(direction.x * maxDist, direction.y * maxDist).add(startPos);
 
     const closestBody = getClosestBody(this.scene, startPos, endPos);
+    emit(GameEvent.timeLock, { body: closestBody });
+
     // TODO (johnedvard) Add some particle effects to the endPos if we found a body
     endPos = getClosestEndPos(closestBody, startPos, endPos, direction);
 

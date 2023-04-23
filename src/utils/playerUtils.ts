@@ -52,7 +52,11 @@ export const getClosestBody = (
   var bodies = scene.matter.world
     .getAllBodies()
     .filter((b) => {
-      return b.label !== BodyTypeLabel.proximity && b.label !== BodyTypeLabel.player;
+      return (
+        b.label !== BodyTypeLabel.proximity &&
+        b.label !== BodyTypeLabel.player &&
+        BodyTypeLabel !== BodyTypeLabel.constraint
+      );
     })
     .sort((a, b) => {
       const aPos = new Phaser.Math.Vector2(a.position.x, a.position.y);

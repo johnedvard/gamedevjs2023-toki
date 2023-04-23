@@ -1,6 +1,8 @@
 import { Scene } from 'phaser';
 import { BodyTypeLabel } from '~/enums/BodyTypeLabel';
 import { DepthGroup } from '~/enums/DepthGroup';
+import { GameEvent } from '~/enums/GameEvent';
+import { on } from '~/utils/eventEmitterUtils';
 
 type TProps = {
   pos: Phaser.Math.Vector2;
@@ -10,6 +12,7 @@ type TProps = {
 
 export class SpinningBar {
   body: MatterJS.BodyType;
+  constraint: MatterJS.BodyType;
   spineObject: SpineGameObject;
   width = 90;
   height = 299;
@@ -22,17 +25,27 @@ export class SpinningBar {
 
     this.createBody(pos);
     this.initSpineObject(pos);
+    this.listenForEvents();
   }
   private createBody(pos: Phaser.Math.Vector2) {
     const startPosX = pos.x;
     const startPosY = pos.y;
-
+    this.constraint = this.scene.matter.add.circle(startPosX, startPosY, 10, {
+      isSensor: true,
+      isStatic: true,
+      label: BodyTypeLabel.constraint,
+    });
     // TODO, don't use body, but a regular rect, and check for collision within polygon, because bug with ignoreGravity
     this.body = this.scene.matter.add.rectangle(startPosX, startPosY, this.width - 30, this.height - 10, {
       label: BodyTypeLabel.spinningBar,
-      isSensor: true,
       ignoreGravity: true, // doesn't work in phaser 3.60 https://github.com/photonstorm/phaser/issues/6473,
+      density: 999,
+      mass: 999,
     });
+    const constraint = this.scene.matter.add.constraint(this.body, this.constraint, 0, 0.1);
+
+    // Add the constraint to the Matter world
+    this.scene.matter.world.add(constraint);
 
     this.body.onCollideCallback = ({ bodyA, bodyB }) => {
       if (bodyB?.label === BodyTypeLabel.player) {
@@ -54,6 +67,8 @@ export class SpinningBar {
   angleUpdateInterval = 10; // upd
 
   updateSpineObject(time: number) {
+    const { x, y } = this.body.position;
+    this.spineObject.setPosition(x, y);
     const elapsedFrames = Math.floor((time - this.lastAngleUpdateTime) / this.angleUpdateInterval);
     if (elapsedFrames > 0) {
       this.scene.matter.setAngularVelocity(this.body, 0.1);
@@ -67,4 +82,13 @@ export class SpinningBar {
 
     this.updateSpineObject(time);
   }
+
+  onTimeLock = ({ body }: { body: MatterJS.BodyType }) => {
+    if (body === this.body) {
+      this.body.isStatic = !this.body.isStatic;
+    }
+  };
+  listenForEvents = () => {
+    on(GameEvent.timeLock, this.onTimeLock);
+  };
 }
