@@ -2,7 +2,7 @@ import { Scene } from 'phaser';
 import { BodyTypeLabel } from '~/enums/BodyTypeLabel';
 import { DepthGroup } from '~/enums/DepthGroup';
 import { GameEvent } from '~/enums/GameEvent';
-import { on } from '~/utils/eventEmitterUtils';
+import { emit, on } from '~/utils/eventEmitterUtils';
 
 type TProps = {
   pos: Phaser.Math.Vector2;
@@ -38,6 +38,7 @@ export class SpinningBar {
     // TODO, don't use body, but a regular rect, and check for collision within polygon, because bug with ignoreGravity
     this.body = this.scene.matter.add.rectangle(startPosX, startPosY, this.width - 30, this.height - 10, {
       label: BodyTypeLabel.spinningBar,
+      isSensor: true,
       ignoreGravity: true, // doesn't work in phaser 3.60 https://github.com/photonstorm/phaser/issues/6473,
       density: 999,
       mass: 999,
@@ -49,7 +50,7 @@ export class SpinningBar {
 
     this.body.onCollideCallback = ({ bodyA, bodyB }) => {
       if (bodyB?.label === BodyTypeLabel.player) {
-        console.log('kill');
+        emit(GameEvent.kill, { body: bodyB });
       }
     };
   }

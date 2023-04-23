@@ -26,8 +26,10 @@ export class Player {
   aimConstraintBone: spine.Bone;
   weaponBone: spine.Bone;
   aimBeamDistance = 500;
+  startPos: Phaser.Math.Vector2;
 
   constructor(private scene: Scene, { pos }: TProps) {
+    this.startPos = pos;
     this.initSpineObject(pos);
     this.createBody(pos);
     this.listenForEvents();
@@ -176,17 +178,29 @@ export class Player {
     if (skinName) this.spineObject.setSkinByName(skinName);
   };
 
+  onKilled = () => {
+    this.scene.matter.world.remove(this.body);
+    this.body = this.scene.matter.add.circle(this.startPos.x, this.startPos.y, this.bodyRadius, {
+      frictionAir: 0.1,
+      label: BodyTypeLabel.player,
+      mass: 10,
+      friction: 0.5,
+    });
+  };
+
   private listenForEvents() {
     // TODO (johnedvard) handle player input events in a different file
     on(ControllerEvent.move, this.onMove);
     on(ControllerEvent.jump, this.onJump);
     on(ControllerEvent.action, this.onAction);
     on(GameEvent.changeSkin, this.onSkinChanged);
+    on(GameEvent.kill, this.onKilled);
   }
   private stopListeningForEvents() {
     off(ControllerEvent.move, this.onMove);
     off(ControllerEvent.jump, this.onJump);
     off(ControllerEvent.action, this.onAction);
     off(GameEvent.changeSkin, this.onSkinChanged);
+    off(GameEvent.kill, this.onKilled);
   }
 }
