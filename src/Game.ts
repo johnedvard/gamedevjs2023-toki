@@ -14,6 +14,7 @@ import { SceneInput } from './scenes/SceneInput';
 import { StoreInterface } from './scenes/StoreInterface';
 import { initSceneHandler } from './sceneHandler';
 import { initContract, isSignedIn, login } from './near/nearConnection';
+import { MatterGravityFixPlugin } from './plugins/MatterGravityFixPlugin';
 
 const addScenes = (game: Game) => {
   game.scene.add(SceneKey.Preload, Preload);
@@ -39,7 +40,7 @@ export class Toki {
       physics: {
         default: 'matter',
         matter: {
-          // debug: true, // TODO (johnedvard) remove debug if production
+          debug: true, // TODO (johnedvard) remove debug if production
           gravity: { y: 5 },
         },
       },
@@ -53,6 +54,12 @@ export class Toki {
             plugin: window['SpinePlugin'],
             mapping: 'spine',
             sceneKey: 'spine',
+          },
+          {
+            key: 'MatterGravityFixPlugin',
+            plugin: MatterGravityFixPlugin,
+            mapping: 'matterGravityFix',
+            start: true,
           },
         ],
       },
