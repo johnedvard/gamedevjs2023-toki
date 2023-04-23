@@ -59,6 +59,7 @@ export class SceneInput extends Scene {
           emit(ControllerEvent.inventory);
           break;
         case 'KeyW':
+        case 'ArrowUp':
           emit(ControllerEvent.up);
           break;
       }
