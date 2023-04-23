@@ -21,6 +21,10 @@ const closeStore = (evt) => {
     game.scene.resume(SceneKey.Level);
   }
 };
+
+const goToLevel = ({ levelId }: { levelId: string }) => {
+  game.scene.start(SceneKey.NextLevel, { levelId });
+};
 /**
  * Call only once (when the game starts)
  * Listen for events and manage scenes, such as settings and inventory
@@ -29,4 +33,5 @@ export const initSceneHandler = (g: Game) => {
   game = g;
   on(GameEvent.openStore, openStore);
   on(GameEvent.closeStore, closeStore);
+  on(GameEvent.goToLevel, goToLevel);
 };

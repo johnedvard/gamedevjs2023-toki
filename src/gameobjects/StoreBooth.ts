@@ -8,6 +8,7 @@ import { emit, on } from '~/utils/eventEmitterUtils';
 type TProps = {
   pos: Phaser.Math.Vector2;
 };
+
 export class StoreBooth {
   body: MatterJS.BodyType;
   spineObject: SpineGameObject;
@@ -33,13 +34,11 @@ export class StoreBooth {
       label: BodyTypeLabel.store,
     });
     this.body.onCollideCallback = ({ bodyA, bodyB }) => {
-      console.log('collision', bodyA, bodyB);
       if (bodyB?.label === BodyTypeLabel.player) {
         this.speechBubble.play('idle', true, true);
       }
     };
     this.body.onCollideEndCallback = ({ bodyA, bodyB }) => {
-      console.log('collision', bodyA, bodyB);
       if (bodyB?.label === BodyTypeLabel.player) {
         this.speechBubble.play('hidden', true, true);
       }

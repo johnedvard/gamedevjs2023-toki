@@ -6,7 +6,7 @@ import { DepthGroup } from '~/enums/DepthGroup';
 import { GameEvent } from '~/enums/GameEvent';
 import { getEquippedSkinName } from '~/near/nearConnection';
 import { PlayerState } from '~/types/PlayerState';
-import { emit, on } from '~/utils/eventEmitterUtils';
+import { emit, off, on } from '~/utils/eventEmitterUtils';
 import { getClosestBody, getClosestEndPos, startActionRoutine, updateAim } from '~/utils/playerUtils';
 
 type TProps = {
@@ -62,6 +62,7 @@ export class Player {
   }
 
   setState(state: PlayerState) {
+    if (!this.spineObject) return;
     if (this.state === state) return;
     switch (state) {
       case 'idle':
@@ -72,6 +73,11 @@ export class Player {
         break;
       default:
     }
+  }
+
+  destroy() {
+    this.spineObject = null;
+    this.stopListeningForEvents();
   }
 
   private cameraFollow() {
@@ -120,6 +126,7 @@ export class Player {
   }
 
   private setDirection(direction: number) {
+    if (!this.spineObject) return;
     if (direction === this.direction) return;
     this.spineObject.setScale(this.scale * direction, this.spineObject.scaleY);
     this.direction = direction;
@@ -156,6 +163,7 @@ export class Player {
     let endPos = new Phaser.Math.Vector2(direction.x * maxDist, direction.y * maxDist).add(startPos);
 
     const closestBody = getClosestBody(this.scene, startPos, endPos);
+    console.log('closestBody', closestBody);
     emit(GameEvent.timeLock, { body: closestBody });
 
     // TODO (johnedvard) Add some particle effects to the endPos if we found a body
@@ -174,5 +182,11 @@ export class Player {
     on(ControllerEvent.jump, this.onJump);
     on(ControllerEvent.action, this.onAction);
     on(GameEvent.changeSkin, this.onSkinChanged);
+  }
+  private stopListeningForEvents() {
+    off(ControllerEvent.move, this.onMove);
+    off(ControllerEvent.jump, this.onJump);
+    off(ControllerEvent.action, this.onAction);
+    off(GameEvent.changeSkin, this.onSkinChanged);
   }
 }

@@ -3,4 +3,5 @@ export enum GameEvent {
   closeStore = 'closeStore',
   changeSkin = 'changeSkin',
   timeLock = 'timeLock',
+  goToLevel = 'goToLevel',
 }

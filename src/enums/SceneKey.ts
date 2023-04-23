@@ -3,6 +3,7 @@ export enum SceneKey {
   MainMenu = 'MainMenu',
   NewGameIntro = 'NewGameIntro',
   Level = 'Level',
+  NextLevel = 'NextLevel',
   UserInterface = 'UserInterface',
   Boot = 'Boot',
   Settings = 'Settings',

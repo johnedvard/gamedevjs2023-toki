@@ -52,7 +52,6 @@ export class Box {
   onTimeLock = ({ body }: { body: MatterJS.BodyType }) => {
     if (body === this.body) {
       this.body.isStatic = !this.body.isStatic;
-      const attachment: spine.Attachment = this.spineObject.getAttachmentByName('SpinningBar', 'SpinningBar');
     }
   };
   listenForEvents = () => {

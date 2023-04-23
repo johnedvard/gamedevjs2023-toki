@@ -53,9 +53,7 @@ export const getClosestBody = (
     .getAllBodies()
     .filter((b) => {
       return (
-        b.label !== BodyTypeLabel.proximity &&
-        b.label !== BodyTypeLabel.player &&
-        BodyTypeLabel !== BodyTypeLabel.constraint
+        b.label !== BodyTypeLabel.proximity && b.label !== BodyTypeLabel.player && b.label !== BodyTypeLabel.constraint
       );
     })
     .sort((a, b) => {

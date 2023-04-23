@@ -39,9 +39,9 @@
             <g transform="matrix(24,0,0,24,4203.23,755.411)">
             </g>
             <text x="4151.23px" y="755.411px" style="font-family:'ArialMT', 'Arial', sans-serif;font-size:24px;">Click</text>
-            <g transform="matrix(24,0,0,24,4321.01,690.328)">
+            <g transform="matrix(24,0,0,24,4314.34,690.328)">
             </g>
-            <text x="4219.22px" y="690.328px" style="font-family:'ArialMT', 'Arial', sans-serif;font-size:24px;">Time lock</text>
+            <text x="4219.22px" y="690.328px" style="font-family:'ArialMT', 'Arial', sans-serif;font-size:24px;">T<tspan x="4232.99px 4238.32px " y="690.328px 690.328px ">im</tspan>elock</text>
             <path d="M4233.69,735.901C4243.01,725.329 4251.32,726.54 4259.3,731.517" style="fill:none;stroke:#fafbf6;stroke-width:3.5px;stroke-miterlimit:1.5;"/>
         </g>
         <circle id="start" cx="1662.69" cy="720.851" r="30.661" style="fill:#f0e;"/>
@@ -181,7 +181,7 @@
             <path d="M6199.12,839.932C6192.77,826.082 6189.23,810.707 6189.23,794.522C6189.23,733.691 6239.2,684.305 6300.75,684.305C6362.29,684.305 6412.26,733.691 6412.26,794.522C6412.26,810.707 6408.72,826.082 6402.37,839.932L6199.12,839.932Z" style="fill:#fafbf6;stroke:#0f0f1b;stroke-width:7px;"/>
             <path d="M6222.05,842.014C6214.69,828.949 6210.49,813.87 6210.49,797.819C6210.49,748.006 6250.93,707.565 6300.75,707.565C6350.56,707.565 6391,748.006 6391,797.819C6391,813.87 6386.8,828.949 6379.44,842.014L6222.05,842.014Z" style="fill:#0f0f1b;stroke:#0f0f1b;stroke-width:10px;"/>
         </g>
-        <circle id="_-goal-" serif:id="{goal}" cx="6300.75" cy="763.159" r="30.661" style="fill:#f0e;"/>
+        <circle id="goal--door---to-level0-" serif:id="goal {door} {to-level0}" cx="6300.75" cy="763.159" r="30.661" style="fill:#f0e;"/>
         <circle id="_-spinningBar-" serif:id="{spinningBar}" cx="4586.95" cy="658.698" r="30.661" style="fill:#ff1717;"/>
     </g>
 </svg>

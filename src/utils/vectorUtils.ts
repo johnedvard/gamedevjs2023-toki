@@ -3,6 +3,7 @@ import svgToPhaserPath from 'svg-to-phaser-path';
 
 import { BodyTypeLabel } from '~/enums/BodyTypeLabel';
 import { Box } from '~/gameobjects/Box';
+import { Door } from '~/gameobjects/Door';
 import { SpinningBar } from '~/gameobjects/SpinningBar';
 import { StoreBooth } from '~/gameobjects/StoreBooth';
 import { SvgPath } from '~/types/SvgPath';
@@ -77,17 +78,20 @@ export const createTextFromSvg = (scene: Scene, svgDoc: Document) => {
     const x = ~~el.getAttribute('x').split('px')[0];
     const y = ~~el.getAttribute('y').split('px')[0];
     const fontSize = ~~el.style.fontSize.split('px')[0];
-    const bitmapText = scene.add.bitmapText(x, y, 'atari', el.innerHTML, fontSize).setAlpha(1).setOrigin(0.2, 0.6);
+    let textValue = el.innerHTML;
+    textValue = textValue.replace(/<[^>]+>/g, '');
+    const bitmapText = scene.add.bitmapText(x, y, 'atari', textValue, fontSize).setAlpha(1).setOrigin(0.2, 0.6);
     bitmapText.setTint(0x000000);
   }
 };
 export const createSpinningBarsFromSvg = (scene: Scene, svgDoc: Document): SpinningBar[] => {
   const spinningObjectEls = svgDoc.querySelectorAll('circle');
-  const bars = [];
+  const bars: SpinningBar[] = [];
   for (let el of spinningObjectEls) {
-    if (!el.getAttribute('serif:id')?.match('{spinningBar}')) continue;
-    const pos = getPosFromSvgCircle(el);
-    bars.push(new SpinningBar(scene, { pos }));
+    if (el.getAttribute('serif:id')?.match('{spinningBar}')) {
+      const pos = getPosFromSvgCircle(el);
+      bars.push(new SpinningBar(scene, { pos }));
+    }
   }
   return bars;
 };
@@ -95,6 +99,22 @@ export const createSpinningBarsFromSvg = (scene: Scene, svgDoc: Document): Spinn
 export const createStoreBoothFromSvg = (scene: Scene, svgDoc: Document): StoreBooth => {
   const pos = getPosFromSvgCircle(svgDoc.querySelector(`#storeBooth`));
   return new StoreBooth(scene, { pos });
+};
+
+export const createDoorsFromSvg = (scene: Scene, svgDoc: Document): Door[] => {
+  const doorEls = svgDoc.querySelectorAll('circle');
+  const doors: Door[] = [];
+  for (let el of doorEls) {
+    if (el.getAttribute('serif:id')?.match('{door}')) {
+      const pos = getPosFromSvgCircle(el);
+      let goToLevelId = '';
+      if (el.getAttribute('serif:id').match('{to-')) {
+        goToLevelId = el.getAttribute('serif:id').split('{to-')[1].split('}')[0];
+      }
+      doors.push(new Door(scene, { pos, goToLevelId }));
+    }
+  }
+  return doors;
 };
 
 export const createBoxesFromSvg = (scene: Scene, svgDoc: Document): Box[] => {

@@ -1,10 +1,14 @@
 import { GameObjects, Scene } from 'phaser';
+import { GameEvent } from '~/enums/GameEvent';
 import { Box } from '~/gameobjects/Box';
+import { Door } from '~/gameobjects/Door';
 import { Player } from '~/gameobjects/Player';
 import { SpinningBar } from '~/gameobjects/SpinningBar';
 import { StoreBooth } from '~/gameobjects/StoreBooth';
+
 import { LevelState } from '~/types/LevelState';
 import { SvgPath } from '~/types/SvgPath';
+import { on } from '~/utils/eventEmitterUtils';
 import {
   createTextFromSvg,
   createCollisionBoxesFromPaths,
@@ -13,9 +17,12 @@ import {
   createBoxesFromSvg,
   createSpinningBarsFromSvg,
   createStoreBoothFromSvg,
+  createDoorsFromSvg,
 } from '~/utils/vectorUtils';
 
 const parser = new DOMParser();
+const levelIds = ['levelTutorial', 'level0'];
+const levelSvgTexts: Record<string, string> = {};
 
 export class Level extends Phaser.Scene {
   player: Player;
@@ -24,33 +31,48 @@ export class Level extends Phaser.Scene {
   boxes: Box[];
   spinningBars: SpinningBar[];
   storeBooth: StoreBooth;
+  doors: Door[];
+  levelId: string;
 
   preload(): void {
     // this.matter.add.mouseSpring(); // TODO (johnedvard) remove if production. Enable through option in debug menu
-    this.loadLevel('levelTutorial');
+    this.loadLevels(levelIds);
     this.graphics = this.add.graphics();
   }
 
-  create(): void {}
+  create({ levelId = 'levelTutorial' }: { levelId: string }): void {
+    this.levelId = levelId;
+    this.createLevel(this.levelId);
+  }
 
   update(time: number, delta: number): void {
     this.player?.update(time, delta);
     this.storeBooth?.update(time, delta);
-    this.boxes.forEach((b) => b.update(time, delta));
-    this.spinningBars.forEach((b) => b.update(time, delta));
+    this.boxes?.forEach((b) => b.update(time, delta));
+    this.doors?.forEach((d) => d.update(time, delta));
+    this.spinningBars?.forEach((b) => b.update(time, delta));
     this.updateLandscape();
   }
 
   createAnimations() {}
 
-  loadLevel(levelId: string) {
-    this.load.text(levelId, `levels/${levelId}.svg`);
-    this.load.on('filecomplete', (key: string, _type, svgText: string) => {
-      if (key === levelId) {
-        const levelState = this.createLevelFromSvg(this, svgText);
-        this.player = new Player(this, { pos: levelState.start });
-      }
+  loadLevels(levelIds: string[]) {
+    levelIds.forEach((levelId) => {
+      this.load.text(levelId, `levels/${levelId}.svg`);
+      this.load.on('filecomplete', (key: string, _type, svgText: string) => {
+        console.log();
+        if (key === levelId) {
+          levelSvgTexts[levelId] = svgText;
+        }
+      });
     });
+  }
+
+  createLevel(levelId: string) {
+    this.player?.destroy();
+    const svgText = levelSvgTexts[levelId];
+    const levelState = this.createLevelFromSvg(this, svgText);
+    this.player = new Player(this, { pos: levelState.start });
   }
 
   createLevelFromSvg(scene: Scene, svgText: string): LevelState {
@@ -61,6 +83,7 @@ export class Level extends Phaser.Scene {
     this.boxes = createBoxesFromSvg(scene, svgDoc);
     this.spinningBars = createSpinningBarsFromSvg(scene, svgDoc);
     this.storeBooth = createStoreBoothFromSvg(scene, svgDoc);
+    this.doors = createDoorsFromSvg(scene, svgDoc);
 
     const start = getPosFromSvgCircle(svgDoc.querySelector(`#start`));
     const goal = getPosFromSvgCircle(svgDoc.querySelector(`#goal`));
