@@ -97,8 +97,11 @@ export const createSpinningBarsFromSvg = (scene: Scene, svgDoc: Document): Spinn
 };
 
 export const createStoreBoothFromSvg = (scene: Scene, svgDoc: Document): StoreBooth => {
-  const pos = getPosFromSvgCircle(svgDoc.querySelector(`#storeBooth`));
-  return new StoreBooth(scene, { pos });
+  const storeBoothEl: SVGElement = svgDoc.querySelector(`#storeBooth`);
+  if (storeBoothEl) {
+    const pos = getPosFromSvgCircle(storeBoothEl);
+    return new StoreBooth(scene, { pos });
+  }
 };
 
 export const createDoorsFromSvg = (scene: Scene, svgDoc: Document): Door[] => {

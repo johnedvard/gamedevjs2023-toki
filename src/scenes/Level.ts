@@ -35,7 +35,7 @@ export class Level extends Phaser.Scene {
   levelId: string;
 
   preload(): void {
-    // this.matter.add.mouseSpring(); // TODO (johnedvard) remove if production. Enable through option in debug menu
+    this.matter.add.mouseSpring(); // TODO (johnedvard) remove if production. Enable through option in debug menu
     this.loadLevels(levelIds);
     this.graphics = this.add.graphics();
   }
