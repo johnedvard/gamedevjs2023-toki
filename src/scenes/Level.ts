@@ -86,9 +86,8 @@ export class Level extends Phaser.Scene {
     this.doors = createDoorsFromSvg(scene, svgDoc);
 
     const start = getPosFromSvgCircle(svgDoc.querySelector(`#start`));
-    const goal = getPosFromSvgCircle(svgDoc.querySelector(`#goal`));
 
-    return { start, goal };
+    return { start };
   }
   updateLandscape() {
     if (!this.svgPaths) return;
