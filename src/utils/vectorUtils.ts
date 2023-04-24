@@ -109,12 +109,16 @@ export const createDoorsFromSvg = (scene: Scene, svgDoc: Document): Door[] => {
   const doors: Door[] = [];
   for (let el of doorEls) {
     if (el.getAttribute('serif:id')?.match('{door}')) {
+      let isGoal = false;
       const pos = getPosFromSvgCircle(el);
       let goToLevelId = '';
       if (el.getAttribute('serif:id').match('{to-')) {
         goToLevelId = el.getAttribute('serif:id').split('{to-')[1].split('}')[0];
       }
-      doors.push(new Door(scene, { pos, goToLevelId }));
+      if (el.getAttribute('serif:id').match('{goal}')) {
+        isGoal = true;
+      }
+      doors.push(new Door(scene, { pos, goToLevelId, isGoal }));
     }
   }
   return doors;

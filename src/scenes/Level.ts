@@ -3,14 +3,13 @@ import { GameEvent } from '~/enums/GameEvent';
 import { Box } from '~/gameobjects/Box';
 import { Door } from '~/gameobjects/Door';
 import { Player } from '~/gameobjects/Player';
-import { SpeechBubble } from '~/gameobjects/SpeechBubble';
 import { SpinningBar } from '~/gameobjects/SpinningBar';
 import { StoreBooth } from '~/gameobjects/StoreBooth';
 
 import { LevelState } from '~/types/LevelState';
 import { SvgPath } from '~/types/SvgPath';
-import { emit, on } from '~/utils/eventEmitterUtils';
-import { sav, saveGame, saveGameeGame } from '~/utils/storageUtils';
+import { emit } from '~/utils/eventEmitterUtils';
+
 import {
   createTextFromSvg,
   createCollisionBoxesFromPaths,
@@ -94,6 +93,8 @@ export class Level extends Phaser.Scene {
     this.doors = createDoorsFromSvg(scene, svgDoc);
 
     const start = getPosFromSvgCircle(svgDoc.querySelector(`#start`));
+
+    console.log('start', start);
 
     return { start };
   }

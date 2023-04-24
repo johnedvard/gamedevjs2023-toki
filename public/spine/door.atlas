@@ -1,0 +1,14 @@
+door.png
+size:461,172
+filter:Linear,Linear
+pma:true
+bars
+bounds:235,10,160,153
+offsets:0,0,160,161
+rotate:90
+door-open
+bounds:2,2,231,168
+lock-locked
+bounds:390,7,69,80
+lock-open
+bounds:390,89,69,81
