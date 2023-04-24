@@ -35,12 +35,12 @@ export class StoreBooth {
     });
     this.body.onCollideCallback = ({ bodyA, bodyB }) => {
       if (bodyB?.label === BodyTypeLabel.player) {
-        this.speechBubble.play('idle', true, true);
+        this.speechBubble?.play('idle', true, true);
       }
     };
     this.body.onCollideEndCallback = ({ bodyA, bodyB }) => {
       if (bodyB?.label === BodyTypeLabel.player) {
-        this.speechBubble.play('hidden', true, true);
+        this.speechBubble?.play('hidden', true, true);
       }
     };
   }
