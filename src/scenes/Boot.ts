@@ -24,6 +24,7 @@ export class Boot extends Phaser.Scene {
     this.load.spine('overlord', 'spine/overlord.json', ['spine/overlord.atlas'], true);
     this.load.image('storeSpeechBubble', 'spine/storeSpeechBubble.png');
     this.load.spine('storeSpeechBubble', 'spine/storeSpeechBubble.json', ['spine/storeSpeechBubble.atlas'], true);
+    this.load.image('particle', 'spine/particle.png');
   }
 
   create(): void {

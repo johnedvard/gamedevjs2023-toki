@@ -96,3 +96,36 @@ export const getClosestEndPos = (
   // return the point where the line intersects with an edge
   return new Phaser.Math.Vector2(direction.x * distanceToBox, direction.y * distanceToBox).add(startPos);
 };
+
+export const startKilledRoutine = (scene: Scene, { pos }: { pos: Phaser.Math.Vector2 }): Promise<boolean> => {
+  const killEmitterTime = 300;
+  const maxEllapsedTime = 1000;
+  let ellapsedTime = 0;
+
+  const emitter = scene.add.particles(0, 0, 'particle', {
+    emitZone: { source: new Phaser.Geom.Circle(pos.x, pos.y, 10), type: 'random', quantity: 100 },
+    lifespan: { min: 100, max: 500 },
+    speedX: { min: -600, max: 600 },
+    speedY: { min: -600, max: 600 },
+    accelerationY: { random: [-100, 100] },
+    accelerationX: { random: [-100, 100] },
+    scale: { start: 1, end: 0.3 },
+    alpha: { start: 0, end: 1, steps: 5 },
+    frequency: 8,
+  });
+  emitter.start();
+
+  return new Promise((resolve) => {
+    const gameUpdateListener = (time: number, delta: number) => {
+      ellapsedTime += delta;
+      if (ellapsedTime >= killEmitterTime && emitter.active) {
+        emitter.stop();
+      }
+      if (ellapsedTime >= maxEllapsedTime) {
+        scene.events.off(Phaser.Scenes.Events.UPDATE, gameUpdateListener);
+        resolve(true);
+      }
+    };
+    scene.events.on(Phaser.Scenes.Events.UPDATE, gameUpdateListener);
+  });
+};

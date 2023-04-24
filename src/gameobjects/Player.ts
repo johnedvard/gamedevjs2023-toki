@@ -7,7 +7,13 @@ import { GameEvent } from '~/enums/GameEvent';
 import { getEquippedSkinName } from '~/near/nearConnection';
 import { PlayerState } from '~/types/PlayerState';
 import { emit, off, on } from '~/utils/eventEmitterUtils';
-import { getClosestBody, getClosestEndPos, startActionRoutine, updateAim } from '~/utils/playerUtils';
+import {
+  getClosestBody,
+  getClosestEndPos,
+  startActionRoutine,
+  startKilledRoutine,
+  updateAim,
+} from '~/utils/playerUtils';
 
 type TProps = {
   pos: Phaser.Math.Vector2;
@@ -66,12 +72,16 @@ export class Player {
   setState(state: PlayerState) {
     if (!this.spineObject) return;
     if (this.state === state) return;
+    this.state = state;
     switch (state) {
       case 'idle':
         this.spineObject.play('idle', true, true);
         break;
       case 'walk':
         this.spineObject.play('walk', true, true);
+        break;
+      case 'killed':
+        this.playDead();
         break;
       default:
     }
@@ -135,6 +145,7 @@ export class Player {
   }
 
   private onMove = ({ velocity }: { velocity: Phaser.Math.Vector2 }) => {
+    if (this.state === 'killed') return;
     if (velocity.x !== 0) {
       this.setState('walk');
       this.scene.matter.setVelocity(this.body, velocity.x * this.speed, this.body.velocity.y);
@@ -145,7 +156,7 @@ export class Player {
   };
 
   private onJump = () => {
-    if (!this.isOnGround()) return;
+    if (!this.isOnGround() || this.state === 'killed') return;
     this.scene.matter.setVelocity(this.body, this.body.velocity.x, -30);
     this.setState('jump');
   };
@@ -178,14 +189,24 @@ export class Player {
     if (skinName) this.spineObject.setSkinByName(skinName);
   };
 
-  onKilled = () => {
+  async playDead() {
+    this.spineObject.play('killed');
+    this.body.isStatic = true;
+    this.body.isSensor = true;
+    await startKilledRoutine(this.scene, { pos: new Phaser.Math.Vector2(this.body.position.x, this.body.position.y) });
     this.scene.matter.world.remove(this.body);
+
+    this.setState('idle');
     this.body = this.scene.matter.add.circle(this.startPos.x, this.startPos.y, this.bodyRadius, {
       frictionAir: 0.1,
       label: BodyTypeLabel.player,
       mass: 10,
       friction: 0.5,
     });
+  }
+
+  onKilled = async () => {
+    this.setState('killed');
   };
 
   private listenForEvents() {
