@@ -22,7 +22,8 @@ import {
 } from '~/utils/vectorUtils';
 
 const parser = new DOMParser();
-const levelIds = ['levelTutorial', 'level0'];
+// TODO (johnedvard) read automatically from folder instead
+const levelIds = ['levelTutorial', 'level0', 'level1'];
 const levelSvgTexts: Record<string, string> = {};
 
 export class Level extends Phaser.Scene {

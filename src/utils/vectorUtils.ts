@@ -90,7 +90,9 @@ export const createSpinningBarsFromSvg = (scene: Scene, svgDoc: Document): Spinn
   for (let el of spinningObjectEls) {
     if (el.getAttribute('serif:id')?.match('{spinningBar}')) {
       const pos = getPosFromSvgCircle(el);
-      bars.push(new SpinningBar(scene, { pos }));
+      let isSafe = false;
+      if (el.getAttribute('serif:id')?.match('{safe}')) isSafe = true;
+      bars.push(new SpinningBar(scene, { pos, isSafe }));
     }
   }
   return bars;

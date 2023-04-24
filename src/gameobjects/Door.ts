@@ -52,10 +52,11 @@ export class Door {
   update(time: number, delta: number) {}
   openDoor = () => {
     const allObjectsInProximity = this.scene.matter.intersectBody(this.body);
-
     for (let obj of allObjectsInProximity) {
       const other = <MatterJS.BodyType>obj;
       if (other.label === BodyTypeLabel.player) {
+        // TODO (make proper game state debug tool)
+        emit(GameEvent.goToLevel, { levelId: this.goToLevelId });
         if (this.state !== 'open') {
           this.spineObject.play('still-locked');
           return;

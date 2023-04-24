@@ -1,6 +1,8 @@
 spinningBar.png
-size:90,299
+size:148,299
 filter:Linear,Linear
 pma:true
-SpinningBar
+safe-bar
+bounds:90,2,56,295
+unsafe-bar
 bounds:2,2,86,295

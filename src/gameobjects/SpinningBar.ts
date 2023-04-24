@@ -8,6 +8,7 @@ type TProps = {
   pos: Phaser.Math.Vector2;
   width?: number;
   height?: number;
+  isSafe?: boolean;
 };
 
 export class SpinningBar {
@@ -18,9 +19,11 @@ export class SpinningBar {
   height = 299;
   angle = 0;
   startPos;
-  constructor(private scene: Scene, { pos, width, height }: TProps) {
+  isSafe;
+  constructor(private scene: Scene, { pos, width, height, isSafe }: TProps) {
     if (height) this.height = height;
     if (width) this.width = width;
+    this.isSafe = isSafe;
     this.startPos = pos;
 
     this.createBody(pos);
@@ -38,7 +41,7 @@ export class SpinningBar {
     // TODO, don't use body, but a regular rect, and check for collision within polygon, because bug with ignoreGravity
     this.body = this.scene.matter.add.rectangle(startPosX, startPosY, this.width - 30, this.height - 10, {
       label: BodyTypeLabel.spinningBar,
-      isSensor: true,
+      isSensor: this.isSafe ? false : true,
       ignoreGravity: true, // doesn't work in phaser 3.60 https://github.com/photonstorm/phaser/issues/6473,
       density: 999,
       mass: 999,
@@ -48,11 +51,13 @@ export class SpinningBar {
     // Add the constraint to the Matter world
     this.scene.matter.world.add(constraint);
 
-    this.body.onCollideCallback = ({ bodyA, bodyB }) => {
-      if (bodyB?.label === BodyTypeLabel.player) {
-        emit(GameEvent.kill, { body: bodyB });
-      }
-    };
+    if (!this.isSafe) {
+      this.body.onCollideCallback = ({ bodyA, bodyB }) => {
+        if (bodyB?.label === BodyTypeLabel.player) {
+          emit(GameEvent.kill, { body: bodyB });
+        }
+      };
+    }
   }
 
   private initSpineObject(pos: Phaser.Math.Vector2) {
@@ -62,6 +67,10 @@ export class SpinningBar {
       .setOffset(0, 0);
     const scale = 1;
     this.spineObject.setScale(scale);
+    if (this.isSafe) {
+      const unsafeBarSlot = this.spineObject.findSlot('unsafe-bar');
+      unsafeBarSlot.setAttachment(null);
+    }
   }
 
   lastAngleUpdateTime = 0;

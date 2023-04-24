@@ -105,7 +105,13 @@ export class Player {
     const allObjectsInProximity = this.scene.matter.intersectBody(this.proximityCircle);
     for (let obj of allObjectsInProximity) {
       const other = <MatterJS.BodyType>obj;
-      if (other.label === BodyTypeLabel.collisionWall || other.label === BodyTypeLabel.box) return true;
+      // TODO (johnedvard) Improve check to be less manual labor
+      if (
+        other.label === BodyTypeLabel.collisionWall ||
+        other.label === BodyTypeLabel.box ||
+        other.label === BodyTypeLabel.spinningBar
+      )
+        return true;
     }
 
     return false;
