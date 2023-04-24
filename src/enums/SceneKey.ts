@@ -9,4 +9,5 @@ export enum SceneKey {
   Settings = 'Settings',
   SceneInput = 'SceneInput',
   StoreInterface = 'StoreInterface',
+  DialogInterface = 'DialogInterface',
 }

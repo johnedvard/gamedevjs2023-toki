@@ -4,7 +4,7 @@ import { displayMainMenuItems, highlightSelectedMenu } from '~/menu';
 
 export class MainMenu extends Phaser.Scene {
   selectedMenuIndex = 0;
-  menuItems: { txt: GameObjects.BitmapText; sceneName: string }[];
+  menuItems: { txt: GameObjects.BitmapText; sceneName: string; args?: any }[];
   constructor() {
     super('MainMenu');
   }
@@ -22,8 +22,9 @@ export class MainMenu extends Phaser.Scene {
   }
 
   selectMenu(index: number) {
-    const sceneName = this.menuItems[index].sceneName;
-    this.scene.start(sceneName);
+    const menuItem = this.menuItems[index];
+    const sceneName = menuItem.sceneName;
+    this.scene.start(sceneName, { ...menuItem.args });
   }
 
   listenForInput() {

@@ -1,5 +1,6 @@
 import { Scene, GameObjects, Math } from 'phaser';
 import { hasSaveFile } from './utils/gameUtils';
+import { SceneKey } from './enums/SceneKey';
 
 let continueTxt: GameObjects.BitmapText;
 let newGameTxt: GameObjects.BitmapText;
@@ -17,24 +18,31 @@ export const displayMainMenuItems = (scene: Scene): { txt: GameObjects.BitmapTex
     continueTxt = scene.add
       .bitmapText(center.x, center.y + margin * menuItems.length, 'atari', 'Continue', 28)
       .setAlpha(1)
-      .setOrigin(0.5, 1);
-    menuItems.push({ txt: continueTxt, sceneName: 'Continue' });
+      .setOrigin(0.5, 1)
+      .setInteractive();
+    continueTxt.on('pointerup', () => {
+      scene.scene.start(SceneKey.Level, { levelId: 'level0' });
+    });
+    menuItems.push({ txt: continueTxt, sceneName: SceneKey.Level, args: { levelId: 'level0' } });
   }
   newGameTxt = scene.add
-    .bitmapText(center.x, center.y + margin * menuItems.length, 'atari', 'New Game', 28)
+    .bitmapText(center.x, center.y + margin * menuItems.length, 'atari', hasSaveFile() ? 'Tutorial' : 'New Game', 28)
     .setAlpha(1)
-    .setOrigin(0.5, 1);
-  menuItems.push({ txt: newGameTxt, sceneName: 'NewGameIntro' });
-  settingsGameTxt = scene.add
-    .bitmapText(center.x, center.y + margin * menuItems.length, 'atari', 'Settings', 28)
-    .setAlpha(1)
-    .setOrigin(0.5, 1);
-  menuItems.push({ txt: settingsGameTxt, sceneName: 'Settings' });
-  quitGameTxt = scene.add
-    .bitmapText(center.x, center.y + margin * menuItems.length, 'atari', 'Quit Game', 28)
-    .setAlpha(1)
-    .setOrigin(0.5, 1);
-  menuItems.push({ txt: quitGameTxt, sceneName: 'QuitGame' });
+    .setOrigin(0.5, 1)
+    .setInteractive();
+  newGameTxt.on('pointerup', () => {
+    scene.scene.start(SceneKey.NewGameIntro);
+  });
+  menuItems.push({ txt: newGameTxt, sceneName: SceneKey.NewGameIntro });
+  // settingsGameTxt = scene.add
+  //   .bitmapText(center.x, center.y + margin * menuItems.length, 'atari', 'Settings', 28)
+  //   .setAlpha(1)
+  //   .setOrigin(0.5, 1)
+  //   .setInteractive();
+  // settingsGameTxt.on('pointerup', () => {
+  //   scene.scene.start(SceneKey.Settings);
+  // });
+  // menuItems.push({ txt: settingsGameTxt, sceneName: SceneKey.Settings });
   return menuItems;
 };
 

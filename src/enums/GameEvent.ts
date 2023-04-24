@@ -5,4 +5,6 @@ export enum GameEvent {
   timeLock = 'timeLock',
   goToLevel = 'goToLevel',
   kill = 'kill',
+  startDialog = 'startDialog',
+  endDialog = 'endDialog',
 }

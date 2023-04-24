@@ -22,6 +22,22 @@ const closeStore = (evt) => {
   }
 };
 
+const startDialog = ({ dialog }: { dialog: any } = { dialog: '' }) => {
+  const isInterfaceActive = game.scene.isActive(SceneKey.DialogInterface);
+  console.log('isInterfaceActive', isInterfaceActive);
+  if (!isInterfaceActive) {
+    game.scene.pause(SceneKey.Level);
+    game.scene.start(SceneKey.DialogInterface, { dialog });
+  }
+};
+
+const endDialog = (evt) => {
+  const isInterfaceActive = game.scene.isActive(SceneKey.DialogInterface);
+  if (isInterfaceActive) {
+    game.scene.stop(SceneKey.DialogInterface);
+    game.scene.resume(SceneKey.Level);
+  }
+};
 const goToLevel = ({ levelId }: { levelId: string }) => {
   game.scene.start(SceneKey.NextLevel, { levelId });
 };
@@ -34,4 +50,6 @@ export const initSceneHandler = (g: Game) => {
   on(GameEvent.openStore, openStore);
   on(GameEvent.closeStore, closeStore);
   on(GameEvent.goToLevel, goToLevel);
+  on(GameEvent.startDialog, startDialog);
+  on(GameEvent.endDialog, endDialog);
 };

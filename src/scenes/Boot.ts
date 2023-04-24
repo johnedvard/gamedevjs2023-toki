@@ -24,16 +24,20 @@ export class Boot extends Phaser.Scene {
     this.load.spine('overlord', 'spine/overlord.json', ['spine/overlord.atlas'], true);
     this.load.image('storeSpeechBubble', 'spine/storeSpeechBubble.png');
     this.load.spine('storeSpeechBubble', 'spine/storeSpeechBubble.json', ['spine/storeSpeechBubble.atlas'], true);
+    this.load.image('sageFloating', 'spine/sageFloating.png');
+    this.load.spine('sageFloating', 'spine/sageFloating.json', ['spine/sageFloating.atlas'], true);
+
     this.load.image('particle', 'spine/particle.png');
+    this.load.image('sage', 'spine/sage.png');
   }
 
   create(): void {
     this.setPixelArtFilterOnAssets();
     this.createAnimations();
     // TODO (johnedvard) start desired scene based on env build variable?
-    this.scene.start(SceneKey.Level);
+    // this.scene.start(SceneKey.Level);
     // this.scene.start(SceneKey.NewGameIntro);
-    // this.scene.start(SceneKey.Preload);
+    this.scene.start(SceneKey.MainMenu);
   }
 
   createAnimations() {}

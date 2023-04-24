@@ -3,12 +3,14 @@ import { GameEvent } from '~/enums/GameEvent';
 import { Box } from '~/gameobjects/Box';
 import { Door } from '~/gameobjects/Door';
 import { Player } from '~/gameobjects/Player';
+import { SpeechBubble } from '~/gameobjects/SpeechBubble';
 import { SpinningBar } from '~/gameobjects/SpinningBar';
 import { StoreBooth } from '~/gameobjects/StoreBooth';
 
 import { LevelState } from '~/types/LevelState';
 import { SvgPath } from '~/types/SvgPath';
-import { on } from '~/utils/eventEmitterUtils';
+import { emit, on } from '~/utils/eventEmitterUtils';
+import { sav, saveGame, saveGameeGame } from '~/utils/storageUtils';
 import {
   createTextFromSvg,
   createCollisionBoxesFromPaths,
@@ -42,7 +44,14 @@ export class Level extends Phaser.Scene {
 
   create({ levelId = 'levelTutorial' }: { levelId: string }): void {
     this.levelId = levelId;
+    console.log('levelId', levelId);
     this.createLevel(this.levelId);
+    setTimeout(() => {
+      // using timeout to step once, make sure Level Scene is actually paused
+      if (levelId === 'levelTutorial') {
+        emit(GameEvent.startDialog);
+      }
+    });
   }
 
   update(time: number, delta: number): void {
@@ -60,7 +69,6 @@ export class Level extends Phaser.Scene {
     levelIds.forEach((levelId) => {
       this.load.text(levelId, `levels/${levelId}.svg`);
       this.load.on('filecomplete', (key: string, _type, svgText: string) => {
-        console.log();
         if (key === levelId) {
           levelSvgTexts[levelId] = svgText;
         }

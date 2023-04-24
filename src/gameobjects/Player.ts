@@ -14,6 +14,7 @@ import {
   startKilledRoutine,
   updateAim,
 } from '~/utils/playerUtils';
+import { SpeechBubble } from './SpeechBubble';
 
 type TProps = {
   pos: Phaser.Math.Vector2;
@@ -33,6 +34,7 @@ export class Player {
   weaponBone: spine.Bone;
   aimBeamDistance = 500;
   startPos: Phaser.Math.Vector2;
+  bubble: SpeechBubble;
 
   constructor(private scene: Scene, { pos }: TProps) {
     this.startPos = pos;
@@ -60,6 +62,7 @@ export class Player {
     this.updateSpineObject();
     this.updateProximityCircle();
     this.updateContainer();
+    this.bubble?.update(time, delta);
 
     updateAim(this.scene, this.aimConstraintBone);
   }
