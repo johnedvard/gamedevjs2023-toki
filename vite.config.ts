@@ -10,6 +10,7 @@ import { NodeModulesPolyfillPlugin } from '@esbuild-plugins/node-modules-polyfil
 fs.rmSync('dist', { recursive: true, force: true }); // v14.14.0
 
 export default defineConfig({
+  base: './',
   plugins: [],
   resolve: {
     alias: {
