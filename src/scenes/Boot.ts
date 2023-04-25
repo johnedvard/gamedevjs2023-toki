@@ -1,13 +1,15 @@
 import { SceneKey } from '~/enums/SceneKey';
-import { loadGame } from '~/gameState';
 import { initMusicAndSfx, playMusic } from '~/utils/soundUtils';
 
 export class Boot extends Phaser.Scene {
+  loadingBitmapText: Phaser.GameObjects.BitmapText;
   // TODO (johnedvard) use an asset loader and constants for the names
   preload(): void {
     this.load.bitmapFont('atari', 'bitmap/atari-classic.png', 'bitmap/atari-classic.xml');
+
     this.preloadSpineAnimations();
     this.loadMusic();
+    this.addProgressBar();
   }
 
   preloadSpineAnimations() {
@@ -49,8 +51,15 @@ export class Boot extends Phaser.Scene {
     this.load.audio('unlock', 'music/unlock.mp3');
   }
   create(): void {
+    this.loadingBitmapText = this.add.bitmapText(
+      this.cameras.main.width / 2,
+      this.cameras.main.height / 2,
+      'atari',
+      'Loading assets',
+      33,
+      1
+    );
     this.setPixelArtFilterOnAssets();
-    this.createAnimations();
 
     // TODO (johnedvard) start desired scene based on env build variable?
     // this.scene.start(SceneKey.Level);
@@ -62,7 +71,21 @@ export class Boot extends Phaser.Scene {
     this.scene.start(SceneKey.MainMenu);
   }
 
-  createAnimations() {}
+  addProgressBar() {
+    const progressBar = this.add.graphics();
+    const progressBox = this.add.graphics();
+    progressBox.fillStyle(0xfafbf6, 0.8);
+    progressBox.fillRect(this.cameras.main.width / 2 - 160, this.cameras.main.height / 2, 320, 50);
+    this.load.on('progress', (value) => {
+      progressBar.clear();
+      progressBar.fillStyle(0xffffff, 1);
+      progressBar.fillRect(this.cameras.main.width / 2 - 150, this.cameras.main.height / 2 + 10, 300 * value, 30);
+    });
+    this.load.on('complete', () => {
+      progressBar.destroy();
+      progressBox.destroy();
+    });
+  }
 
   setPixelArtFilterOnAssets() {
     // Remember to set FilterMode.NEAREST for pixel art (to prevent anti-alias when scaling up)
