@@ -1,5 +1,5 @@
 import { Scene, GameObjects, Math } from 'phaser';
-import { hasSaveFile } from './utils/gameUtils';
+import { hasSaveFile } from './gameState';
 import { SceneKey } from './enums/SceneKey';
 
 let continueTxt: GameObjects.BitmapText;

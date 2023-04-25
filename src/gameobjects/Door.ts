@@ -56,7 +56,6 @@ export class Door {
       const other = <MatterJS.BodyType>obj;
       if (other.label === BodyTypeLabel.player) {
         // TODO (make proper game state debug tool)
-        emit(GameEvent.goToLevel, { levelId: this.goToLevelId });
         if (this.state !== 'open') {
           this.spineObject.play('still-locked');
           return;

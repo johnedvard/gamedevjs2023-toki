@@ -1,6 +1,3 @@
-import { getGameState } from '~/gameState';
-import { SaveGameState } from '~/types/SaveGameState';
-
 const keyPrefix = 'toki-';
 export const setItem = (key: string, value: string) => {
   try {
@@ -19,15 +16,4 @@ export const getItem = (key: string): string | null => {
   } finally {
     return res;
   }
-};
-
-export const saveGame = (): void => {
-  const state: SaveGameState = getGameState();
-  setItem('saveFile', JSON.stringify(state));
-};
-
-export const getSaveFile = () => {
-  const saveFile = getItem('saveFile');
-  if (!saveFile) return null;
-  return JSON.parse(saveFile);
 };

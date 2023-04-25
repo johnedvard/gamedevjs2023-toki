@@ -1,5 +1,6 @@
 import { GameObjects, Scene } from 'phaser';
 import { GameEvent } from '~/enums/GameEvent';
+import { loadGame, saveLevelComplete } from '~/gameState';
 import { Box } from '~/gameobjects/Box';
 import { Door } from '~/gameobjects/Door';
 import { Player } from '~/gameobjects/Player';
@@ -8,7 +9,7 @@ import { StoreBooth } from '~/gameobjects/StoreBooth';
 
 import { LevelState } from '~/types/LevelState';
 import { SvgPath } from '~/types/SvgPath';
-import { emit } from '~/utils/eventEmitterUtils';
+import { emit, on } from '~/utils/eventEmitterUtils';
 
 import {
   createTextFromSvg,
@@ -35,16 +36,20 @@ export class Level extends Phaser.Scene {
   storeBooth: StoreBooth;
   doors: Door[];
   levelId: string;
+  maxCapsules: number;
+  collectedCapsules = 0;
+  numCapsules = 0;
 
   preload(): void {
+    loadGame();
     this.matter.add.mouseSpring(); // TODO (johnedvard) remove if production. Enable through option in debug menu
     this.loadLevels(levelIds);
     this.graphics = this.add.graphics();
+    this.listenForEvents();
   }
 
   create({ levelId = 'levelTutorial' }: { levelId: string }): void {
     this.levelId = levelId;
-    console.log('levelId', levelId);
     this.createLevel(this.levelId);
     setTimeout(() => {
       // using timeout to step once, make sure Level Scene is actually paused
@@ -95,8 +100,6 @@ export class Level extends Phaser.Scene {
 
     const start = getPosFromSvgCircle(svgDoc.querySelector(`#start`));
 
-    console.log('start', start);
-
     return { start };
   }
   updateLandscape() {
@@ -111,5 +114,14 @@ export class Level extends Phaser.Scene {
       this.graphics.fillPoints(path.getPoints());
       path.draw(this.graphics);
     });
+  }
+
+  onGoToLevel = ({ levelId }: { levelId: string }) => {
+    // Save the current level before we go to the next
+    saveLevelComplete({ levelId: this.levelId, collectedCapsules: this.collectedCapsules });
+  };
+
+  listenForEvents() {
+    on(GameEvent.goToLevel, this.onGoToLevel);
   }
 }

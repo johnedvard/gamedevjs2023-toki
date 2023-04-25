@@ -1,4 +1,5 @@
 import { SceneKey } from '~/enums/SceneKey';
+import { loadGame } from '~/gameState';
 
 export class Boot extends Phaser.Scene {
   // TODO (johnedvard) use an asset loader and constants for the names
