@@ -12,17 +12,25 @@ type TProps = {
   goToLevelId: string;
   isGoal?: boolean;
   canUnlock?: boolean;
+  numCapsules: number;
 };
 
 export class Door {
   body: MatterJS.BodyType;
   goToLevelId: string;
   spineObject: SpineGameObject;
+  timeCapsuesBitmap: Phaser.GameObjects.BitmapText;
+  spineTimeCapsule: SpineGameObject;
   isGoal: boolean;
+  numTimeCapsules: number;
   isDoorUnlocked: boolean;
   canUnlock: boolean;
   state: DoorState;
-  constructor(private scene: Scene, { pos, goToLevelId, isGoal, canUnlock }: TProps) {
+  numCapsules: number;
+  collectedCapsules: number;
+
+  constructor(private scene: Scene, { pos, goToLevelId, isGoal, canUnlock, numCapsules }: TProps) {
+    this.numCapsules = numCapsules;
     this.canUnlock = canUnlock;
     this.isGoal = isGoal;
     this.goToLevelId = goToLevelId;
@@ -30,7 +38,8 @@ export class Door {
     this.createBody(pos);
     this.createSpineObject(pos);
     this.listenForEvents();
-    console.log('isDoorUnlocked', this.isDoorUnlocked, this.goToLevelId);
+    this.setCollectedCapsules();
+    this.createTimeCapsuleText(pos);
     this.setState(this.isDoorUnlocked ? 'open' : 'locked');
   }
   private createBody(pos: Phaser.Math.Vector2) {
@@ -46,6 +55,13 @@ export class Door {
       }
     };
   }
+  createTimeCapsuleText(pos: Phaser.Math.Vector2) {
+    if (this.isGoal) return;
+    this.timeCapsuesBitmap = this.scene.add
+      .bitmapText(pos.x - 20, pos.y - 120, 'atari', '', 32, 0)
+      .setDepth(DepthGroup.door);
+    this.timeCapsuesBitmap.setText(`${this.collectedCapsules || 0}/${this.numCapsules}`);
+  }
   setState(state: DoorState) {
     if (this.state === state) return;
     this.state = state;
@@ -59,8 +75,19 @@ export class Door {
       default:
     }
   }
+  setCollectedCapsules() {
+    if (this.isGoal) return;
+    const collectedCapsules = getGameState()[this.goToLevelId];
+    if (collectedCapsules) this.collectedCapsules = collectedCapsules;
+  }
   createSpineObject(pos: Phaser.Math.Vector2) {
     this.spineObject = this.scene.add.spine(pos.x, pos.y, 'door', 'close', true).setDepth(DepthGroup.door);
+    if (!this.isGoal) {
+      this.spineTimeCapsule = this.scene.add
+        .spine(pos.x - 50, pos.y - 100, 'timeCapsule')
+        .setDepth(DepthGroup.door)
+        .setScale(0.2);
+    }
   }
   update(time: number, delta: number) {}
   openDoor = () => {

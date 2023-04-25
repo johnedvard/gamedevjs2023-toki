@@ -10,7 +10,7 @@ import { TimeCapsule } from '~/gameobjects/TimeCapsule';
 
 import { LevelState } from '~/types/LevelState';
 import { SvgPath } from '~/types/SvgPath';
-import { emit, on } from '~/utils/eventEmitterUtils';
+import { emit, off, on } from '~/utils/eventEmitterUtils';
 import { capturedCapsuleDialog, tutorialStartDialog } from '~/utils/tutorialUtils';
 
 import {
@@ -49,10 +49,11 @@ export class Level extends Phaser.Scene {
     this.matter.add.mouseSpring(); // TODO (johnedvard) remove if production. Enable through option in debug menu
     this.loadLevels(levelIds);
     this.graphics = this.add.graphics();
-    this.listenForEvents();
   }
 
   create({ levelId = 'levelTutorial' }: { levelId: string }): void {
+    this.stopListeningForEvents();
+    this.collectedCapsules = 0;
     this.levelId = levelId;
     this.createLevel(this.levelId);
     setTimeout(() => {
@@ -61,6 +62,7 @@ export class Level extends Phaser.Scene {
         emit(GameEvent.startDialog, { dialog: tutorialStartDialog });
       }
     });
+    this.listenForEvents();
   }
 
   update(time: number, delta: number): void {
@@ -149,9 +151,15 @@ export class Level extends Phaser.Scene {
     if (this.levelId === 'levelTutorial') {
       emit(GameEvent.startDialog, { dialog: capturedCapsuleDialog });
     }
+    this.collectedCapsules++;
   };
   listenForEvents() {
     on(GameEvent.goToLevel, this.onGoToLevel);
     on(GameEvent.collectTimeCapsule, this.onTimeCapsuleCollected);
+  }
+
+  stopListeningForEvents() {
+    off(GameEvent.goToLevel, this.onGoToLevel);
+    off(GameEvent.collectTimeCapsule, this.onTimeCapsuleCollected);
   }
 }

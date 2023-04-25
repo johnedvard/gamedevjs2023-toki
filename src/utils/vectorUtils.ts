@@ -115,6 +115,7 @@ export const createDoorsFromSvg = (scene: Scene, svgDoc: Document): Door[] => {
     if (el.getAttribute('serif:id')?.match('{door}')) {
       let isGoal = false;
       let canUnlock = false;
+      let numCapsules = 0;
       const pos = getPosFromSvgCircle(el);
       let goToLevelId = '';
       if (el.getAttribute('serif:id').match('{to-')) {
@@ -123,11 +124,15 @@ export const createDoorsFromSvg = (scene: Scene, svgDoc: Document): Door[] => {
       if (el.getAttribute('serif:id').match('{goal}')) {
         isGoal = true;
       }
+      if (el.getAttribute('serif:id').match('{numCapsules-')) {
+        const numCapsulesStr = el.getAttribute('serif:id').split('{numCapsules-')[1].split('}')[0];
+        numCapsules = parseInt(numCapsulesStr);
+      }
       if (goToLevelId === 'level1' || goToLevelId === 'leveltutorial') {
         canUnlock = true;
       }
 
-      doors.push(new Door(scene, { pos, goToLevelId, isGoal, canUnlock }));
+      doors.push(new Door(scene, { pos, goToLevelId, isGoal, canUnlock, numCapsules }));
     }
   }
   return doors;
