@@ -9,4 +9,5 @@ export enum BodyTypeLabel {
   collisionWall = 'collisionWalll',
   proximity = 'proximity',
   constraint = 'constraint',
+  timeCapsule = 'timeCapsule',
 }

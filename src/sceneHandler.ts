@@ -22,9 +22,8 @@ const closeStore = (evt) => {
   }
 };
 
-const startDialog = ({ dialog }: { dialog: any } = { dialog: '' }) => {
+const startDialog = ({ dialog }: { dialog: string[] }) => {
   const isInterfaceActive = game.scene.isActive(SceneKey.DialogInterface);
-  console.log('isInterfaceActive', isInterfaceActive);
   if (!isInterfaceActive) {
     game.scene.pause(SceneKey.Level);
     game.scene.start(SceneKey.DialogInterface, { dialog });

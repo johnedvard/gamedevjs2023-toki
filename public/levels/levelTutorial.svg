@@ -175,5 +175,6 @@
         </g>
         <circle id="goal--door---to-level0---goal-" serif:id="goal {door} {to-level0} {goal}" cx="6300.75" cy="763.159" r="30.661" style="fill:#f0e;"/>
         <circle id="_-spinningBar-" serif:id="{spinningBar}" cx="4586.95" cy="658.698" r="30.661" style="fill:#ff1717;"/>
+        <circle id="_-timeCapsule-" serif:id="{timeCapsule}" cx="5645.24" cy="995.487" r="30.661" style="fill:#00f683;"/>
     </g>
 </svg>

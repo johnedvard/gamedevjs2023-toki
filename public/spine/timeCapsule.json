@@ -1,0 +1,110 @@
+{
+"skeleton": {
+	"hash": "prCkxMQZspg",
+	"spine": "4.1.20",
+	"x": -83,
+	"y": -112,
+	"width": 167,
+	"height": 225,
+	"images": "../../AffinityDesigner/gamedevjs2023-toki/",
+	"audio": ""
+},
+"bones": [
+	{ "name": "root" },
+	{ "name": "hour-glass", "parent": "root", "length": 26.34, "x": 0.53, "y": 0.17 },
+	{ "name": "sand-grain", "parent": "hour-glass", "x": -0.53, "y": 23.37 },
+	{ "name": "sand-grain-mesh-bone", "parent": "sand-grain", "length": 11.82, "x": -0.09, "y": -0.1 }
+],
+"slots": [
+	{ "name": "time-capsule", "bone": "hour-glass", "attachment": "time-capsule" },
+	{ "name": "sand-grain", "bone": "sand-grain", "attachment": "sand-grain" }
+],
+"skins": [
+	{
+		"name": "default",
+		"attachments": {
+			"sand-grain": {
+				"sand-grain": {
+					"type": "mesh",
+					"uvs": [ 0.81772, 0, 1, 0.29404, 1, 0.80554, 0.72526, 1, 0.27536, 1, 0, 0.70779, 0, 0.33276, 4.2E-4, 0.21558, 0.2418, 0 ],
+					"triangles": [ 8, 5, 6, 1, 4, 8, 1, 3, 4, 2, 3, 1, 1, 8, 0, 4, 5, 8, 8, 6, 7 ],
+					"vertices": [ 1, 3, 5.81, 9.1, 1, 1, 3, 9.09, 4.1, 1, 1, 3, 9.09, -4.59, 1, 1, 3, 4.14, -7.9, 1, 1, 3, -3.95, -7.9, 1, 1, 3, -8.91, -2.93, 1, 1, 3, -8.91, 3.44, 1, 1, 3, -8.9, 5.44, 1, 1, 3, -4.56, 9.1, 1 ],
+					"hull": 9,
+					"edges": [ 0, 16, 0, 2, 2, 4, 4, 6, 6, 8, 8, 10, 10, 12, 12, 14, 14, 16 ],
+					"width": 18,
+					"height": 17
+				}
+			},
+			"time-capsule": {
+				"time-capsule": { "x": -0.03, "y": 0.33, "width": 167, "height": 225 }
+			}
+		}
+	}
+],
+"animations": {
+	"collected": {
+		"slots": {
+			"sand-grain": {
+				"attachment": [
+					{ "time": 0.5667 }
+				]
+			},
+			"time-capsule": {
+				"attachment": [
+					{ "time": 0.5667 }
+				]
+			}
+		},
+		"bones": {
+			"root": {
+				"rotate": [
+					{},
+					{ "time": 0.2667, "value": 360 },
+					{ "time": 0.5333, "value": 720 }
+				],
+				"scale": [
+					{},
+					{ "time": 0.2667, "x": 0.616, "y": 0.562 },
+					{ "time": 0.5333, "x": 0.171, "y": 0.131 }
+				]
+			}
+		}
+	},
+	"idle": {
+		"bones": {
+			"sand-grain": {
+				"translate": [
+					{},
+					{ "time": 0.8, "y": -87.32 },
+					{ "time": 0.9, "y": -91.98 }
+				],
+				"scale": [
+					{},
+					{ "time": 0.3333, "x": 0.894, "y": 1.069 }
+				]
+			},
+			"sand-grain-mesh-bone": {
+				"scale": [
+					{ "time": 0.7333 },
+					{ "time": 0.8667, "x": 1.478, "y": 0.554 },
+					{ "time": 1, "x": 1.646, "y": 0.431 }
+				]
+			},
+			"hour-glass": {
+				"rotate": [
+					{
+						"value": 6.45,
+						"curve": [ 0.167, 6.45, 0.333, -6.45 ]
+					},
+					{
+						"time": 0.5,
+						"value": -6.45,
+						"curve": [ 0.667, -6.45, 0.833, 6.45 ]
+					},
+					{ "time": 1, "value": 6.45 }
+				]
+			}
+		}
+	}
+}
+}

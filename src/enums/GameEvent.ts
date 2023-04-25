@@ -7,4 +7,5 @@ export enum GameEvent {
   kill = 'kill',
   startDialog = 'startDialog',
   endDialog = 'endDialog',
+  collectTimeCapsule = 'collectTimeCapsule',
 }

@@ -7,16 +7,19 @@ import { emit } from '~/utils/eventEmitterUtils';
 export class DialogInterface extends Scene {
   bubble: SpeechBubble;
   sage: Phaser.GameObjects.Sprite;
-  sageDialog: string[] = [
-    'Where am I? And why am I trapped in this weird suit?',
-    `Everything looks so smooth, so vector-like.\nNot what I'm used used to at all.`,
-    `I don't like it!`,
-    `It looks like I'm trapped in a different time.\nI better figure out how to return back to my normal self`,
-  ];
-  currentDialogIndex = 0;
+  dialog: string[] = [];
+  dialogIndex = 0;
   dialogBitmap;
-  create(data: any) {
-    // TODO (johnedvard) support any dialog, not just the hardcoded one
+  isInputDisabled: boolean;
+  maxInputDelay = 1000;
+  ellapsedInputDelay = 0;
+
+  create({ dialog = [] }: { dialog: string[] }) {
+    console.log('dialog', dialog);
+    this.isInputDisabled = true;
+    this.ellapsedInputDelay = 0;
+    this.dialogIndex = 0;
+    this.dialog = dialog;
     const pos = new Phaser.Math.Vector2(250, this.cameras.main.height - 500);
     const margin = 500;
     // Add UI elements
@@ -26,7 +29,7 @@ export class DialogInterface extends Scene {
     });
     this.createSprite();
     this.dialogBitmap = this.add
-      .bitmapText(550, this.cameras.main.height - 400, 'atari', this.sageDialog[this.currentDialogIndex], 28, 0)
+      .bitmapText(550, this.cameras.main.height - 400, 'atari', this.dialog[this.dialogIndex], 28, 0)
       .setAlpha(1)
       .setTint(0)
       .setOrigin(0, 0.5)
@@ -41,20 +44,29 @@ export class DialogInterface extends Scene {
   }
   update(time: number, delta: number) {
     this.bubble?.update(time, delta);
+    this.ellapsedInputDelay += delta;
+    if (this.ellapsedInputDelay <= this.maxInputDelay) {
+      this.isInputDisabled = true;
+    } else {
+      this.isInputDisabled = false;
+    }
   }
   listenForInput() {
     this.input.keyboard.on('keydown', (evt: KeyboardEvent) => {
+      if (this.isInputDisabled) return;
       this.continueDialog();
     });
     this.input.on('pointerdown', (pointer: Phaser.Input.Pointer) => {
+      if (this.isInputDisabled) return;
       if (pointer.primaryDown) {
         this.continueDialog();
       }
     });
   }
   continueDialog() {
-    const nextDialog = this.sageDialog[++this.currentDialogIndex];
+    const nextDialog = this.dialog[++this.dialogIndex];
     if (nextDialog) {
+      this.ellapsedInputDelay = 0;
       this.dialogBitmap.setText(nextDialog);
     } else {
       emit(GameEvent.endDialog);

@@ -29,6 +29,8 @@ export class Boot extends Phaser.Scene {
     this.load.spine('sageFloating', 'spine/sageFloating.json', ['spine/sageFloating.atlas'], true);
     this.load.image('door', 'spine/door.png');
     this.load.spine('door', 'spine/door.json', ['spine/door.atlas'], true);
+    this.load.image('timeCapsule', 'spine/timeCapsule.png');
+    this.load.spine('timeCapsule', 'spine/timeCapsule.json', ['spine/timeCapsule.atlas'], true);
 
     this.load.image('particle', 'spine/particle.png');
     this.load.image('sage', 'spine/sage.png');

@@ -6,10 +6,12 @@ import { Door } from '~/gameobjects/Door';
 import { Player } from '~/gameobjects/Player';
 import { SpinningBar } from '~/gameobjects/SpinningBar';
 import { StoreBooth } from '~/gameobjects/StoreBooth';
+import { TimeCapsule } from '~/gameobjects/TimeCapsule';
 
 import { LevelState } from '~/types/LevelState';
 import { SvgPath } from '~/types/SvgPath';
 import { emit, on } from '~/utils/eventEmitterUtils';
+import { capturedCapsuleDialog, tutorialStartDialog } from '~/utils/tutorialUtils';
 
 import {
   createTextFromSvg,
@@ -20,6 +22,7 @@ import {
   createSpinningBarsFromSvg,
   createStoreBoothFromSvg,
   createDoorsFromSvg,
+  createTimeCapsulesFromSvg,
 } from '~/utils/vectorUtils';
 
 const parser = new DOMParser();
@@ -35,6 +38,7 @@ export class Level extends Phaser.Scene {
   spinningBars: SpinningBar[];
   storeBooth: StoreBooth;
   doors: Door[];
+  timeCapsules: TimeCapsule[];
   levelId: string;
   maxCapsules: number;
   collectedCapsules = 0;
@@ -54,7 +58,7 @@ export class Level extends Phaser.Scene {
     setTimeout(() => {
       // using timeout to step once, make sure Level Scene is actually paused
       if (levelId === 'levelTutorial') {
-        emit(GameEvent.startDialog);
+        emit(GameEvent.startDialog, { dialog: tutorialStartDialog });
       }
     });
   }
@@ -65,6 +69,7 @@ export class Level extends Phaser.Scene {
     this.boxes?.forEach((b) => b.update(time, delta));
     this.doors?.forEach((d) => d.update(time, delta));
     this.spinningBars?.forEach((b) => b.update(time, delta));
+    this.timeCapsules?.forEach((b) => b.update(time, delta));
     this.updateLandscape();
   }
 
@@ -98,6 +103,7 @@ export class Level extends Phaser.Scene {
     this.spinningBars = createSpinningBarsFromSvg(scene, svgDoc);
     this.storeBooth = createStoreBoothFromSvg(scene, svgDoc);
     this.doors = createDoorsFromSvg(scene, svgDoc);
+    this.timeCapsules = createTimeCapsulesFromSvg(scene, svgDoc);
     this.setDoorState(this.doors);
 
     const start = getPosFromSvgCircle(svgDoc.querySelector(`#start`));
@@ -138,7 +144,14 @@ export class Level extends Phaser.Scene {
     saveLevelComplete({ levelId: this.levelId, collectedCapsules: this.collectedCapsules });
   };
 
+  onTimeCapsuleCollected = () => {
+    // Exception for the tutorial level
+    if (this.levelId === 'levelTutorial') {
+      emit(GameEvent.startDialog, { dialog: capturedCapsuleDialog });
+    }
+  };
   listenForEvents() {
     on(GameEvent.goToLevel, this.onGoToLevel);
+    on(GameEvent.collectTimeCapsule, this.onTimeCapsuleCollected);
   }
 }

@@ -7,6 +7,7 @@ import { Box } from '~/gameobjects/Box';
 import { Door } from '~/gameobjects/Door';
 import { SpinningBar } from '~/gameobjects/SpinningBar';
 import { StoreBooth } from '~/gameobjects/StoreBooth';
+import { TimeCapsule } from '~/gameobjects/TimeCapsule';
 import { SvgPath } from '~/types/SvgPath';
 
 export const getPosFromSvgCircle = (circleElement: SVGElement): Phaser.Math.Vector2 => {
@@ -132,6 +133,17 @@ export const createDoorsFromSvg = (scene: Scene, svgDoc: Document): Door[] => {
   return doors;
 };
 
+export const createTimeCapsulesFromSvg = (scene: Scene, svgDoc: Document): TimeCapsule[] => {
+  const doorEls = svgDoc.querySelectorAll('circle');
+  const capsules: TimeCapsule[] = [];
+  for (let el of doorEls) {
+    if (el.getAttribute('serif:id')?.match('{timeCapsule}')) {
+      const pos = getPosFromSvgCircle(el);
+      capsules.push(new TimeCapsule(scene, { pos }));
+    }
+  }
+  return capsules;
+};
 export const createBoxesFromSvg = (scene: Scene, svgDoc: Document): Box[] => {
   const rectElements = svgDoc.querySelectorAll('rect');
   const boxes = [];
