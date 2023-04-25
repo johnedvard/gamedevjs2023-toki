@@ -21,7 +21,7 @@ export class TimeCapsule {
     const startPosX = pos.x;
     const startPosY = pos.y;
 
-    this.body = this.scene.matter.add.rectangle(startPosX, startPosY, 226, 171, {
+    this.body = this.scene.matter.add.circle(startPosX, startPosY, 40, {
       isSensor: true,
       isStatic: true,
       label: BodyTypeLabel.timeCapsule,

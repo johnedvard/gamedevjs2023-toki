@@ -166,8 +166,8 @@ export class Level extends Phaser.Scene {
         path.draw(this.graphicsBack);
         groupBack.add(this.graphicsBack);
       } else if (attributes?.isParallaxFront) {
-        this.graphics.fillPoints(path.getPoints());
-        path.draw(this.graphics);
+        this.graphicsFront.fillPoints(path.getPoints());
+        path.draw(this.graphicsFront);
         groupFront.add(this.graphicsFront);
       } else {
         this.graphics.fillPoints(path.getPoints());
@@ -175,7 +175,7 @@ export class Level extends Phaser.Scene {
         this.graphics.translateCanvas(0, 0);
       }
     });
-    const parallaxFactorFront = this.cameras.main.scrollX / 7;
+    const parallaxFactorFront = this.cameras.main.scrollX / 4;
     const parallaxFactorBack = (this.cameras.main.scrollX / 10) * -1;
     groupFront.shiftPosition(parallaxFactorFront, 0);
     groupBack.shiftPosition(parallaxFactorBack, 0);
