@@ -15,7 +15,6 @@ export class DialogInterface extends Scene {
   ellapsedInputDelay = 0;
 
   create({ dialog = [] }: { dialog: string[] }) {
-    console.log('dialog', dialog);
     this.isInputDisabled = true;
     this.ellapsedInputDelay = 0;
     this.dialogIndex = 0;

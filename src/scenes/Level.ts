@@ -1,4 +1,5 @@
 import { GameObjects, Scene } from 'phaser';
+import { DepthGroup } from '~/enums/DepthGroup';
 import { GameEvent } from '~/enums/GameEvent';
 import { getGameState, loadGame, saveLevelComplete } from '~/gameState';
 import { Box } from '~/gameobjects/Box';
@@ -33,6 +34,8 @@ const levelSvgTexts: Record<string, string> = {};
 export class Level extends Phaser.Scene {
   player: Player;
   graphics: GameObjects.Graphics;
+  graphicsBack: GameObjects.Graphics;
+  graphicsFront: GameObjects.Graphics;
   svgPaths: SvgPath[];
   boxes: Box[];
   spinningBars: SpinningBar[];
@@ -48,7 +51,10 @@ export class Level extends Phaser.Scene {
     loadGame();
     this.matter.add.mouseSpring(); // TODO (johnedvard) remove if production. Enable through option in debug menu
     this.loadLevels(levelIds);
-    this.graphics = this.add.graphics();
+
+    this.graphics = this.add.graphics().setDepth(DepthGroup.back);
+    this.graphicsFront = this.add.graphics().setDepth(DepthGroup.back + 1);
+    this.graphicsBack = this.add.graphics().setDepth(DepthGroup.back - 1);
   }
 
   create({ levelId = 'levelTutorial' }: { levelId: string }): void {
@@ -116,29 +122,63 @@ export class Level extends Phaser.Scene {
   setDoorState(doors: Door[]) {
     if (this.levelId === 'levelTutorial') return; // Exception for the tutorial level
     const gameState = getGameState();
-    console.log('gameState', gameState);
     doors.forEach((d) => {
       if (d.goToLevelId === 'level0') return;
-      console.log('goToLevelId', d.goToLevelId);
       const goToLevelNum = parseInt(d.goToLevelId.split('level')[1]); // name pattern is level{number}, e.g. level0 and level1
-      console.log('goToLevelNum', goToLevelNum);
       if (gameState[`level${goToLevelNum - 1}`] >= 0) {
         d.canUnlock = true;
       }
     });
   }
+
   updateLandscape() {
     if (!this.svgPaths) return;
+    // TODO (johnedvard) use array instead of copying
+    this.graphicsBack.clear();
     this.graphics.clear();
-    this.svgPaths.forEach(({ path, strokeWidth, color, fill }) => {
-      if (color != null) this.graphics.lineStyle(strokeWidth, color, 1);
-      else this.graphics.lineStyle(0, 0, 0);
-      if (fill != null) this.graphics.fillStyle(fill, 1);
-      else this.graphics.fillStyle(0, 0);
+    this.graphicsFront.clear();
+    // group parallaxPaths
+    const groupFront = this.add.group();
+    const groupBack = this.add.group();
+
+    this.svgPaths.forEach(({ path, strokeWidth, color, fill, attributes }) => {
+      if (color != null) {
+        this.graphics.lineStyle(strokeWidth, color, 1);
+        this.graphicsBack.lineStyle(strokeWidth, color, 1);
+        this.graphicsFront.lineStyle(strokeWidth, color, 1);
+      } else {
+        this.graphics.lineStyle(0, 0, 0);
+        this.graphicsBack.lineStyle(0, 0, 0);
+        this.graphicsFront.lineStyle(0, 0, 0);
+      }
+      if (fill != null) {
+        this.graphics.fillStyle(fill, 1);
+        this.graphicsBack.fillStyle(fill, 1);
+        this.graphicsFront.fillStyle(fill, 1);
+      } else {
+        this.graphics.fillStyle(0, 0);
+        this.graphicsBack.fillStyle(0, 0);
+        this.graphicsFront.fillStyle(0, 0);
+      }
       // TODO (johnedvard) figure out why fillPath doesn't work
-      this.graphics.fillPoints(path.getPoints());
-      path.draw(this.graphics);
+      if (attributes?.isParallaxBack) {
+        this.graphicsBack.fillPoints(path.getPoints());
+        path.draw(this.graphicsBack);
+        groupBack.add(this.graphicsBack);
+      } else if (attributes?.isParallaxFront) {
+        this.graphics.fillPoints(path.getPoints());
+        path.draw(this.graphics);
+        groupFront.add(this.graphicsFront);
+      } else {
+        this.graphics.fillPoints(path.getPoints());
+        path.draw(this.graphics);
+        this.graphics.translateCanvas(0, 0);
+      }
     });
+    const parallaxFactorFront = this.cameras.main.scrollX / 7;
+    const parallaxFactorBack = (this.cameras.main.scrollX / 10) * -1;
+    groupFront.shiftPosition(parallaxFactorFront, 0);
+    groupBack.shiftPosition(parallaxFactorBack, 0);
   }
 
   onGoToLevel = ({ levelId }: { levelId: string }) => {

@@ -27,7 +27,6 @@ const saveGame = (): void => {
 };
 
 export const saveLevelComplete = ({ levelId, collectedCapsules }: SaveLevelState) => {
-  console.log(gameState);
   gameState[levelId] = collectedCapsules;
   saveGame();
 };

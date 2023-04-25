@@ -9,6 +9,7 @@ import { SpinningBar } from '~/gameobjects/SpinningBar';
 import { StoreBooth } from '~/gameobjects/StoreBooth';
 import { TimeCapsule } from '~/gameobjects/TimeCapsule';
 import { SvgPath } from '~/types/SvgPath';
+import { SvgPathAttributes } from '~/types/SvgPathAttributes';
 
 export const getPosFromSvgCircle = (circleElement: SVGElement): Phaser.Math.Vector2 => {
   if (!circleElement) return new Phaser.Math.Vector2(0, 0);
@@ -38,12 +39,27 @@ export const createPathsFromSvg = (svgDoc: Document): SvgPath[] => {
   const pathEls = svgDoc.querySelectorAll('path');
 
   pathEls.forEach((el) => {
-    if (el.getAttribute('id') === 'tree-area') return;
     const jsonPath = svgToPhaserPath(el.getAttribute('d'));
     const path = new Phaser.Curves.Path(jsonPath);
     const color: number = rgbTohex(el.style.stroke);
     const fill: number = rgbTohex(el.style.fill);
-    svgPaths.push({ path, svgPathEl: el, strokeWidth: getStrokeWidth(el), color, fill });
+    const attributes: SvgPathAttributes = {};
+    // TODO (johnedvard) move to seperater function
+
+    if (
+      el.getAttribute('serif:id')?.match('{parallax-') ||
+      el.parentElement.getAttribute('serif:id')?.match('{parallax-')
+    ) {
+      const parallaxType =
+        el.getAttribute('serif:id')?.split('{parallax-')[1]?.split('}')[0] ||
+        el.parentElement.getAttribute('serif:id')?.split('{parallax-')[1]?.split('}')[0];
+      if (parallaxType === 'back') {
+        attributes.isParallaxBack = true;
+      } else if (parallaxType === 'front') {
+        attributes.isParallaxFront = true;
+      }
+    }
+    svgPaths.push({ path, svgPathEl: el, strokeWidth: getStrokeWidth(el), color, fill, attributes });
   });
   return svgPaths;
 };
