@@ -1,11 +1,13 @@
 import { SceneKey } from '~/enums/SceneKey';
 import { loadGame } from '~/gameState';
+import { initMusicAndSfx, playMusic } from '~/utils/soundUtils';
 
 export class Boot extends Phaser.Scene {
   // TODO (johnedvard) use an asset loader and constants for the names
   preload(): void {
     this.load.bitmapFont('atari', 'bitmap/atari-classic.png', 'bitmap/atari-classic.xml');
     this.preloadSpineAnimations();
+    this.loadMusic();
   }
 
   preloadSpineAnimations() {
@@ -36,12 +38,27 @@ export class Boot extends Phaser.Scene {
     this.load.image('sage', 'spine/sage.png');
   }
 
+  loadMusic() {
+    this.load.audio('backgroundMusic', 'music/background music.mp3');
+    this.load.audio('lockObject', 'music/lock object.mp3');
+    this.load.audio('unlockObject', 'music/unlock object.mp3');
+    this.load.audio('dead', 'music/dead.mp3');
+    this.load.audio('hourGlass', 'music/hourglass.mp3');
+    this.load.audio('laserBeam', 'music/laser beam.mp3');
+    this.load.audio('store', 'music/store.mp3');
+    this.load.audio('unlock', 'music/unlock.mp3');
+  }
   create(): void {
     this.setPixelArtFilterOnAssets();
     this.createAnimations();
+
     // TODO (johnedvard) start desired scene based on env build variable?
     // this.scene.start(SceneKey.Level);
     // this.scene.start(SceneKey.NewGameIntro);
+
+    initMusicAndSfx(this);
+    playMusic();
+
     this.scene.start(SceneKey.MainMenu);
   }
 

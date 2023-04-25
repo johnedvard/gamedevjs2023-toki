@@ -6,6 +6,7 @@ import { GameEvent } from '~/enums/GameEvent';
 import { getGameState, isLevelComplete } from '~/gameState';
 import { DoorState } from '~/types/DoorState';
 import { emit, on } from '~/utils/eventEmitterUtils';
+import { playUnLockObject, playUnlockDoor } from '~/utils/soundUtils';
 
 type TProps = {
   pos: Phaser.Math.Vector2;
@@ -52,6 +53,7 @@ export class Door {
       if (bodyB?.label === BodyTypeLabel.player && this.state === 'locked' && this.canUnlock) {
         this.setState('open');
         this.spineObject?.play('unlock');
+        playUnlockDoor();
       }
     };
   }

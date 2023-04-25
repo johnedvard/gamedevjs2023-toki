@@ -4,6 +4,7 @@ import { ControllerEvent } from '~/enums/ControllerEvent';
 import { DepthGroup } from '~/enums/DepthGroup';
 import { GameEvent } from '~/enums/GameEvent';
 import { emit, on } from '~/utils/eventEmitterUtils';
+import { playStoreSound } from '~/utils/soundUtils';
 
 type TProps = {
   pos: Phaser.Math.Vector2;
@@ -61,6 +62,7 @@ export class StoreBooth {
     for (let obj of allObjectsInProximity) {
       const other = <MatterJS.BodyType>obj;
       if (other.label === BodyTypeLabel.player) {
+        playStoreSound();
         emit(GameEvent.openStore);
       }
     }

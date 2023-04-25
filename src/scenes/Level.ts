@@ -12,6 +12,7 @@ import { TimeCapsule } from '~/gameobjects/TimeCapsule';
 import { LevelState } from '~/types/LevelState';
 import { SvgPath } from '~/types/SvgPath';
 import { emit, off, on } from '~/utils/eventEmitterUtils';
+import { playTimeCapsulePickup } from '~/utils/soundUtils';
 import { capturedCapsuleDialog, tutorialStartDialog } from '~/utils/tutorialUtils';
 
 import {
@@ -191,6 +192,7 @@ export class Level extends Phaser.Scene {
     if (this.levelId === 'levelTutorial') {
       emit(GameEvent.startDialog, { dialog: capturedCapsuleDialog });
     }
+    playTimeCapsulePickup();
     this.collectedCapsules++;
   };
   listenForEvents() {

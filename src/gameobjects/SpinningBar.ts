@@ -3,6 +3,7 @@ import { BodyTypeLabel } from '~/enums/BodyTypeLabel';
 import { DepthGroup } from '~/enums/DepthGroup';
 import { GameEvent } from '~/enums/GameEvent';
 import { emit, on } from '~/utils/eventEmitterUtils';
+import { playLockObject, playUnLockObject } from '~/utils/soundUtils';
 
 type TProps = {
   pos: Phaser.Math.Vector2;
@@ -96,6 +97,8 @@ export class SpinningBar {
   onTimeLock = ({ body }: { body: MatterJS.BodyType }) => {
     if (body === this.body) {
       this.body.isStatic = !this.body.isStatic;
+      if (this.body.isStatic) playLockObject();
+      else playUnLockObject();
     }
   };
   listenForEvents = () => {

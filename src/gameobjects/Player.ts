@@ -15,6 +15,8 @@ import {
   updateAim,
 } from '~/utils/playerUtils';
 import { SpeechBubble } from './SpeechBubble';
+import { playDeadSound, playLaserBeam } from '~/utils/soundUtils';
+import { SceneKey } from '~/enums/SceneKey';
 
 type TProps = {
   pos: Phaser.Math.Vector2;
@@ -171,6 +173,7 @@ export class Player {
   };
 
   private onAction = ({ pos }: { pos: Phaser.Math.Vector2 }) => {
+    if (!this.scene.game.scene.isActive(SceneKey.Level)) return; // don't do action if scene is paused
     const x = this.weaponBone.worldX + this.scene.cameras.main.scrollX;
     const y = -this.weaponBone.worldY + this.scene.cameras.main.height + this.scene.cameras.main.scrollY; // spine y coordinates are opposite of Phaser's
 
@@ -187,6 +190,7 @@ export class Player {
     const closestBody = getClosestBody(this.scene, startPos, endPos);
     console.log('closestBody', closestBody);
     emit(GameEvent.timeLock, { body: closestBody });
+    playLaserBeam();
 
     // TODO (johnedvard) Add some particle effects to the endPos if we found a body
     endPos = getClosestEndPos(closestBody, startPos, endPos, direction);
@@ -202,6 +206,7 @@ export class Player {
     this.spineObject.play('killed');
     this.body.isStatic = true;
     this.body.isSensor = true;
+    playDeadSound();
     await startKilledRoutine(this.scene, { pos: new Phaser.Math.Vector2(this.body.position.x, this.body.position.y) });
     this.scene.matter.world.remove(this.body);
 
