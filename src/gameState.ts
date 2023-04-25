@@ -42,3 +42,7 @@ export const hasSaveFile = (): boolean => {
   if (!isGameLoaded) loadGame();
   return Object.keys(gameState).length > 0;
 };
+
+export const isLevelComplete = (levelId: string) => {
+  return Boolean(gameState[levelId] >= 0);
+};

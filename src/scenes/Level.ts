@@ -1,6 +1,6 @@
 import { GameObjects, Scene } from 'phaser';
 import { GameEvent } from '~/enums/GameEvent';
-import { loadGame, saveLevelComplete } from '~/gameState';
+import { getGameState, loadGame, saveLevelComplete } from '~/gameState';
 import { Box } from '~/gameobjects/Box';
 import { Door } from '~/gameobjects/Door';
 import { Player } from '~/gameobjects/Player';
@@ -85,6 +85,7 @@ export class Level extends Phaser.Scene {
     this.player?.destroy();
     const svgText = levelSvgTexts[levelId];
     const levelState = this.createLevelFromSvg(this, svgText);
+
     this.player = new Player(this, { pos: levelState.start });
   }
 
@@ -97,10 +98,26 @@ export class Level extends Phaser.Scene {
     this.spinningBars = createSpinningBarsFromSvg(scene, svgDoc);
     this.storeBooth = createStoreBoothFromSvg(scene, svgDoc);
     this.doors = createDoorsFromSvg(scene, svgDoc);
+    this.setDoorState(this.doors);
 
     const start = getPosFromSvgCircle(svgDoc.querySelector(`#start`));
 
     return { start };
+  }
+  /** Update properties on the door, e.g. if it can be unlocked or not */
+  setDoorState(doors: Door[]) {
+    if (this.levelId === 'levelTutorial') return; // Exception for the tutorial level
+    const gameState = getGameState();
+    console.log('gameState', gameState);
+    doors.forEach((d) => {
+      if (d.goToLevelId === 'level0') return;
+      console.log('goToLevelId', d.goToLevelId);
+      const goToLevelNum = parseInt(d.goToLevelId.split('level')[1]); // name pattern is level{number}, e.g. level0 and level1
+      console.log('goToLevelNum', goToLevelNum);
+      if (gameState[`level${goToLevelNum - 1}`] >= 0) {
+        d.canUnlock = true;
+      }
+    });
   }
   updateLandscape() {
     if (!this.svgPaths) return;

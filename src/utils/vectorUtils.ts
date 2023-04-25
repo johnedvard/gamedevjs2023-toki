@@ -2,6 +2,7 @@ import { Scene } from 'phaser';
 import svgToPhaserPath from 'svg-to-phaser-path';
 
 import { BodyTypeLabel } from '~/enums/BodyTypeLabel';
+import { getGameState } from '~/gameState';
 import { Box } from '~/gameobjects/Box';
 import { Door } from '~/gameobjects/Door';
 import { SpinningBar } from '~/gameobjects/SpinningBar';
@@ -112,6 +113,7 @@ export const createDoorsFromSvg = (scene: Scene, svgDoc: Document): Door[] => {
   for (let el of doorEls) {
     if (el.getAttribute('serif:id')?.match('{door}')) {
       let isGoal = false;
+      let canUnlock = false;
       const pos = getPosFromSvgCircle(el);
       let goToLevelId = '';
       if (el.getAttribute('serif:id').match('{to-')) {
@@ -120,7 +122,11 @@ export const createDoorsFromSvg = (scene: Scene, svgDoc: Document): Door[] => {
       if (el.getAttribute('serif:id').match('{goal}')) {
         isGoal = true;
       }
-      doors.push(new Door(scene, { pos, goToLevelId, isGoal }));
+      if (goToLevelId === 'level1' || goToLevelId === 'leveltutorial') {
+        canUnlock = true;
+      }
+
+      doors.push(new Door(scene, { pos, goToLevelId, isGoal, canUnlock }));
     }
   }
   return doors;
