@@ -5,6 +5,7 @@ import { BodyTypeLabel } from '~/enums/BodyTypeLabel';
 import { getGameState } from '~/gameState';
 import { Box } from '~/gameobjects/Box';
 import { Door } from '~/gameobjects/Door';
+import { Hook } from '~/gameobjects/Hook';
 import { Platform } from '~/gameobjects/Platform';
 import { SpinningBar } from '~/gameobjects/SpinningBar';
 import { StoreBooth } from '~/gameobjects/StoreBooth';
@@ -188,6 +189,20 @@ export const createPlatformsFromSvg = (scene: Scene, svgDoc: Document): Platform
     platforms.push(new Platform(scene, { pos, height, width, pathToFollow: pathToFollow }));
   }
   return platforms;
+};
+
+export const createHooksFromSvg = (scene: Scene, svgDoc: Document): Platform[] => {
+  const circleElements = svgDoc.querySelectorAll('circle');
+  const hooks = [];
+  for (let el of circleElements) {
+    if (!el.getAttribute('serif:id')?.match('{hook}')) continue;
+    const pathToFollowEl = el.parentElement.querySelector('[id*=patrolRoute]');
+    const jsonPath = svgToPhaserPath(pathToFollowEl.getAttribute('d'));
+    const pathToFollow = new Phaser.Curves.Path(jsonPath);
+    const pos = getPosFromSvgCircle(el);
+    hooks.push(new Hook(scene, { pos, pathToFollow: pathToFollow }));
+  }
+  return hooks;
 };
 export const createBoxesFromSvg = (scene: Scene, svgDoc: Document): Box[] => {
   const rectElements = svgDoc.querySelectorAll('rect');

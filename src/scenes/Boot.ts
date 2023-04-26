@@ -34,6 +34,8 @@ export class Boot extends Phaser.Scene {
     this.load.spine('door', 'spine/door.json', ['spine/door.atlas'], true);
     this.load.image('timeCapsule', 'spine/timeCapsule.png');
     this.load.spine('timeCapsule', 'spine/timeCapsule.json', ['spine/timeCapsule.atlas'], true);
+    this.load.image('hook', 'spine/Hook.png');
+    this.load.spine('hook', 'spine/Hook.json', ['spine/Hook.atlas'], true);
 
     this.load.image('particle', 'spine/particle.png');
     this.load.image('sage', 'spine/sage.png');
@@ -59,7 +61,7 @@ export class Boot extends Phaser.Scene {
     initMusicAndSfx(this);
     playMusic();
 
-    this.scene.start(SceneKey.Level, { levelId: 'level2' });
+    this.scene.start(SceneKey.Level, { levelId: 'level3' });
   }
 
   addProgressBar() {

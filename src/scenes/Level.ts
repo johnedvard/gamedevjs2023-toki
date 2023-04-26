@@ -4,6 +4,7 @@ import { GameEvent } from '~/enums/GameEvent';
 import { getGameState, loadGame, saveLevelComplete } from '~/gameState';
 import { Box } from '~/gameobjects/Box';
 import { Door } from '~/gameobjects/Door';
+import { Hook } from '~/gameobjects/Hook';
 import { Platform } from '~/gameobjects/Platform';
 import { Player } from '~/gameobjects/Player';
 import { SpinningBar } from '~/gameobjects/SpinningBar';
@@ -27,11 +28,12 @@ import {
   createDoorsFromSvg,
   createTimeCapsulesFromSvg,
   createPlatformsFromSvg,
+  createHooksFromSvg,
 } from '~/utils/vectorUtils';
 
 const parser = new DOMParser();
 // TODO (johnedvard) read automatically from folder instead
-const levelIds = ['levelTutorial', 'level0', 'level1', 'level2'];
+const levelIds = ['levelTutorial', 'level0', 'level1', 'level2', 'level3'];
 const levelSvgTexts: Record<string, string> = {};
 
 export class Level extends Phaser.Scene {
@@ -47,6 +49,7 @@ export class Level extends Phaser.Scene {
   timeCapsules: TimeCapsule[];
   platforms: Platform[];
   collisionBoxes: MatterJS.BodyType[];
+  hooks: Hook[];
   levelId: string;
   maxCapsules: number;
   collectedCapsules = 0;
@@ -54,7 +57,7 @@ export class Level extends Phaser.Scene {
 
   preload(): void {
     loadGame();
-    this.matter.add.mouseSpring(); // TODO (johnedvard) remove if production. Enable through option in debug menu
+    // this.matter.add.mouseSpring(); // TODO (johnedvard) remove if production. Enable through option in debug menu
     this.loadLevels(levelIds);
 
     this.graphics = this.add.graphics().setDepth(DepthGroup.back);
@@ -84,6 +87,7 @@ export class Level extends Phaser.Scene {
     this.spinningBars?.forEach((b) => b.update(time, delta));
     this.timeCapsules?.forEach((b) => b.update(time, delta));
     this.platforms?.forEach((b) => b.update(time, delta));
+    this.hooks?.forEach((b) => b.update(time, delta));
     this.updateLandscape();
   }
 
@@ -119,6 +123,7 @@ export class Level extends Phaser.Scene {
     this.doors = createDoorsFromSvg(scene, svgDoc);
     this.timeCapsules = createTimeCapsulesFromSvg(scene, svgDoc);
     this.platforms = createPlatformsFromSvg(scene, svgDoc);
+    this.hooks = createHooksFromSvg(scene, svgDoc);
     this.setDoorState(this.doors);
 
     const start = getPosFromSvgCircle(svgDoc.querySelector(`#start`));
@@ -190,6 +195,8 @@ export class Level extends Phaser.Scene {
   restartLevel({ levelId }: { levelId: string }) {
     this.player?.destroy();
     this.storeBooth?.destroy();
+    this.collisionBoxes?.forEach((b) => this.matter.world.remove(b));
+    this.collisionBoxes.length = 0;
     this.boxes?.forEach((b) => b?.destroy());
     this.boxes.length = 0;
     this.doors?.forEach((d) => d?.destroy());
@@ -200,8 +207,8 @@ export class Level extends Phaser.Scene {
     this.timeCapsules.length = 0;
     this.platforms?.forEach((b) => b?.destroy());
     this.platforms.length = 0;
-    this.collisionBoxes?.forEach((b) => this.matter.world.remove(b));
-    this.collisionBoxes.length = 0;
+    this.hooks?.forEach((b) => b?.destroy());
+    this.hooks.length = 0;
     this.create({ levelId });
   }
 

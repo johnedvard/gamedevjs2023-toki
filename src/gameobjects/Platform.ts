@@ -65,7 +65,7 @@ export class Platform implements IGameObject {
     if (this.body.isStatic) return;
     this.timeAlive += delta;
     // TODO (johnedvard) move to other file
-    const s = 0.5 + 0.5 * Math.sin(this.timeAlive / (700 * this.followPath.length));
+    const s = 0.5 + 0.5 * Math.sin(this.timeAlive / (1.5 * this.pathToFollow.getLength()));
     const p = this.pathToFollow.getPoint(s);
     this.bodyConstraint.position.x = p.x;
     this.bodyConstraint.position.y = p.y;
