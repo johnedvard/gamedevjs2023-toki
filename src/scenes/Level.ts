@@ -15,7 +15,7 @@ import { LevelState } from '~/types/LevelState';
 import { SvgPath } from '~/types/SvgPath';
 import { emit, off, on } from '~/utils/eventEmitterUtils';
 import { playTimeCapsulePickup } from '~/utils/soundUtils';
-import { capturedCapsuleDialog, tutorialStartDialog } from '~/utils/tutorialUtils';
+import { capturedCapsuleDialog, gameWonDialog, tutorialStartDialog } from '~/utils/tutorialUtils';
 
 import {
   createTextFromSvg,
@@ -55,6 +55,8 @@ export class Level extends Phaser.Scene {
   maxCapsules: number;
   collectedCapsules = 0;
   numCapsules = 0;
+  hasDisplayedGameClearDialog = false;
+  hasDisplayedTutroialDialog = false;
 
   preload(): void {
     loadGame();
@@ -73,9 +75,11 @@ export class Level extends Phaser.Scene {
     this.createLevel(this.levelId);
     setTimeout(() => {
       // using timeout to step once, make sure Level Scene is actually paused
-      if (levelId === 'levelTutorial') {
+      if (levelId === 'levelTutorial' && !this.hasDisplayedTutroialDialog) {
         emit(GameEvent.startDialog, { dialog: tutorialStartDialog });
+        this.hasDisplayedTutroialDialog = true;
       }
+      this.checkIfGameCleared();
     });
     this.listenForEvents();
   }
@@ -243,5 +247,21 @@ export class Level extends Phaser.Scene {
     off(GameEvent.goToLevel, this.onGoToLevel);
     off(GameEvent.collectTimeCapsule, this.onTimeCapsuleCollected);
     off(GameEvent.restartLevel, this.onRestartLevel);
+  }
+
+  checkIfGameCleared() {
+    if (this.hasDisplayedGameClearDialog) return;
+    const levelsThatCanBeCleared = ['level1', 'level2', 'level3'];
+    const gameState = getGameState();
+    let hasWon = true;
+    levelsThatCanBeCleared.forEach((l) => {
+      if (gameState[l] === undefined) {
+        hasWon = false;
+      }
+    });
+    if (hasWon) {
+      emit(GameEvent.startDialog, { dialog: gameWonDialog });
+      this.hasDisplayedGameClearDialog = true;
+    }
   }
 }
