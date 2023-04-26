@@ -2,14 +2,16 @@ import { Scene } from 'phaser';
 import { BodyTypeLabel } from '~/enums/BodyTypeLabel';
 import { DepthGroup } from '~/enums/DepthGroup';
 import { GameEvent } from '~/enums/GameEvent';
+import { IGameObject } from '~/interfaces/IGameObject';
 import { TimeCapsuleState } from '~/types/TimeCapsuleState';
 import { emit } from '~/utils/eventEmitterUtils';
+import { destroyObject } from '~/utils/gameobjectUtils';
 
 type TProps = {
   pos: Phaser.Math.Vector2;
 };
 
-export class TimeCapsule {
+export class TimeCapsule implements IGameObject {
   body: MatterJS.BodyType;
   spineObject: SpineGameObject;
   state: TimeCapsuleState;
@@ -62,5 +64,11 @@ export class TimeCapsule {
 
   update(time: number, delta: number) {
     this.updateSpineObject();
+  }
+
+  stopListeningForEvents() {}
+
+  destroy() {
+    destroyObject(this.scene, this);
   }
 }

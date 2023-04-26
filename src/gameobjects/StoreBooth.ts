@@ -3,14 +3,16 @@ import { BodyTypeLabel } from '~/enums/BodyTypeLabel';
 import { ControllerEvent } from '~/enums/ControllerEvent';
 import { DepthGroup } from '~/enums/DepthGroup';
 import { GameEvent } from '~/enums/GameEvent';
-import { emit, on } from '~/utils/eventEmitterUtils';
+import { IGameObject } from '~/interfaces/IGameObject';
+import { emit, off, on } from '~/utils/eventEmitterUtils';
+import { destroyObject } from '~/utils/gameobjectUtils';
 import { playStoreSound } from '~/utils/soundUtils';
 
 type TProps = {
   pos: Phaser.Math.Vector2;
 };
 
-export class StoreBooth {
+export class StoreBooth implements IGameObject {
   body: MatterJS.BodyType;
   spineObject: SpineGameObject;
   overlordSpine: SpineGameObject;
@@ -79,5 +81,18 @@ export class StoreBooth {
 
   update(time: number, delta: number) {
     this.updateSpineObject();
+  }
+
+  stopListeningForEvents() {
+    off(ControllerEvent.up, this.onOpenStore);
+  }
+
+  destroy() {
+    destroyObject(this.scene, this);
+    this.overlordSpine.destroy();
+    this.speechBubble.destroy();
+    this.spineObject = null;
+    this.overlordSpine = null;
+    this.speechBubble = null;
   }
 }

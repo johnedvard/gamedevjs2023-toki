@@ -4,9 +4,11 @@ import { ControllerEvent } from '~/enums/ControllerEvent';
 import { DepthGroup } from '~/enums/DepthGroup';
 import { GameEvent } from '~/enums/GameEvent';
 import { getGameState, isLevelComplete } from '~/gameState';
+import { IGameObject } from '~/interfaces/IGameObject';
 import { DoorState } from '~/types/DoorState';
-import { emit, on } from '~/utils/eventEmitterUtils';
-import { playUnLockObject, playUnlockDoor } from '~/utils/soundUtils';
+import { emit, off, on } from '~/utils/eventEmitterUtils';
+import { destroyObject } from '~/utils/gameobjectUtils';
+import { playUnlockDoor } from '~/utils/soundUtils';
 
 type TProps = {
   pos: Phaser.Math.Vector2;
@@ -16,7 +18,7 @@ type TProps = {
   numCapsules: number;
 };
 
-export class Door {
+export class Door implements IGameObject {
   body: MatterJS.BodyType;
   goToLevelId: string;
   spineObject: SpineGameObject;
@@ -108,6 +110,20 @@ export class Door {
     }
   };
 
+  destroy() {
+    if (this.spineTimeCapsule) {
+      this.spineTimeCapsule.destroy();
+      this.spineTimeCapsule = null;
+    }
+    if (this.timeCapsuesBitmap) {
+      this.timeCapsuesBitmap.destroy();
+    }
+    destroyObject(this.scene, this);
+  }
+
+  stopListeningForEvents() {
+    off(ControllerEvent.up, this.openDoor);
+  }
   private listenForEvents() {
     on(ControllerEvent.up, this.openDoor);
   }

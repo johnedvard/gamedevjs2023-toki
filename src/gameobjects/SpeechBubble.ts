@@ -1,5 +1,6 @@
 import { Scene } from 'phaser';
 import { DepthGroup } from '~/enums/DepthGroup';
+import { IGameObject } from '~/interfaces/IGameObject';
 
 type TProps = {
   pos: Phaser.Math.Vector2;

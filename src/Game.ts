@@ -15,7 +15,6 @@ import { StoreInterface } from './scenes/StoreInterface';
 import { initSceneHandler } from './sceneHandler';
 import { initContract } from './near/nearConnection';
 import { MatterGravityFixPlugin } from './plugins/MatterGravityFixPlugin';
-import { NextLevel } from './scenes/NextLevel';
 import { DialogInterface } from './scenes/DialogInterface';
 
 const addScenes = (game: Game) => {
@@ -24,7 +23,6 @@ const addScenes = (game: Game) => {
   game.scene.add(SceneKey.NewGameIntro, NewGameIntro);
   game.scene.add(SceneKey.UserInterface, UserInterface);
   game.scene.add(SceneKey.Level, Level);
-  game.scene.add(SceneKey.NextLevel, NextLevel);
   game.scene.add(SceneKey.SceneInput, SceneInput);
   game.scene.add(SceneKey.StoreInterface, StoreInterface);
   game.scene.add(SceneKey.DialogInterface, DialogInterface);

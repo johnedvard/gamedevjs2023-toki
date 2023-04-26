@@ -66,7 +66,6 @@ export class StoreInterface extends Scene {
     this.initHitAreas();
 
     this.sys.events.on('stop', (data) => {
-      console.log('destroy');
       // perform any other necessary actions here
     });
     this.isInitialized = true;

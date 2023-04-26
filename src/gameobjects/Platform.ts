@@ -2,7 +2,9 @@ import { GameObjects, Scene } from 'phaser';
 import { BodyTypeLabel } from '~/enums/BodyTypeLabel';
 import { DepthGroup } from '~/enums/DepthGroup';
 import { GameEvent } from '~/enums/GameEvent';
-import { on } from '~/utils/eventEmitterUtils';
+import { IGameObject } from '~/interfaces/IGameObject';
+import { off, on } from '~/utils/eventEmitterUtils';
+import { destroyObject } from '~/utils/gameobjectUtils';
 import { playLockObject, playUnLockObject } from '~/utils/soundUtils';
 
 type TProps = {
@@ -11,9 +13,10 @@ type TProps = {
   height: number;
   pathToFollow?: Phaser.Curves.Path;
 };
-export class Platform {
+export class Platform implements IGameObject {
   body: MatterJS.BodyType;
-  constraint: MatterJS.BodyType;
+  bodyConstraint: MatterJS.BodyType;
+  constraint: MatterJS.ConstraintType;
   spineObject: SpineGameObject;
   width = 10;
   height = 10;
@@ -32,7 +35,7 @@ export class Platform {
     const startPosX = pos.x;
     const startPosY = pos.y;
 
-    this.constraint = this.scene.matter.add.circle(startPosX + this.width / 2, startPosY + this.height / 2, 10, {
+    this.bodyConstraint = this.scene.matter.add.circle(startPosX + this.width / 2, startPosY + this.height / 2, 10, {
       isSensor: true,
       isStatic: true,
       label: BodyTypeLabel.constraint,
@@ -46,8 +49,7 @@ export class Platform {
 
     this.scene.matter.body.setInertia(this.body, Infinity); // prevent body from rotating
 
-    const constraint = this.scene.matter.add.constraint(this.body, this.constraint, 0, 1);
-    this.scene.matter.world.add(constraint);
+    this.constraint = this.scene.matter.add.constraint(this.body, this.bodyConstraint, 0, 1);
   }
   private initSpineObject(pos: Phaser.Math.Vector2) {
     this.spineObject = this.scene.add
@@ -65,8 +67,8 @@ export class Platform {
     // TODO (johnedvard) move to other file
     const s = 0.5 + 0.5 * Math.sin(this.timeAlive / (700 * this.followPath.length));
     const p = this.pathToFollow.getPoint(s);
-    this.constraint.position.x = p.x;
-    this.constraint.position.y = p.y;
+    this.bodyConstraint.position.x = p.x;
+    this.bodyConstraint.position.y = p.y;
   }
   updateSpineObject() {
     const { x, y } = this.body.position;
@@ -88,4 +90,19 @@ export class Platform {
   listenForEvents = () => {
     on(GameEvent.timeLock, this.onTimeLock);
   };
+  stopListeningForEvents() {
+    off(GameEvent.timeLock, this.onTimeLock);
+  }
+
+  destroy() {
+    if (this.bodyConstraint) {
+      this.scene.matter.world.remove(this.bodyConstraint);
+      this.bodyConstraint = null;
+    }
+    if (this.constraint) {
+      this.scene.matter.world.removeConstraint(this.constraint, true);
+      this.constraint = null;
+    }
+    destroyObject(this.scene, this);
+  }
 }

@@ -2,7 +2,9 @@ import { Scene } from 'phaser';
 import { BodyTypeLabel } from '~/enums/BodyTypeLabel';
 import { DepthGroup } from '~/enums/DepthGroup';
 import { GameEvent } from '~/enums/GameEvent';
-import { on } from '~/utils/eventEmitterUtils';
+import { IGameObject } from '~/interfaces/IGameObject';
+import { off, on } from '~/utils/eventEmitterUtils';
+import { destroyObject } from '~/utils/gameobjectUtils';
 import { playLockObject, playUnLockObject } from '~/utils/soundUtils';
 
 type TProps = {
@@ -10,7 +12,7 @@ type TProps = {
   width: number;
   height: number;
 };
-export class Box {
+export class Box implements IGameObject {
   body: MatterJS.BodyType;
   spineObject: SpineGameObject;
   width = 10;
@@ -41,6 +43,7 @@ export class Box {
   }
 
   updateSpineObject() {
+    if (!this.body) return;
     const { x, y } = this.body.position;
     this.spineObject.setPosition(x, y);
     this.spineObject.rotation = this.body.angle;
@@ -51,7 +54,7 @@ export class Box {
   }
 
   onTimeLock = ({ body }: { body: MatterJS.BodyType }) => {
-    if (body === this.body) {
+    if (body && body === this.body) {
       this.body.isStatic = !this.body.isStatic;
       if (this.body.isStatic) playLockObject();
       else playUnLockObject();
@@ -60,4 +63,11 @@ export class Box {
   listenForEvents = () => {
     on(GameEvent.timeLock, this.onTimeLock);
   };
+  stopListeningForEvents = () => {
+    off(GameEvent.timeLock, this.onTimeLock);
+  };
+
+  destroy() {
+    destroyObject(this.scene, this);
+  }
 }

@@ -2,7 +2,9 @@ import { Scene } from 'phaser';
 import { BodyTypeLabel } from '~/enums/BodyTypeLabel';
 import { DepthGroup } from '~/enums/DepthGroup';
 import { GameEvent } from '~/enums/GameEvent';
-import { emit, on } from '~/utils/eventEmitterUtils';
+import { IGameObject } from '~/interfaces/IGameObject';
+import { emit, off, on } from '~/utils/eventEmitterUtils';
+import { destroyObject } from '~/utils/gameobjectUtils';
 import { playLockObject, playUnLockObject } from '~/utils/soundUtils';
 
 type TProps = {
@@ -12,10 +14,12 @@ type TProps = {
   isSafe?: boolean;
 };
 
-export class SpinningBar {
+export class SpinningBar implements IGameObject {
   body: MatterJS.BodyType;
-  constraint: MatterJS.BodyType;
+  bodyConstraint: MatterJS.BodyType;
+  constraint: MatterJS.ConstraintType;
   spineObject: SpineGameObject;
+
   width = 90;
   height = 299;
   angle = 0;
@@ -34,7 +38,7 @@ export class SpinningBar {
   private createBody(pos: Phaser.Math.Vector2) {
     const startPosX = pos.x;
     const startPosY = pos.y;
-    this.constraint = this.scene.matter.add.circle(startPosX, startPosY, 10, {
+    this.bodyConstraint = this.scene.matter.add.circle(startPosX, startPosY, 10, {
       isSensor: true,
       isStatic: true,
       label: BodyTypeLabel.constraint,
@@ -47,10 +51,7 @@ export class SpinningBar {
       density: 999,
       mass: 999,
     });
-    const constraint = this.scene.matter.add.constraint(this.body, this.constraint, 0, 0.1);
-
-    // Add the constraint to the Matter world
-    this.scene.matter.world.add(constraint);
+    this.constraint = this.scene.matter.add.constraint(this.body, this.bodyConstraint, 0, 0.1);
 
     if (!this.isSafe) {
       this.body.onCollideCallback = ({ bodyA, bodyB }) => {
@@ -101,7 +102,22 @@ export class SpinningBar {
       else playUnLockObject();
     }
   };
-  listenForEvents = () => {
+  listenForEvents() {
     on(GameEvent.timeLock, this.onTimeLock);
-  };
+  }
+
+  stopListeningForEvents() {
+    off(GameEvent.timeLock, this.onTimeLock);
+  }
+  destroy() {
+    if (this.bodyConstraint) {
+      this.scene.matter.world.remove(this.bodyConstraint);
+      this.bodyConstraint = null;
+    }
+    if (this.constraint) {
+      this.scene.matter.world.removeConstraint(this.constraint, true);
+      this.constraint = null;
+    }
+    destroyObject(this.scene, this);
+  }
 }

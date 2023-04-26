@@ -46,6 +46,7 @@ export class Level extends Phaser.Scene {
   doors: Door[];
   timeCapsules: TimeCapsule[];
   platforms: Platform[];
+  collisionBoxes: MatterJS.BodyType[];
   levelId: string;
   maxCapsules: number;
   collectedCapsules = 0;
@@ -53,7 +54,7 @@ export class Level extends Phaser.Scene {
 
   preload(): void {
     loadGame();
-    // this.matter.add.mouseSpring(); // TODO (johnedvard) remove if production. Enable through option in debug menu
+    this.matter.add.mouseSpring(); // TODO (johnedvard) remove if production. Enable through option in debug menu
     this.loadLevels(levelIds);
 
     this.graphics = this.add.graphics().setDepth(DepthGroup.back);
@@ -110,7 +111,7 @@ export class Level extends Phaser.Scene {
   createLevelFromSvg(scene: Scene, svgText: string): LevelState {
     const svgDoc: Document = parser.parseFromString(svgText, 'image/svg+xml');
     this.svgPaths = createPathsFromSvg(svgDoc);
-    createCollisionBoxesFromPaths(scene, this.svgPaths);
+    this.collisionBoxes = createCollisionBoxesFromPaths(scene, this.svgPaths);
     createTextFromSvg(scene, svgDoc);
     this.boxes = createBoxesFromSvg(scene, svgDoc);
     this.spinningBars = createSpinningBarsFromSvg(scene, svgDoc);
@@ -186,10 +187,29 @@ export class Level extends Phaser.Scene {
     groupFront.shiftPosition(parallaxFactorFront, 0);
     groupBack.shiftPosition(parallaxFactorBack, 0);
   }
+  restartLevel({ levelId }: { levelId: string }) {
+    this.player?.destroy();
+    this.storeBooth?.destroy();
+    this.boxes?.forEach((b) => b?.destroy());
+    this.boxes.length = 0;
+    this.doors?.forEach((d) => d?.destroy());
+    this.doors.length = 0;
+    this.spinningBars?.forEach((b) => b?.destroy());
+    this.spinningBars.length = 0;
+    this.timeCapsules?.forEach((b) => b?.destroy());
+    this.timeCapsules.length = 0;
+    this.platforms?.forEach((b) => b?.destroy());
+    this.platforms.length = 0;
+    this.collisionBoxes?.forEach((b) => this.matter.world.remove(b));
+    this.collisionBoxes.length = 0;
+    this.create({ levelId });
+  }
 
   onGoToLevel = ({ levelId }: { levelId: string }) => {
+    this.stopListeningForEvents();
     // Save the current level before we go to the next
     saveLevelComplete({ levelId: this.levelId, collectedCapsules: this.collectedCapsules });
+    this.restartLevel({ levelId });
   };
 
   onTimeCapsuleCollected = () => {

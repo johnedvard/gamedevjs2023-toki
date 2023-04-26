@@ -17,11 +17,13 @@ import {
 import { SpeechBubble } from './SpeechBubble';
 import { playDeadSound, playLaserBeam } from '~/utils/soundUtils';
 import { SceneKey } from '~/enums/SceneKey';
+import { IGameObject } from '~/interfaces/IGameObject';
+import { destroyObject } from '~/utils/gameobjectUtils';
 
 type TProps = {
   pos: Phaser.Math.Vector2;
 };
-export class Player {
+export class Player implements IGameObject {
   body: MatterJS.BodyType;
   proximityCircle: MatterJS.BodyType;
   bodyRadius = 35;
@@ -93,8 +95,7 @@ export class Player {
   }
 
   destroy() {
-    this.spineObject = null;
-    this.stopListeningForEvents();
+    destroyObject(this.scene, this);
   }
 
   private cameraFollow() {
@@ -189,7 +190,7 @@ export class Player {
     let endPos = new Phaser.Math.Vector2(direction.x * maxDist, direction.y * maxDist).add(startPos);
 
     const closestBody = getClosestBody(this.scene, startPos, endPos);
-    console.log('closestBody', closestBody);
+
     emit(GameEvent.timeLock, { body: closestBody });
     playLaserBeam();
 
@@ -232,7 +233,7 @@ export class Player {
     on(GameEvent.changeSkin, this.onSkinChanged);
     on(GameEvent.kill, this.onKilled);
   }
-  private stopListeningForEvents() {
+  stopListeningForEvents() {
     off(ControllerEvent.move, this.onMove);
     off(ControllerEvent.jump, this.onJump);
     off(ControllerEvent.action, this.onAction);
