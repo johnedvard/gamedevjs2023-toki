@@ -8,4 +8,5 @@ export enum GameEvent {
   startDialog = 'startDialog',
   endDialog = 'endDialog',
   collectTimeCapsule = 'collectTimeCapsule',
+  restartLevel = 'restartLevel',
 }

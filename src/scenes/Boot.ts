@@ -55,13 +55,13 @@ export class Boot extends Phaser.Scene {
     this.setPixelArtFilterOnAssets();
 
     // TODO (johnedvard) start desired scene based on env build variable?
-    // this.scene.start(SceneKey.Level);
-    // this.scene.start(SceneKey.NewGameIntro);
 
     initMusicAndSfx(this);
     playMusic();
 
-    this.scene.start(SceneKey.Level, { levelId: 'level3' });
+    // this.scene.start(SceneKey.Level);
+    this.scene.start(SceneKey.MainMenu);
+    // this.scene.start(SceneKey.Level, { levelId: 'level3' });
   }
 
   addProgressBar() {

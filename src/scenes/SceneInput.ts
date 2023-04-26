@@ -1,5 +1,6 @@
 import { Input, Scene } from 'phaser';
 import { ControllerEvent } from '~/enums/ControllerEvent';
+import { GameEvent } from '~/enums/GameEvent';
 import { emit } from '~/utils/eventEmitterUtils';
 import { gamepadIndex, leftstick } from '~/utils/gamepadUtils';
 
@@ -61,6 +62,9 @@ export class SceneInput extends Scene {
         case 'KeyW':
         case 'ArrowUp':
           emit(ControllerEvent.up);
+          break;
+        case 'KeyR':
+          emit(GameEvent.restartLevel);
           break;
       }
     });

@@ -41,6 +41,7 @@ export class Level extends Phaser.Scene {
   graphics: GameObjects.Graphics;
   graphicsBack: GameObjects.Graphics;
   graphicsFront: GameObjects.Graphics;
+  bitmapTexts: Phaser.GameObjects.BitmapText[];
   svgPaths: SvgPath[];
   boxes: Box[];
   spinningBars: SpinningBar[];
@@ -116,7 +117,7 @@ export class Level extends Phaser.Scene {
     const svgDoc: Document = parser.parseFromString(svgText, 'image/svg+xml');
     this.svgPaths = createPathsFromSvg(svgDoc);
     this.collisionBoxes = createCollisionBoxesFromPaths(scene, this.svgPaths);
-    createTextFromSvg(scene, svgDoc);
+    this.bitmapTexts = createTextFromSvg(scene, svgDoc);
     this.boxes = createBoxesFromSvg(scene, svgDoc);
     this.spinningBars = createSpinningBarsFromSvg(scene, svgDoc);
     this.storeBooth = createStoreBoothFromSvg(scene, svgDoc);
@@ -196,6 +197,7 @@ export class Level extends Phaser.Scene {
     this.player?.destroy();
     this.storeBooth?.destroy();
     this.collisionBoxes?.forEach((b) => this.matter.world.remove(b));
+    this.bitmapTexts?.forEach((b) => b.destroy());
     this.collisionBoxes.length = 0;
     this.boxes?.forEach((b) => b?.destroy());
     this.boxes.length = 0;
@@ -227,13 +229,19 @@ export class Level extends Phaser.Scene {
     playTimeCapsulePickup();
     this.collectedCapsules++;
   };
+
+  onRestartLevel = () => {
+    this.restartLevel({ levelId: this.levelId });
+  };
   listenForEvents() {
     on(GameEvent.goToLevel, this.onGoToLevel);
     on(GameEvent.collectTimeCapsule, this.onTimeCapsuleCollected);
+    on(GameEvent.restartLevel, this.onRestartLevel);
   }
 
   stopListeningForEvents() {
     off(GameEvent.goToLevel, this.onGoToLevel);
     off(GameEvent.collectTimeCapsule, this.onTimeCapsuleCollected);
+    off(GameEvent.restartLevel, this.onRestartLevel);
   }
 }

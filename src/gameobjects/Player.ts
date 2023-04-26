@@ -210,15 +210,16 @@ export class Player implements IGameObject {
     this.body.isSensor = true;
     playDeadSound();
     await startKilledRoutine(this.scene, { pos: new Phaser.Math.Vector2(this.body.position.x, this.body.position.y) });
-    this.scene.matter.world.remove(this.body);
+    emit(GameEvent.restartLevel);
+    // this.scene.matter.world.remove(this.body);
 
-    this.setState('idle');
-    this.body = this.scene.matter.add.circle(this.startPos.x, this.startPos.y, this.bodyRadius, {
-      frictionAir: 0.1,
-      label: BodyTypeLabel.player,
-      mass: 10,
-      friction: 0.5,
-    });
+    // this.setState('idle');
+    // this.body = this.scene.matter.add.circle(this.startPos.x, this.startPos.y, this.bodyRadius, {
+    //   frictionAir: 0.1,
+    //   label: BodyTypeLabel.player,
+    //   mass: 10,
+    //   friction: 0.5,
+    // });
   }
 
   onKilled = async () => {

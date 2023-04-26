@@ -98,8 +98,9 @@ export const createCollisionBoxesFromPaths = (scene: Scene, svgPaths: SvgPath[])
   return boxes;
 };
 
-export const createTextFromSvg = (scene: Scene, svgDoc: Document) => {
+export const createTextFromSvg = (scene: Scene, svgDoc: Document): Phaser.GameObjects.BitmapText[] => {
   const textelements = svgDoc.querySelectorAll('text');
+  const bitmapTexts = [];
 
   for (let el of textelements) {
     // TODO (johnedvard) deal with attributes not containing 'px'
@@ -110,7 +111,9 @@ export const createTextFromSvg = (scene: Scene, svgDoc: Document) => {
     textValue = textValue.replace(/<[^>]+>/g, '');
     const bitmapText = scene.add.bitmapText(x, y, 'atari', textValue, fontSize).setAlpha(1).setOrigin(0.2, 0.6);
     bitmapText.setTint(0x000000);
+    bitmapTexts.push(bitmapText);
   }
+  return bitmapTexts;
 };
 export const createSpinningBarsFromSvg = (scene: Scene, svgDoc: Document): SpinningBar[] => {
   const spinningObjectEls = svgDoc.querySelectorAll('circle');
@@ -191,7 +194,7 @@ export const createPlatformsFromSvg = (scene: Scene, svgDoc: Document): Platform
   return platforms;
 };
 
-export const createHooksFromSvg = (scene: Scene, svgDoc: Document): Platform[] => {
+export const createHooksFromSvg = (scene: Scene, svgDoc: Document): Hook[] => {
   const circleElements = svgDoc.querySelectorAll('circle');
   const hooks = [];
   for (let el of circleElements) {
