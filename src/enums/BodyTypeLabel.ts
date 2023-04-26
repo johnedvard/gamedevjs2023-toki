@@ -10,4 +10,5 @@ export enum BodyTypeLabel {
   proximity = 'proximity',
   constraint = 'constraint',
   timeCapsule = 'timeCapsule',
+  platform = 'platform',
 }

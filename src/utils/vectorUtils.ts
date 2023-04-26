@@ -5,6 +5,7 @@ import { BodyTypeLabel } from '~/enums/BodyTypeLabel';
 import { getGameState } from '~/gameState';
 import { Box } from '~/gameobjects/Box';
 import { Door } from '~/gameobjects/Door';
+import { Platform } from '~/gameobjects/Platform';
 import { SpinningBar } from '~/gameobjects/SpinningBar';
 import { StoreBooth } from '~/gameobjects/StoreBooth';
 import { TimeCapsule } from '~/gameobjects/TimeCapsule';
@@ -27,13 +28,20 @@ export const getPosFromSvgRect = (svgEl: SVGElement): Phaser.Math.Vector2 => {
   if (!x || !y) return null;
   return new Phaser.Math.Vector2(~~x, ~~y);
 };
-export const getHeightFromSvgRect = (svgEl: SVGElement): number => {
-  let height = svgEl.getAttribute('height');
 
-  if (height.match('px')) height = height.split('px')[0];
-  if (!height) return 0;
-  return ~~height;
+const getPixelValueFromAttribute = (attribute: string): number => {
+  if (attribute.match('px')) attribute = attribute.split('px')[0];
+  if (!attribute) return 0;
+  return ~~attribute;
 };
+export const getHeightFromSvgRect = (svgEl: SVGElement): number => {
+  return getPixelValueFromAttribute(svgEl.getAttribute('height'));
+};
+
+export const getWidthFromSvgRect = (svgEl: SVGElement): number => {
+  return getPixelValueFromAttribute(svgEl.getAttribute('width'));
+};
+
 export const createPathsFromSvg = (svgDoc: Document): SvgPath[] => {
   const svgPaths: SvgPath[] = [];
   const pathEls = svgDoc.querySelectorAll('path');
@@ -164,6 +172,21 @@ export const createTimeCapsulesFromSvg = (scene: Scene, svgDoc: Document): TimeC
     }
   }
   return capsules;
+};
+export const createPlatformsFromSvg = (scene: Scene, svgDoc: Document): Platform[] => {
+  const rectElements = svgDoc.querySelectorAll('rect');
+  const platforms = [];
+  for (let el of rectElements) {
+    if (!el.getAttribute('serif:id')?.match('{platform}')) continue;
+    const pathToFollowEl = el.parentElement.querySelector('[id*=patrolRoute]');
+    const jsonPath = svgToPhaserPath(pathToFollowEl.getAttribute('d'));
+    const pathToFollow = new Phaser.Curves.Path(jsonPath);
+    const pos = getPosFromSvgRect(el);
+    const height = getHeightFromSvgRect(el);
+    const width = getWidthFromSvgRect(el);
+    platforms.push(new Platform(scene, { pos, height, width, pathToFollow: pathToFollow }));
+  }
+  return platforms;
 };
 export const createBoxesFromSvg = (scene: Scene, svgDoc: Document): Box[] => {
   const rectElements = svgDoc.querySelectorAll('rect');

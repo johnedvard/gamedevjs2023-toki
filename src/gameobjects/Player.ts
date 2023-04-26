@@ -111,7 +111,8 @@ export class Player {
       if (
         other.label === BodyTypeLabel.collisionWall ||
         other.label === BodyTypeLabel.box ||
-        other.label === BodyTypeLabel.spinningBar
+        other.label === BodyTypeLabel.spinningBar ||
+        other.label === BodyTypeLabel.platform
       )
         return true;
     }
@@ -127,7 +128,7 @@ export class Player {
       frictionAir: 0.1,
       label: BodyTypeLabel.player,
       mass: 10,
-      friction: 0.5,
+      friction: 1,
     });
 
     this.proximityCircle = this.scene.matter.add.circle(startPosX, startPosY, this.bodyRadius + 15, {

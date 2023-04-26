@@ -2,7 +2,6 @@ import { SceneKey } from '~/enums/SceneKey';
 import { initMusicAndSfx, playMusic } from '~/utils/soundUtils';
 
 export class Boot extends Phaser.Scene {
-  loadingBitmapText: Phaser.GameObjects.BitmapText;
   // TODO (johnedvard) use an asset loader and constants for the names
   preload(): void {
     this.load.bitmapFont('atari', 'bitmap/atari-classic.png', 'bitmap/atari-classic.xml');
@@ -51,14 +50,6 @@ export class Boot extends Phaser.Scene {
     this.load.audio('unlock', 'music/unlock.mp3');
   }
   create(): void {
-    this.loadingBitmapText = this.add.bitmapText(
-      this.cameras.main.width / 2,
-      this.cameras.main.height / 2,
-      'atari',
-      'Loading assets',
-      33,
-      1
-    );
     this.setPixelArtFilterOnAssets();
 
     // TODO (johnedvard) start desired scene based on env build variable?
@@ -68,7 +59,7 @@ export class Boot extends Phaser.Scene {
     initMusicAndSfx(this);
     playMusic();
 
-    this.scene.start(SceneKey.MainMenu);
+    this.scene.start(SceneKey.Level, { levelId: 'level2' });
   }
 
   addProgressBar() {

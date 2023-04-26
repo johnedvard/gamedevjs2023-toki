@@ -4,6 +4,7 @@ import { GameEvent } from '~/enums/GameEvent';
 import { getGameState, loadGame, saveLevelComplete } from '~/gameState';
 import { Box } from '~/gameobjects/Box';
 import { Door } from '~/gameobjects/Door';
+import { Platform } from '~/gameobjects/Platform';
 import { Player } from '~/gameobjects/Player';
 import { SpinningBar } from '~/gameobjects/SpinningBar';
 import { StoreBooth } from '~/gameobjects/StoreBooth';
@@ -25,11 +26,12 @@ import {
   createStoreBoothFromSvg,
   createDoorsFromSvg,
   createTimeCapsulesFromSvg,
+  createPlatformsFromSvg,
 } from '~/utils/vectorUtils';
 
 const parser = new DOMParser();
 // TODO (johnedvard) read automatically from folder instead
-const levelIds = ['levelTutorial', 'level0', 'level1'];
+const levelIds = ['levelTutorial', 'level0', 'level1', 'level2'];
 const levelSvgTexts: Record<string, string> = {};
 
 export class Level extends Phaser.Scene {
@@ -43,6 +45,7 @@ export class Level extends Phaser.Scene {
   storeBooth: StoreBooth;
   doors: Door[];
   timeCapsules: TimeCapsule[];
+  platforms: Platform[];
   levelId: string;
   maxCapsules: number;
   collectedCapsules = 0;
@@ -50,7 +53,7 @@ export class Level extends Phaser.Scene {
 
   preload(): void {
     loadGame();
-    this.matter.add.mouseSpring(); // TODO (johnedvard) remove if production. Enable through option in debug menu
+    // this.matter.add.mouseSpring(); // TODO (johnedvard) remove if production. Enable through option in debug menu
     this.loadLevels(levelIds);
 
     this.graphics = this.add.graphics().setDepth(DepthGroup.back);
@@ -79,6 +82,7 @@ export class Level extends Phaser.Scene {
     this.doors?.forEach((d) => d.update(time, delta));
     this.spinningBars?.forEach((b) => b.update(time, delta));
     this.timeCapsules?.forEach((b) => b.update(time, delta));
+    this.platforms?.forEach((b) => b.update(time, delta));
     this.updateLandscape();
   }
 
@@ -113,6 +117,7 @@ export class Level extends Phaser.Scene {
     this.storeBooth = createStoreBoothFromSvg(scene, svgDoc);
     this.doors = createDoorsFromSvg(scene, svgDoc);
     this.timeCapsules = createTimeCapsulesFromSvg(scene, svgDoc);
+    this.platforms = createPlatformsFromSvg(scene, svgDoc);
     this.setDoorState(this.doors);
 
     const start = getPosFromSvgCircle(svgDoc.querySelector(`#start`));
