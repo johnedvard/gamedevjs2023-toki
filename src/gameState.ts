@@ -27,7 +27,9 @@ const saveGame = (): void => {
 };
 
 export const saveLevelComplete = ({ levelId, collectedCapsules }: SaveLevelState) => {
-  gameState[levelId] = collectedCapsules;
+  let bestScore = collectedCapsules;
+  if (gameState[levelId] > bestScore) bestScore = gameState[levelId];
+  gameState[levelId] = bestScore;
   saveGame();
 };
 
