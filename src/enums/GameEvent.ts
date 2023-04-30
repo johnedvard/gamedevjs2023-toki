@@ -9,4 +9,6 @@ export enum GameEvent {
   endDialog = 'endDialog',
   collectTimeCapsule = 'collectTimeCapsule',
   restartLevel = 'restartLevel',
+  onPlatform = 'onPlatform',
+  offPlatform = 'offPlatform',
 }

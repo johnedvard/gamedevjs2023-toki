@@ -39,6 +39,7 @@ export class Player implements IGameObject {
   aimBeamDistance = 500;
   startPos: Phaser.Math.Vector2;
   bubble: SpeechBubble;
+  attachedToPlatform: MatterJS.BodyType;
 
   constructor(private scene: Scene, { pos }: TProps) {
     this.startPos = pos;
@@ -63,6 +64,10 @@ export class Player implements IGameObject {
   };
 
   update(time: number, delta: number) {
+    // this.scene.matter.setAngularVelocity(this.body, 0); another method to prevent rotation
+    if (this.state === 'idle') {
+      this.addVelocityToBody();
+    }
     this.updateSpineObject();
     this.updateProximityCircle();
     this.updateContainer();
@@ -126,11 +131,14 @@ export class Player implements IGameObject {
     const startPosY = pos.y;
 
     this.body = this.scene.matter.add.circle(startPosX, startPosY, this.bodyRadius, {
-      frictionAir: 0.1,
+      frictionAir: 0.05,
       label: BodyTypeLabel.player,
       mass: 10,
       friction: 1,
+      frictionStatic: 0,
+      restitution: 0,
     });
+    this.scene.matter.body.setInertia(this.body, Infinity); // prevent body from rotating
 
     this.proximityCircle = this.scene.matter.add.circle(startPosX, startPosY, this.bodyRadius + 15, {
       isSensor: true,
@@ -161,7 +169,15 @@ export class Player implements IGameObject {
     if (this.state === 'killed') return;
     if (velocity.x !== 0) {
       this.setState('walk');
-      this.scene.matter.setVelocity(this.body, velocity.x * this.speed, this.body.velocity.y);
+      let velocityX = velocity.x * this.speed;
+
+      // TODO (johnedvard) also check if actually on top of platform (not below or on the sides)
+      if (this.attachedToPlatform) {
+        const velocityMultiplier =
+          Math.sign(this.attachedToPlatform.velocity.x) == Math.sign(this.body.velocity.x) ? 0.5 : 1.5;
+        velocityX += this.attachedToPlatform.velocity.x * velocityMultiplier;
+      }
+      this.scene.matter.setVelocity(this.body, velocityX, this.body.velocity.y);
       this.setDirection(velocity.x > 0 ? 1 : -1);
     } else {
       this.setState('idle');
@@ -211,19 +227,21 @@ export class Player implements IGameObject {
     playDeadSound();
     await startKilledRoutine(this.scene, { pos: new Phaser.Math.Vector2(this.body.position.x, this.body.position.y) });
     emit(GameEvent.restartLevel);
-    // this.scene.matter.world.remove(this.body);
+  }
 
-    // this.setState('idle');
-    // this.body = this.scene.matter.add.circle(this.startPos.x, this.startPos.y, this.bodyRadius, {
-    //   frictionAir: 0.1,
-    //   label: BodyTypeLabel.player,
-    //   mass: 10,
-    //   friction: 0.5,
-    // });
+  addVelocityToBody() {
+    // TODO (johnedavrd) Only add velocity to body (player) if it's above the platform
+    if (this.attachedToPlatform) {
+      this.scene.matter.setVelocityX(this.body, this.attachedToPlatform.velocity.x); // make player follow moving platform
+    }
   }
 
   onKilled = async () => {
     this.setState('killed');
+  };
+
+  onAttachedTo = ({ body }) => {
+    this.attachedToPlatform = body;
   };
 
   private listenForEvents() {
@@ -233,6 +251,8 @@ export class Player implements IGameObject {
     on(ControllerEvent.action, this.onAction);
     on(GameEvent.changeSkin, this.onSkinChanged);
     on(GameEvent.kill, this.onKilled);
+    on(GameEvent.onPlatform, this.onAttachedTo);
+    on(GameEvent.offPlatform, this.onAttachedTo);
   }
   stopListeningForEvents() {
     off(ControllerEvent.move, this.onMove);
@@ -240,5 +260,7 @@ export class Player implements IGameObject {
     off(ControllerEvent.action, this.onAction);
     off(GameEvent.changeSkin, this.onSkinChanged);
     off(GameEvent.kill, this.onKilled);
+    off(GameEvent.onPlatform, this.onAttachedTo);
+    off(GameEvent.offPlatform, this.onAttachedTo);
   }
 }

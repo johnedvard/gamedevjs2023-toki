@@ -1,9 +1,10 @@
 import { GameObjects, Scene } from 'phaser';
+
 import { BodyTypeLabel } from '~/enums/BodyTypeLabel';
 import { DepthGroup } from '~/enums/DepthGroup';
 import { GameEvent } from '~/enums/GameEvent';
 import { IGameObject } from '~/interfaces/IGameObject';
-import { off, on } from '~/utils/eventEmitterUtils';
+import { emit, off, on } from '~/utils/eventEmitterUtils';
 import { destroyObject } from '~/utils/gameobjectUtils';
 import { playLockObject, playUnLockObject } from '~/utils/soundUtils';
 
@@ -44,8 +45,20 @@ export class Platform implements IGameObject {
     this.body = this.scene.matter.add.rectangle(startPosX, startPosY, this.width, this.height, {
       label: BodyTypeLabel.platform,
       friction: 1,
+      frictionStatic: 0,
       mass: 10,
     });
+
+    this.body.onCollideActiveCallback = ({ bodyA, bodyB }) => {
+      if (bodyB?.label === BodyTypeLabel.player) {
+        emit(GameEvent.onPlatform, { body: bodyA });
+      }
+    };
+    this.body.onCollideEndCallback = ({ bodyA, bodyB }) => {
+      if (bodyB?.label === BodyTypeLabel.player) {
+        emit(GameEvent.offPlatform, { body: null });
+      }
+    };
 
     this.scene.matter.body.setInertia(this.body, Infinity); // prevent body from rotating
 
@@ -76,17 +89,28 @@ export class Platform implements IGameObject {
   }
 
   update(time: number, delta: number) {
+    // this.scene.matter.setAngularVelocity(this.body, 0); // another way of preventing rotation
     this.followPath(time, delta);
     this.updateSpineObject();
   }
 
   onTimeLock = ({ body }: { body: MatterJS.BodyType }) => {
     if (body === this.body) {
+      this.stopCompletely();
       this.body.isStatic = !this.body.isStatic;
       if (this.body.isStatic) playLockObject();
       else playUnLockObject();
     }
   };
+
+  /**
+   * Need to set these properties to prevent the player from sliding on the object after making the platfor stattic
+   */
+  stopCompletely() {
+    this.scene.matter.setAngularVelocity(this.body, 0);
+    this.scene.matter.setVelocity(this.body, 0, 0);
+  }
+
   listenForEvents = () => {
     on(GameEvent.timeLock, this.onTimeLock);
   };
