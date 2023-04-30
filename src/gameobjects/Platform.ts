@@ -5,6 +5,7 @@ import { DepthGroup } from '~/enums/DepthGroup';
 import { GameEvent } from '~/enums/GameEvent';
 import { IGameObject } from '~/interfaces/IGameObject';
 import { emit, off, on } from '~/utils/eventEmitterUtils';
+import { commonTimeLock } from '~/utils/gameUtils';
 import { destroyObject } from '~/utils/gameobjectUtils';
 import { playLockObject, playUnLockObject } from '~/utils/soundUtils';
 
@@ -95,18 +96,15 @@ export class Platform implements IGameObject {
   }
 
   onTimeLock = ({ body }: { body: MatterJS.BodyType }) => {
-    if (body === this.body) {
-      this.stopCompletely();
-      this.body.isStatic = !this.body.isStatic;
-      if (this.body.isStatic) playLockObject();
-      else playUnLockObject();
-    }
+    commonTimeLock(body, this.body);
+    this.stopCompletely();
   };
 
   /**
    * Need to set these properties to prevent the player from sliding on the object after making the platfor stattic
    */
   stopCompletely() {
+    if (!this.body) return;
     this.scene.matter.setAngularVelocity(this.body, 0);
     this.scene.matter.setVelocity(this.body, 0, 0);
   }

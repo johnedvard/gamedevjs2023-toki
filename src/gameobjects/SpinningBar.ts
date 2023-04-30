@@ -4,6 +4,7 @@ import { DepthGroup } from '~/enums/DepthGroup';
 import { GameEvent } from '~/enums/GameEvent';
 import { IGameObject } from '~/interfaces/IGameObject';
 import { emit, off, on } from '~/utils/eventEmitterUtils';
+import { commonTimeLock } from '~/utils/gameUtils';
 import { destroyObject } from '~/utils/gameobjectUtils';
 import { playLockObject, playUnLockObject } from '~/utils/soundUtils';
 
@@ -96,11 +97,7 @@ export class SpinningBar implements IGameObject {
   }
 
   onTimeLock = ({ body }: { body: MatterJS.BodyType }) => {
-    if (body === this.body) {
-      this.body.isStatic = !this.body.isStatic;
-      if (this.body.isStatic) playLockObject();
-      else playUnLockObject();
-    }
+    commonTimeLock(body, this.body);
   };
   listenForEvents() {
     on(GameEvent.timeLock, this.onTimeLock);
