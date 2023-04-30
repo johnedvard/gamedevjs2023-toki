@@ -95,6 +95,10 @@ export class Platform implements IGameObject {
     this.updateSpineObject();
   }
 
+  canBeGrabbed() {
+    return false;
+  }
+
   onTimeLock = ({ body }: { body: MatterJS.BodyType }) => {
     commonTimeLock(body, this.body);
     this.stopCompletely();

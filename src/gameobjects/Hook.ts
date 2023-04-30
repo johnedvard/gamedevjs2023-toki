@@ -84,6 +84,10 @@ export class Hook implements IGameObject {
     this.updateSpineObject();
   }
 
+  canBeGrabbed() {
+    return false;
+  }
+
   onTimeLock = ({ body }: { body: MatterJS.BodyType }) => {
     commonTimeLock(body, this.body);
   };

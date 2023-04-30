@@ -90,6 +90,10 @@ export class SpinningBar implements IGameObject {
     }
   }
 
+  canBeGrabbed() {
+    return false;
+  }
+
   update(time: number, delta: number) {
     this.angle = this.angle + delta / 800;
 

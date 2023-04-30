@@ -99,6 +99,10 @@ export class Player implements IGameObject {
     }
   }
 
+  canBeGrabbed() {
+    return false;
+  }
+
   destroy() {
     destroyObject(this.scene, this);
   }
@@ -131,7 +135,7 @@ export class Player implements IGameObject {
     const startPosY = pos.y;
 
     this.body = this.scene.matter.add.circle(startPosX, startPosY, this.bodyRadius, {
-      frictionAir: 0.05,
+      frictionAir: 0.03,
       label: BodyTypeLabel.player,
       mass: 10,
       friction: 1,

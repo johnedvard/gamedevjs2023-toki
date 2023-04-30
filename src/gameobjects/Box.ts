@@ -54,6 +54,11 @@ export class Box implements IGameObject {
     this.updateSpineObject();
   }
 
+  canBeGrabbed() {
+    // TODO (johnedvard) Maybe prevent grabbing in certain situations
+    return true;
+  }
+
   onTimeLock = ({ body }: { body: MatterJS.BodyType }) => {
     commonTimeLock(body, this.body);
   };
