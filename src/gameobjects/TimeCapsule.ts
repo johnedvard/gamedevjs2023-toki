@@ -66,7 +66,7 @@ export class TimeCapsule implements IGameObject {
     this.updateSpineObject();
   }
 
-  canBeGrabbed() {
+  isGrabbable() {
     return false;
   }
 

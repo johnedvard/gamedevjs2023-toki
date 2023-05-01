@@ -3,5 +3,5 @@ export interface IGameObject {
   spineObject: SpineGameObject;
   destroy: Function;
   stopListeningForEvents: Function;
-  canBeGrabbed: Function;
+  isGrabbable: Function;
 }

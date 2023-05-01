@@ -90,7 +90,7 @@ export class SpinningBar implements IGameObject {
     }
   }
 
-  canBeGrabbed() {
+  isGrabbable() {
     return false;
   }
 

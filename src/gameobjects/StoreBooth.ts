@@ -83,7 +83,7 @@ export class StoreBooth implements IGameObject {
     this.updateSpineObject();
   }
 
-  canBeGrabbed() {
+  isGrabbable() {
     return false;
   }
 

@@ -54,7 +54,7 @@ export class Box implements IGameObject {
     this.updateSpineObject();
   }
 
-  canBeGrabbed() {
+  isGrabbable() {
     // TODO (johnedvard) Maybe prevent grabbing in certain situations
     return true;
   }

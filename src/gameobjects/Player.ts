@@ -99,7 +99,7 @@ export class Player implements IGameObject {
     }
   }
 
-  canBeGrabbed() {
+  isGrabbable() {
     return false;
   }
 

@@ -84,7 +84,7 @@ export class Hook implements IGameObject {
     this.updateSpineObject();
   }
 
-  canBeGrabbed() {
+  isGrabbable() {
     return false;
   }
 

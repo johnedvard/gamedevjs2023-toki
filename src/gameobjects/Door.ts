@@ -110,7 +110,7 @@ export class Door implements IGameObject {
     }
   };
 
-  canBeGrabbed() {
+  isGrabbable() {
     return false;
   }
 
