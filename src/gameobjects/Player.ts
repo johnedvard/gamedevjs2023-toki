@@ -10,6 +10,7 @@ import { emit, off, on } from '~/utils/eventEmitterUtils';
 import {
   getClosestBody,
   getClosestEndPos,
+  grabItemInProximity,
   startActionRoutine,
   startKilledRoutine,
   updateAim,
@@ -26,8 +27,11 @@ type TProps = {
 export class Player implements IGameObject {
   body: MatterJS.BodyType;
   proximityCircle: MatterJS.BodyType;
+  aboveHeadBody: MatterJS.BodyType;
+  grabbedObject: IGameObject;
   bodyRadius = 35;
   container: Phaser.GameObjects.Container; // used for camera to follow
+  grabbedObjectConstraint: MatterJS.ConstraintType;
   spineObject: SpineGameObject;
   spineOffset = new Phaser.Math.Vector2(0, 25);
   speed = 8;
@@ -45,8 +49,17 @@ export class Player implements IGameObject {
     this.startPos = pos;
     this.initSpineObject(pos);
     this.createBody(pos);
+    this.createAboveHeadBody(pos);
     this.listenForEvents();
     this.cameraFollow();
+  }
+
+  createAboveHeadBody(pos: Phaser.Math.Vector2) {
+    this.aboveHeadBody = this.scene.matter.add.circle(pos.x, pos.y + this.bodyRadius, 2, { isSensor: true });
+    const overHeadPoint = new Phaser.Math.Vector2(0, this.bodyRadius * -3);
+    this.scene.matter.add.constraint(this.body, this.aboveHeadBody, 0, 1, {
+      pointA: overHeadPoint,
+    });
   }
 
   initSpineObject = (pos: Phaser.Math.Vector2) => {
@@ -64,16 +77,23 @@ export class Player implements IGameObject {
   };
 
   update(time: number, delta: number) {
-    // this.scene.matter.setAngularVelocity(this.body, 0); another method to prevent rotation
     if (this.state === 'idle') {
       this.addVelocityToBody();
     }
+
     this.updateSpineObject();
     this.updateProximityCircle();
     this.updateContainer();
+    this.updateGrabbedObject();
     this.bubble?.update(time, delta);
 
     updateAim(this.scene, this.aimConstraintBone);
+  }
+
+  updateGrabbedObject() {
+    if (this.grabbedObject?.body) {
+      this.scene.matter.setAngularVelocity(this.grabbedObject.body, 0); // another way of preventing rotation
+    }
   }
 
   updateSpineObject() {
@@ -137,14 +157,14 @@ export class Player implements IGameObject {
     this.body = this.scene.matter.add.circle(startPosX, startPosY, this.bodyRadius, {
       frictionAir: 0.03,
       label: BodyTypeLabel.player,
-      mass: 10,
+      mass: 5,
       friction: 1,
-      frictionStatic: 0,
+      frictionStatic: 0.1,
       restitution: 0,
     });
     this.scene.matter.body.setInertia(this.body, Infinity); // prevent body from rotating
 
-    this.proximityCircle = this.scene.matter.add.circle(startPosX, startPosY, this.bodyRadius + 15, {
+    this.proximityCircle = this.scene.matter.add.circle(startPosX, startPosY, this.bodyRadius + 30, {
       isSensor: true,
       label: BodyTypeLabel.proximity,
     });
@@ -191,10 +211,36 @@ export class Player implements IGameObject {
   private onJump = () => {
     if (!this.isOnGround() || this.state === 'killed') return;
     this.scene.matter.setVelocity(this.body, this.body.velocity.x, -30);
+    if (this.grabbedObject) {
+      this.scene.matter.setVelocity(this.grabbedObject.body, this.body.velocity.x, -30);
+    }
     this.setState('jump');
   };
 
-  private onAction = ({ pos }: { pos: Phaser.Math.Vector2 }) => {
+  private onAction = () => {
+    if (this.grabbedObject) return this.throwGrabbedObject();
+    const grabbedObject = grabItemInProximity(this.scene, this.proximityCircle);
+    if (!grabbedObject?.body) return;
+    this.grabbedObject = grabbedObject;
+    this.scene.matter.body.setPosition(
+      this.grabbedObject.body,
+      new Phaser.Math.Vector2(this.aboveHeadBody.position.x, this.aboveHeadBody.position.y),
+      false
+    );
+    this.scene.matter.body.setAngle(this.grabbedObject.body, 0, false);
+    this.scene.matter.body.setInertia(this.body, Infinity); // prevent body from rotating
+    this.grabbedObjectConstraint = this.scene.matter.add.constraint(this.aboveHeadBody, this.grabbedObject.body, 0, 50);
+  };
+
+  throwGrabbedObject() {
+    if (!this.grabbedObject) return;
+    this.scene.matter.world.removeConstraint(this.grabbedObjectConstraint);
+    emit(GameEvent.throwObject, { object: this.grabbedObject });
+    this.grabbedObjectConstraint = null;
+    this.grabbedObject = null;
+  }
+
+  private onShoot = ({ pos }: { pos: Phaser.Math.Vector2 }) => {
     if (!this.scene.game.scene.isActive(SceneKey.Level)) return; // don't do action if scene is paused
     const x = this.weaponBone.worldX + this.scene.cameras.main.scrollX;
     const y = -this.weaponBone.worldY + this.scene.cameras.main.height + this.scene.cameras.main.scrollY; // spine y coordinates are opposite of Phaser's
@@ -213,6 +259,7 @@ export class Player implements IGameObject {
 
     emit(GameEvent.timeLock, { body: closestBody });
     playLaserBeam();
+    if (closestBody === this.grabbedObject?.body) this.throwGrabbedObject();
 
     // TODO (johnedvard) Add some particle effects to the endPos if we found a body
     endPos = getClosestEndPos(closestBody, startPos, endPos, direction);
@@ -252,6 +299,7 @@ export class Player implements IGameObject {
     // TODO (johnedvard) handle player input events in a different file
     on(ControllerEvent.move, this.onMove);
     on(ControllerEvent.jump, this.onJump);
+    on(ControllerEvent.shoot, this.onShoot);
     on(ControllerEvent.action, this.onAction);
     on(GameEvent.changeSkin, this.onSkinChanged);
     on(GameEvent.kill, this.onKilled);
@@ -261,6 +309,7 @@ export class Player implements IGameObject {
   stopListeningForEvents() {
     off(ControllerEvent.move, this.onMove);
     off(ControllerEvent.jump, this.onJump);
+    off(ControllerEvent.shoot, this.onShoot);
     off(ControllerEvent.action, this.onAction);
     off(GameEvent.changeSkin, this.onSkinChanged);
     off(GameEvent.kill, this.onKilled);

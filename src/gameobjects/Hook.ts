@@ -4,7 +4,7 @@ import { DepthGroup } from '~/enums/DepthGroup';
 import { GameEvent } from '~/enums/GameEvent';
 import { IGameObject } from '~/interfaces/IGameObject';
 import { off, on } from '~/utils/eventEmitterUtils';
-import { commonTimeLock } from '~/utils/gameUtils';
+import { commonTimeLock, stopCompletely } from '~/utils/gameUtils';
 import { destroyObject } from '~/utils/gameobjectUtils';
 import { playLockObject, playUnLockObject } from '~/utils/soundUtils';
 
@@ -24,7 +24,6 @@ export class Hook implements IGameObject {
   radius = 60;
 
   constructor(private scene: Scene, { pos, pathToFollow }: TProps) {
-    console.log('hook');
     this.timeAlive = (Math.PI / -2) * pathToFollow.getLength(); // set in order to start path from 0, and not 0.5
     this.pathToFollow = pathToFollow;
     this.createBody(pos);
@@ -89,7 +88,10 @@ export class Hook implements IGameObject {
   }
 
   onTimeLock = ({ body }: { body: MatterJS.BodyType }) => {
-    commonTimeLock(body, this.body);
+    if (body && body === this.body) {
+      stopCompletely(this.scene, this.body);
+      commonTimeLock(this.body);
+    }
   };
 
   listenForEvents = () => {

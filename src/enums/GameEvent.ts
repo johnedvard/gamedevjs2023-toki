@@ -11,4 +11,6 @@ export enum GameEvent {
   restartLevel = 'restartLevel',
   onPlatform = 'onPlatform',
   offPlatform = 'offPlatform',
+  grabObject = 'grabObject',
+  throwObject = 'throwObject',
 }

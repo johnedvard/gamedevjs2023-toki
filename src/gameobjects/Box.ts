@@ -4,9 +4,8 @@ import { DepthGroup } from '~/enums/DepthGroup';
 import { GameEvent } from '~/enums/GameEvent';
 import { IGameObject } from '~/interfaces/IGameObject';
 import { off, on } from '~/utils/eventEmitterUtils';
-import { commonTimeLock } from '~/utils/gameUtils';
+import { commonTimeLock, setBodyMapping, stopCompletely } from '~/utils/gameUtils';
 import { destroyObject } from '~/utils/gameobjectUtils';
-import { playLockObject, playUnLockObject } from '~/utils/soundUtils';
 
 type TProps = {
   pos: Phaser.Math.Vector2;
@@ -25,6 +24,7 @@ export class Box implements IGameObject {
     this.createBody(pos);
     this.initSpineObject(pos);
     this.listenForEvents();
+    setBodyMapping(this.body, this);
   }
   private createBody(pos: Phaser.Math.Vector2) {
     const startPosX = pos.x;
@@ -34,7 +34,8 @@ export class Box implements IGameObject {
       frictionAir: 0.05,
       friction: 0.5,
       label: BodyTypeLabel.box,
-      mass: 10,
+      mass: 5,
+      restitution: 0,
     });
   }
   private initSpineObject(pos: Phaser.Math.Vector2) {
@@ -56,15 +57,20 @@ export class Box implements IGameObject {
 
   isGrabbable() {
     // TODO (johnedvard) Maybe prevent grabbing in certain situations
-    return true;
+    return !this.body.isStatic;
   }
 
   onTimeLock = ({ body }: { body: MatterJS.BodyType }) => {
-    commonTimeLock(body, this.body);
+    if (body && body === this.body) {
+      stopCompletely(this.scene, this.body);
+      commonTimeLock(this.body);
+    }
   };
+
   listenForEvents = () => {
     on(GameEvent.timeLock, this.onTimeLock);
   };
+
   stopListeningForEvents = () => {
     off(GameEvent.timeLock, this.onTimeLock);
   };

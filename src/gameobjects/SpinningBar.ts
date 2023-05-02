@@ -4,7 +4,7 @@ import { DepthGroup } from '~/enums/DepthGroup';
 import { GameEvent } from '~/enums/GameEvent';
 import { IGameObject } from '~/interfaces/IGameObject';
 import { emit, off, on } from '~/utils/eventEmitterUtils';
-import { commonTimeLock } from '~/utils/gameUtils';
+import { commonTimeLock, stopCompletely } from '~/utils/gameUtils';
 import { destroyObject } from '~/utils/gameobjectUtils';
 import { playLockObject, playUnLockObject } from '~/utils/soundUtils';
 
@@ -26,6 +26,10 @@ export class SpinningBar implements IGameObject {
   angle = 0;
   startPos;
   isSafe;
+
+  lastAngleUpdateTime = 0;
+  angleUpdateInterval = 10; // upd
+
   constructor(private scene: Scene, { pos, width, height, isSafe }: TProps) {
     if (height) this.height = height;
     if (width) this.width = width;
@@ -49,8 +53,9 @@ export class SpinningBar implements IGameObject {
       label: BodyTypeLabel.spinningBar,
       isSensor: this.isSafe ? false : true,
       ignoreGravity: true, // doesn't work in phaser 3.60 https://github.com/photonstorm/phaser/issues/6473,
-      density: 999,
-      mass: 999,
+      restitution: 0,
+      frictionStatic: 1,
+      friction: 1,
     });
     this.constraint = this.scene.matter.add.constraint(this.body, this.bodyConstraint, 0, 0.1);
 
@@ -76,11 +81,15 @@ export class SpinningBar implements IGameObject {
     }
   }
 
-  lastAngleUpdateTime = 0;
-  angleUpdateInterval = 10; // upd
+  isGrabbable() {
+    return false;
+  }
 
-  updateSpineObject(time: number) {
+  update(time: number, delta: number) {
+    if (this.body.isStatic) return;
     const { x, y } = this.body.position;
+
+    this.angle = this.angle + delta / 800;
     this.spineObject.setPosition(x, y);
     const elapsedFrames = Math.floor((time - this.lastAngleUpdateTime) / this.angleUpdateInterval);
     if (elapsedFrames > 0) {
@@ -90,18 +99,11 @@ export class SpinningBar implements IGameObject {
     }
   }
 
-  isGrabbable() {
-    return false;
-  }
-
-  update(time: number, delta: number) {
-    this.angle = this.angle + delta / 800;
-
-    this.updateSpineObject(time);
-  }
-
   onTimeLock = ({ body }: { body: MatterJS.BodyType }) => {
-    commonTimeLock(body, this.body);
+    if (body && body === this.body) {
+      stopCompletely(this.scene, this.body);
+      commonTimeLock(this.body);
+    }
   };
   listenForEvents() {
     on(GameEvent.timeLock, this.onTimeLock);
