@@ -33,8 +33,8 @@ export class Player implements IGameObject {
   container: Phaser.GameObjects.Container; // used for camera to follow
   grabbedObjectConstraint: MatterJS.ConstraintType;
   spineObject: SpineGameObject;
-  spineOffset = new Phaser.Math.Vector2(0, 25);
-  speed = 8;
+  spineOffset = new Phaser.Math.Vector2(0, 13);
+  speed = 7;
   scale = 0.5;
   state: PlayerState;
   direction = 1;
@@ -154,14 +154,17 @@ export class Player implements IGameObject {
     const startPosX = pos.x;
     const startPosY = pos.y;
 
-    this.body = this.scene.matter.add.circle(startPosX, startPosY, this.bodyRadius, {
+    this.body = this.scene.matter.add.polygon(startPosX, startPosY, 3, 37, {
       frictionAir: 0.03,
       label: BodyTypeLabel.player,
       mass: 5,
       friction: 1,
       frictionStatic: 0.1,
       restitution: 0,
+      angle: Math.PI / 2,
+      chamfer: [25, 0, 25],
     });
+
     this.scene.matter.body.setInertia(this.body, Infinity); // prevent body from rotating
 
     this.proximityCircle = this.scene.matter.add.circle(startPosX, startPosY, this.bodyRadius + 30, {
@@ -283,7 +286,8 @@ export class Player implements IGameObject {
   addVelocityToBody() {
     // TODO (johnedavrd) Only add velocity to body (player) if it's above the platform
     if (this.attachedToPlatform) {
-      this.scene.matter.setVelocityX(this.body, this.attachedToPlatform.velocity.x); // make player follow moving platform
+      let platformSpeed = this.attachedToPlatform.velocity.x + this.attachedToPlatform.velocity.x / 25;
+      this.scene.matter.setVelocityX(this.body, platformSpeed); // make player follow moving platform
     }
   }
 
