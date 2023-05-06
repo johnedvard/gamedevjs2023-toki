@@ -6,7 +6,7 @@
   "author": "johnedvard",
   "scripts": {
     "start": "vite",
-    "start:mainnet": "vite --mode mainnet",
+    "start:mainnet": "vite --mode dev",
     "build:testnet": "tsc && vite build --mode testnet",
     "build:mainnet": "tsc && vite build --mode mainnet",
     "preview": "vite preview",

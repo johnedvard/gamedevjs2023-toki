@@ -20,6 +20,7 @@ import { playDeadSound, playLaserBeam } from '~/utils/soundUtils';
 import { SceneKey } from '~/enums/SceneKey';
 import { IGameObject } from '~/interfaces/IGameObject';
 import { destroyObject } from '~/utils/gameobjectUtils';
+import { StasisChain } from './StatisChain';
 
 type TProps = {
   pos: Phaser.Math.Vector2;

@@ -39,6 +39,7 @@ export class Boot extends Phaser.Scene {
 
     this.load.image('particle', 'spine/particle.png');
     this.load.image('sage', 'spine/sage.png');
+    this.load.image('chain', 'spine/chain.png');
   }
 
   loadMusic() {

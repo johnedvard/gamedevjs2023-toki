@@ -1,5 +1,3 @@
-const mode = import.meta.env.VITE_MODE || 'testnet';
-
 import { GameObjects, Scene } from 'phaser';
 
 import { DepthGroup } from '~/enums/DepthGroup';
@@ -13,7 +11,6 @@ import {
   nftBuy,
   nftTokensForOwner,
 } from '~/near/nearConnection';
-import { NftSeriesId } from '~/types/NftSeriesId';
 import { emit } from '~/utils/eventEmitterUtils';
 
 export class StoreInterface extends Scene {
@@ -35,7 +32,7 @@ export class StoreInterface extends Scene {
   selectBitmap: GameObjects.BitmapText;
 
   skinNum = 3;
-  skins: { name: string; isOwned: boolean; seriesId: NftSeriesId; price: string; nearPrice: string }[] = [
+  skins: { name: string; isOwned: boolean; seriesId: string; price: string; nearPrice: string }[] = [
     { name: 'blue', isOwned: true, seriesId: undefined, price: undefined, nearPrice: undefined },
     {
       name: 'green',

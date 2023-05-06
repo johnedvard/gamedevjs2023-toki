@@ -1,6 +1,7 @@
 import { Scene } from 'phaser';
 import { playLockObject, playUnLockObject } from './soundUtils';
 import { IGameObject } from '~/interfaces/IGameObject';
+import { StasisChain } from '~/gameobjects/StatisChain';
 
 /**
  * Store the mapping between a game object, and it's parent
@@ -15,10 +16,19 @@ export const getCenter = (scene: Scene): Phaser.Math.Vector2 => {
   return new Phaser.Math.Vector2(scene.cameras.main.centerX, scene.cameras.main.centerY);
 };
 
-export const commonTimeLock = (body: MatterJS.BodyType) => {
+export const commonTimeLock = (scene: Scene, body: MatterJS.BodyType) => {
   body.isStatic = !body.isStatic;
-  if (body.isStatic) playLockObject();
-  else playUnLockObject();
+  if (body.isStatic) {
+    playLockObject();
+    const pos = new Phaser.Math.Vector2(body.position.x, body.position.y);
+    new StasisChain(scene, { pos, length: 10 }).animate();
+    new StasisChain(scene, { pos, length: 10 }).animate();
+    new StasisChain(scene, { pos, length: 10 }).animate();
+    new StasisChain(scene, { pos, length: 10 }).animate();
+    new StasisChain(scene, { pos, length: 10 }).animate();
+  } else {
+    playUnLockObject();
+  }
 };
 
 export const setBodyMapping = (body: MatterJS.BodyType, object: IGameObject) => {

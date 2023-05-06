@@ -102,7 +102,7 @@ export class SpinningBar implements IGameObject {
   onTimeLock = ({ body }: { body: MatterJS.BodyType }) => {
     if (body && body === this.body) {
       stopCompletely(this.scene, this.body);
-      commonTimeLock(this.body);
+      commonTimeLock(this.scene, this.body);
     }
   };
   listenForEvents() {
