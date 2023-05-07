@@ -58,7 +58,7 @@ export class Boot extends Phaser.Scene {
     // TODO (johnedvard) start desired scene based on env build variable?
 
     initMusicAndSfx(this);
-    playMusic();
+    // playMusic();
 
     // this.scene.start(SceneKey.Level);
     this.scene.start(SceneKey.MainMenu);

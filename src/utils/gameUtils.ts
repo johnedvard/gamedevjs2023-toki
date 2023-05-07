@@ -18,16 +18,18 @@ export const getCenter = (scene: Scene): Phaser.Math.Vector2 => {
 
 export const commonTimeLock = (scene: Scene, body: MatterJS.BodyType) => {
   body.isStatic = !body.isStatic;
+  const pos = new Phaser.Math.Vector2(body.position.x, body.position.y);
   if (body.isStatic) {
     playLockObject();
-    const pos = new Phaser.Math.Vector2(body.position.x, body.position.y);
-    new StasisChain(scene, { pos, length: 10 }).animate();
-    new StasisChain(scene, { pos, length: 10 }).animate();
-    new StasisChain(scene, { pos, length: 10 }).animate();
-    new StasisChain(scene, { pos, length: 10 }).animate();
-    new StasisChain(scene, { pos, length: 10 }).animate();
+    for (let i = 0; i < 5; i++) {
+      new StasisChain(scene, { pos, numChainUnits: 10 }).lockAnimation();
+    }
   } else {
     playUnLockObject();
+    for (let i = 0; i < 5; i++) {
+      const numChainUnits = 2 + Math.floor(Math.random() * 3);
+      new StasisChain(scene, { pos, numChainUnits }).unlockAnimation();
+    }
   }
 };
 
