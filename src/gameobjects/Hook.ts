@@ -4,6 +4,7 @@ import { DepthGroup } from '~/enums/DepthGroup';
 import { GameEvent } from '~/enums/GameEvent';
 import { IGameObject } from '~/interfaces/IGameObject';
 import { off, on } from '~/utils/eventEmitterUtils';
+import { commonTimeLock, stopCompletely } from '~/utils/gameUtils';
 import { destroyObject } from '~/utils/gameobjectUtils';
 import { playLockObject, playUnLockObject } from '~/utils/soundUtils';
 
@@ -23,7 +24,6 @@ export class Hook implements IGameObject {
   radius = 60;
 
   constructor(private scene: Scene, { pos, pathToFollow }: TProps) {
-    console.log('hook');
     this.timeAlive = (Math.PI / -2) * pathToFollow.getLength(); // set in order to start path from 0, and not 0.5
     this.pathToFollow = pathToFollow;
     this.createBody(pos);
@@ -83,19 +83,21 @@ export class Hook implements IGameObject {
     this.updateSpineObject();
   }
 
+  isGrabbable() {
+    return false;
+  }
+
   onTimeLock = ({ body }: { body: MatterJS.BodyType }) => {
-    if (body === this.body) {
-      this.body.isStatic = !this.body.isStatic;
-      if (this.body.isStatic) {
-        playLockObject();
-      } else {
-        playUnLockObject();
-      }
+    if (body && body === this.body) {
+      stopCompletely(this.scene, this.body);
+      commonTimeLock(this.scene, this.body);
     }
   };
+
   listenForEvents = () => {
     on(GameEvent.timeLock, this.onTimeLock);
   };
+
   stopListeningForEvents() {
     off(GameEvent.timeLock, this.onTimeLock);
   }

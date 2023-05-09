@@ -1,9 +1,13 @@
-const mode = import.meta.env.VITE_MODE || 'testnet';
+import { NearNet } from '~/types/NearNet';
+import { GameMode } from '~/types/GameMode';
+
+const mode: GameMode = import.meta.env.VITE_MODE || 'dev';
+const nearNet: NearNet = import.meta.env.VITE_NEAR_NET || 'testnet';
 
 const CONTARCT_NAME_MAINNET = 'x.paras.near';
 const CONTARCT_NAME_TESTNET = 'paras-token-v2.testnet';
 export const getConfig = () => {
-  if (mode === 'mainnet' || mode === 'production') {
+  if (nearNet === 'mainnet' || mode === 'prod') {
     return {
       networkId: 'mainnet',
       nodeUrl: 'https://rpc.mainnet.near.org',

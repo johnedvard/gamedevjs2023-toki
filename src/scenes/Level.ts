@@ -1,3 +1,5 @@
+const mode: GameMode = import.meta.env.VITE_MODE || 'dev';
+
 import { GameObjects, Scene } from 'phaser';
 import { DepthGroup } from '~/enums/DepthGroup';
 import { GameEvent } from '~/enums/GameEvent';
@@ -10,6 +12,7 @@ import { Player } from '~/gameobjects/Player';
 import { SpinningBar } from '~/gameobjects/SpinningBar';
 import { StoreBooth } from '~/gameobjects/StoreBooth';
 import { TimeCapsule } from '~/gameobjects/TimeCapsule';
+import { GameMode } from '~/types/GameMode';
 
 import { LevelState } from '~/types/LevelState';
 import { SvgPath } from '~/types/SvgPath';
@@ -79,7 +82,10 @@ export class Level extends Phaser.Scene {
         emit(GameEvent.startDialog, { dialog: tutorialStartDialog });
         this.hasDisplayedTutroialDialog = true;
       }
-      this.checkIfGameCleared();
+
+      if (mode != 'dev') {
+        this.checkIfGameCleared();
+      }
     });
     this.listenForEvents();
   }

@@ -110,6 +110,10 @@ export class Door implements IGameObject {
     }
   };
 
+  isGrabbable() {
+    return false;
+  }
+
   destroy() {
     if (this.spineTimeCapsule) {
       this.spineTimeCapsule.destroy();

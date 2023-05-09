@@ -31,7 +31,7 @@ export class SceneInput extends Scene {
     this.input.on('pointerdown', (pointer: Phaser.Input.Pointer) => {
       if (pointer.primaryDown) {
         const pos = new Phaser.Math.Vector2(pointer.worldX, pointer.worldY);
-        emit(ControllerEvent.action, { pos });
+        emit(ControllerEvent.shoot, { pos });
       }
     });
   };
@@ -74,7 +74,7 @@ export class SceneInput extends Scene {
     this.input.gamepad.on('down', (_pad: Input.Gamepad.Gamepad, button: Input.Gamepad.Button) => {
       switch (button.index) {
         case gamepadIndex.west:
-          emit(ControllerEvent.action);
+          emit(ControllerEvent.shoot);
           break;
         case gamepadIndex.south:
           emit(ControllerEvent.jump);

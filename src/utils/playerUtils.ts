@@ -1,6 +1,10 @@
 import { Scene } from 'phaser';
 import { BodyTypeLabel } from '~/enums/BodyTypeLabel';
 import { Player } from '~/gameobjects/Player';
+import { IGameObject } from '~/interfaces/IGameObject';
+import { getBodyMapping } from './gameUtils';
+import { GameEvent } from '~/enums/GameEvent';
+import { emit } from './eventEmitterUtils';
 
 /**
  * Aim the weapon, but not farther out than the circle
@@ -128,4 +132,16 @@ export const startKilledRoutine = (scene: Scene, { pos }: { pos: Phaser.Math.Vec
     };
     scene.events.on(Phaser.Scenes.Events.UPDATE, gameUpdateListener);
   });
+};
+
+export const grabItemInProximity = (scene: Scene, proximityCircle: MatterJS.BodyType): IGameObject => {
+  const allObjectsInProximity = scene.matter.intersectBody(proximityCircle);
+  for (let i = 0; i < allObjectsInProximity.length; i++) {
+    const body: MatterJS.BodyType = <MatterJS.BodyType>allObjectsInProximity[i];
+    const object = getBodyMapping(body);
+    if (!object?.isGrabbable()) continue;
+    emit(GameEvent.grabObject, { object });
+    return object;
+  }
+  return null;
 };

@@ -1,10 +1,11 @@
-const mode = import.meta.env.VITE_MODE || 'testnet';
+const nearNet: NearNet = import.meta.env.VITE_NEAR_NET || 'testnet';
 
 import { connect, keyStores, WalletConnection, Contract } from 'near-api-js';
 import { getConfig } from './nearConfig';
 import { NftSeriesId } from '~/types/NftSeriesId';
 import { setItem } from '~/utils/storageUtils';
 import { getItem } from '~/utils/storageUtils';
+import { NearNet } from '~/types/NearNet';
 
 export const APP_PREFIX = 'toki';
 
@@ -28,8 +29,8 @@ const getAccountId = () => {
   return walletConnection.getAccountId();
 };
 
-export const getNftSeriesId = (id: NftSeriesId) => {
-  return NFT_SERIES_IDS[mode][id];
+export const getNftSeriesId = (id: NftSeriesId): string => {
+  return NFT_SERIES_IDS[nearNet][id];
 };
 export const isSignedIn = () => {
   return walletConnection && walletConnection.isSignedIn();

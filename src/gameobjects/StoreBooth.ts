@@ -83,6 +83,10 @@ export class StoreBooth implements IGameObject {
     this.updateSpineObject();
   }
 
+  isGrabbable() {
+    return false;
+  }
+
   stopListeningForEvents() {
     off(ControllerEvent.up, this.onOpenStore);
   }
