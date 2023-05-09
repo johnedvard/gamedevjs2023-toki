@@ -54,7 +54,21 @@ export const initContract = async () => {
     changeMethods: ['nft_buy', 'nft_mint'],
   });
 
+  reloadPageIfSignedInForTheFirstTime();
   return walletConnection;
+};
+
+// Hack to make sure user can actually buy NFT after logging in for the first time. The contract hasn't registered the account_id for some reason
+const reloadPageIfSignedInForTheFirstTime = () => {
+  const walletAuthKeyStr = localStorage.getItem('toki_wallet_auth_key');
+  if (walletAuthKeyStr) {
+    const walletAuthKeyJson = JSON.parse(walletAuthKeyStr);
+    if (walletAuthKeyJson.accountId && !walletConnection.account().accountId) {
+      setTimeout(() => {
+        window.location.reload();
+      });
+    }
+  }
 };
 
 export const logout = () => {
