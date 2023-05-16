@@ -1,6 +1,6 @@
 ## Toki
 
-Toki, a gamedev entry for the [gamedevjs 2023 gamejam](https://itch.io/jam/gamedevjs-2023/rate/2035033). This game is still being worked on. Check out this tag, [gamedevjs2023](https://github.com/johnedvard/gamedevjs2023-toki/tree/gamedevjs2023), to see the code in the state it was submitted to the game jam
+Toki, a gamedev entry for the [gamedevjs 2023 gamejam](https://itch.io/jam/gamedevjs-2023/rate/2035033). This game is still being worked on. Check out this tag, [gamedevjs2023](https://github.com/johnedvard/gamedevjs2023-toki/tree/gamedevjs2023), to see the code in the state it was submitted to the game jam.
 
 ### NEAR
 
@@ -14,7 +14,7 @@ It's possible to buy NFTs from the store (after completing the tutorial level.) 
 ## Get started
 
 ```
-npm run install
+npm install
 npm run start
 ```
 
