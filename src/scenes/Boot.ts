@@ -1,9 +1,13 @@
 import { SceneKey } from '~/enums/SceneKey';
+import { ShaderType } from '~/enums/ShaderType';
+import { WavyPipeline } from '~/shaders/WavyPipeline';
 import { initMusicAndSfx, playMusic } from '~/utils/soundUtils';
 
 export class Boot extends Phaser.Scene {
-  // TODO (johnedvard) use an asset loader and constants for the names
+  renderer: Phaser.Renderer.WebGL.WebGLRenderer;
+
   preload(): void {
+    // TODO (johnedvard) use an asset loader and constants for the names
     this.load.bitmapFont('atari', 'bitmap/atari-classic.png', 'bitmap/atari-classic.xml');
 
     this.preloadSpineAnimations();
@@ -54,6 +58,7 @@ export class Boot extends Phaser.Scene {
   }
   create(): void {
     this.setPixelArtFilterOnAssets();
+    this.createShaders();
 
     // TODO (johnedvard) start desired scene based on env build variable?
 
@@ -63,6 +68,10 @@ export class Boot extends Phaser.Scene {
     // this.scene.start(SceneKey.Level);
     this.scene.start(SceneKey.MainMenu);
     // this.scene.start(SceneKey.Level, { levelId: 'level3' });
+  }
+
+  createShaders() {
+    this.renderer.pipelines.add(ShaderType.wavy, new WavyPipeline(this.game));
   }
 
   addProgressBar() {
