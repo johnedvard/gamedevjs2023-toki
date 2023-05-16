@@ -10,6 +10,7 @@ export class DialogInterface extends Scene {
   dialog: string[] = [];
   dialogIndex = 0;
   dialogBitmap;
+  renderTexture;
   isInputDisabled: boolean;
   maxInputDelay = 1000;
   ellapsedInputDelay = 0;
@@ -27,15 +28,9 @@ export class DialogInterface extends Scene {
       // perform any other necessary actions here
     });
     this.createSprite();
-    this.dialogBitmap = this.add
-      .bitmapText(550, this.cameras.main.height - 400, 'atari', this.dialog[this.dialogIndex], 28, 0)
-      .setAlpha(1)
-      .setTint(0)
-      .setOrigin(0, 0.5)
-      .setInteractive()
-      .setLineSpacing(50)
-      .setDepth(DepthGroup.front);
-
+    this.createDialogBitmap();
+    this.createDialogTexture();
+    this.renderDialog(this.dialog[this.dialogIndex]);
     this.listenForInput();
   }
   createSprite() {
@@ -62,11 +57,44 @@ export class DialogInterface extends Scene {
       }
     });
   }
+
+  /**
+   * Need to convert the bitmap text to a texture in order to make the shader work properly
+   */
+  renderDialog(text: string) {
+    this.dialogBitmap?.setText(text)?.setAlpha(1);
+    this.renderTexture?.clear();
+    this.renderTexture?.draw(this.dialogBitmap, 550, this.cameras.main.height - 400);
+    this.dialogBitmap?.setAlpha(0); // trick to hide the text without having to destroy and recreate it.
+  }
+  createDialogTexture() {
+    this.renderTexture = this.make
+      .renderTexture({
+        x: 0,
+        y: 0,
+        width: this.cameras.main.width,
+        height: this.cameras.main.height,
+      })
+      .setDepth(DepthGroup.front)
+      .setOrigin(0, 0);
+  }
+
+  createDialogBitmap() {
+    this.dialogBitmap = this.add
+      .bitmapText(0, 0, 'atari', '', 28, 0)
+      .setAlpha(1)
+      .setTint(0)
+      .setOrigin(0, 0.5)
+      .setInteractive()
+      .setLineSpacing(50)
+      .setDepth(DepthGroup.front);
+  }
+
   continueDialog() {
     const nextDialog = this.dialog[++this.dialogIndex];
     if (nextDialog) {
       this.ellapsedInputDelay = 0;
-      this.dialogBitmap.setText(nextDialog);
+      this.renderDialog(nextDialog);
     } else {
       emit(GameEvent.endDialog);
     }

@@ -7,7 +7,11 @@ import { IGameObject } from '~/interfaces/IGameObject';
 import { emit, off, on } from '~/utils/eventEmitterUtils';
 import { commonTimeLock, stopCompletely } from '~/utils/gameUtils';
 import { destroyObject } from '~/utils/gameobjectUtils';
-import { playLockObject, playUnLockObject } from '~/utils/soundUtils';
+
+type CollideCallback = {
+  bodyA: MatterJS.BodyType;
+  bodyB: MatterJS.BodyType;
+};
 
 type TProps = {
   pos: Phaser.Math.Vector2;
@@ -15,6 +19,7 @@ type TProps = {
   height: number;
   pathToFollow?: Phaser.Curves.Path;
 };
+
 export class Platform implements IGameObject {
   body: MatterJS.BodyType;
   bodyConstraint: MatterJS.BodyType;
@@ -51,14 +56,21 @@ export class Platform implements IGameObject {
       mass: 10,
     });
 
-    this.body.onCollideActiveCallback = ({ bodyA, bodyB }) => {
+    this.body.onCollideActiveCallback = ({ bodyA, bodyB }: CollideCallback) => {
       if (bodyB?.label === BodyTypeLabel.player) {
         emit(GameEvent.onPlatform, { body: bodyA });
       }
     };
-    this.body.onCollideEndCallback = ({ bodyA, bodyB }) => {
+    this.body.onCollideEndCallback = ({ bodyA, bodyB }: CollideCallback) => {
       if (bodyB?.label === BodyTypeLabel.player) {
         emit(GameEvent.offPlatform, { body: null });
+      }
+    };
+    this.body.onCollideCallback = ({ bodyA, bodyB }: CollideCallback) => {
+      if (bodyB?.label === BodyTypeLabel.player) {
+        if (Math.abs(bodyB.speed) >= 20) {
+          // TODO (johnedvard) Maybe change scale of object based on speed within inpact and add a bouncy-ish juicy effect
+        }
       }
     };
 

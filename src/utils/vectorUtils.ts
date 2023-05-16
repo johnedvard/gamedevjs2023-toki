@@ -2,7 +2,6 @@ import { Scene } from 'phaser';
 import svgToPhaserPath from 'svg-to-phaser-path';
 
 import { BodyTypeLabel } from '~/enums/BodyTypeLabel';
-import { getGameState } from '~/gameState';
 import { Box } from '~/gameobjects/Box';
 import { Door } from '~/gameobjects/Door';
 import { Hook } from '~/gameobjects/Hook';
