@@ -37,3 +37,5 @@ npm run start
 | Innovation       | #45  | 3.250   | 3.250     |
 | Graphics         | #46  | 3.568   | 3.568     |
 | Gameplay         | #55  | 3.295   | 3.295     |
+
+Ranked from 44 ratings. Score is adjusted from raw score by the median number of ratings per game in the jam.
