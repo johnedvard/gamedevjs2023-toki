@@ -1,6 +1,6 @@
 ## Toki
 
-Toki, a gamedev entry for gamedevjs2023 gamejam. The theme is "Time"
+Toki, a gamedev entry for the [gamedevjs 2023 gamejam](https://itch.io/jam/gamedevjs-2023/rate/2035033). This game is still being worked on. Check out this tag, [gamedevjs2023](https://github.com/johnedvard/gamedevjs2023-toki/tree/gamedevjs2023), to see the code in the state it was submitted to the game jam
 
 ### NEAR
 
@@ -17,3 +17,23 @@ It's possible to buy NFTs from the store (after completing the tutorial level.) 
 npm run install
 npm run start
 ```
+
+## Result from the gamejam
+
+- Placed 1st the web3 challenge
+- Placed 9th in the open source challenge
+- Ranked 33rd overall
+
+| Criteria         | Rank | Score\* | Raw Score |
+| ---------------- | ---- | ------- | --------- |
+| Web3             | #1   | n/a     | n/a       |
+| Interoperability | #2   | n/a     | n/a       |
+| Arcadians        | #3   | n/a     | n/a       |
+| Overlord's Arena | #3   | n/a     | n/a       |
+| Open Source      | #9   | n/a     | n/a       |
+| Audio            | #25  | 3.545   | 3.545     |
+| Overall          | #33  | 3.441   | 3.441     |
+| Theme            | #39  | 3.545   | 3.545     |
+| Innovation       | #45  | 3.250   | 3.250     |
+| Graphics         | #46  | 3.568   | 3.568     |
+| Gameplay         | #55  | 3.295   | 3.295     |
