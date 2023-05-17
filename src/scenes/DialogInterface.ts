@@ -1,7 +1,9 @@
 import { Scene } from 'phaser';
 import { DepthGroup } from '~/enums/DepthGroup';
 import { GameEvent } from '~/enums/GameEvent';
+import { ShaderType } from '~/enums/ShaderType';
 import { SpeechBubble } from '~/gameobjects/SpeechBubble';
+import { DissolvePipeline } from '~/shaders/DissolvePipeline';
 import { emit } from '~/utils/eventEmitterUtils';
 
 export class DialogInterface extends Scene {
@@ -34,7 +36,9 @@ export class DialogInterface extends Scene {
     this.listenForInput();
   }
   createSprite() {
+    // const dissolvePipeline: DissolvePipeline = (<any>this.game.renderer).pipelines.get(ShaderType.dissolve);
     this.add.sprite(350, this.cameras.main.height - 400, 'sage').setDepth(DepthGroup.front);
+    // .setPipeline(dissolvePipeline);
   }
   update(time: number, delta: number) {
     this.bubble?.update(time, delta);

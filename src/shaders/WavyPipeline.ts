@@ -1,45 +1,45 @@
 const vertShader = `
-    precision mediump float;
+  precision mediump float;
 
-    uniform mat4 uProjectionMatrix;
+  uniform mat4 uProjectionMatrix;
 
-    attribute vec2 inPosition;
-    attribute vec2 inTexCoord;
-    attribute vec4 inColor;
+  attribute vec2 inPosition;
+  attribute vec2 inTexCoord;
+  attribute vec4 inColor;
 
-    varying vec2 outTexCoord;
-    varying vec4 outColor;
+  varying vec2 outTexCoord;
+  varying vec4 outColor;
 
-    void main(void) {
-      gl_Position = uProjectionMatrix * vec4(inPosition, 0.0, 1.0);
-      outTexCoord = inTexCoord;
-      outColor = inColor;
-    }
-  `;
+  void main(void) {
+    gl_Position = uProjectionMatrix * vec4(inPosition, 0.0, 1.0);
+    outTexCoord = inTexCoord;
+    outColor = inColor;
+  }
+`;
 
 const fragShader = `
-    precision mediump float;
+  precision mediump float;
 
-    uniform sampler2D uMainSampler;
-    uniform float uTime;
-    uniform float uSpeed;
-    uniform float uAmplitude;
-    uniform float uWaveLength;
+  uniform sampler2D uMainSampler;
+  uniform float uTime;
+  uniform float uSpeed;
+  uniform float uAmplitude;
+  uniform float uWaveLength;
 
-    varying vec2 outTexCoord;
-    varying vec4 outColor;
+  varying vec2 outTexCoord;
+  varying vec4 outColor;
 
-    void main(void) {
-      float time = uTime * uSpeed;
-      vec2 texCoord = outTexCoord;
-      float position = texCoord.x * uWaveLength;
+  void main(void) {
+    float time = uTime * uSpeed;
+    vec2 texCoord = outTexCoord;
+    float position = texCoord.x * uWaveLength;
 
-      float offset = sin(uTime * uSpeed + position) * uAmplitude;
+    float offset = sin(uTime * uSpeed + position) * uAmplitude;
 
-      vec2 distortedCoord = vec2(texCoord.x, texCoord.y + offset);
-      gl_FragColor = texture2D(uMainSampler, distortedCoord);
-    }
-  `;
+    vec2 distortedCoord = vec2(texCoord.x, texCoord.y + offset);
+    gl_FragColor = texture2D(uMainSampler, distortedCoord);
+  }
+`;
 
 export class WavyPipeline extends Phaser.Renderer.WebGL.Pipelines.SinglePipeline {
   constructor(game: Phaser.Game) {

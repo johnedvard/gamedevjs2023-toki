@@ -1,5 +1,6 @@
 import { SceneKey } from '~/enums/SceneKey';
 import { ShaderType } from '~/enums/ShaderType';
+import { DissolvePipeline } from '~/shaders/DissolvePipeline';
 import { WavyPipeline } from '~/shaders/WavyPipeline';
 import { initMusicAndSfx, playMusic } from '~/utils/soundUtils';
 
@@ -72,6 +73,7 @@ export class Boot extends Phaser.Scene {
 
   createShaders() {
     this.renderer.pipelines.add(ShaderType.wavy, new WavyPipeline(this.game));
+    this.renderer.pipelines.add(ShaderType.dissolve, new DissolvePipeline(this.game));
   }
 
   addProgressBar() {
