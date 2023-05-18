@@ -20,6 +20,7 @@ import { playDeadSound, playLaserBeam } from '~/utils/soundUtils';
 import { SceneKey } from '~/enums/SceneKey';
 import { IGameObject } from '~/interfaces/IGameObject';
 import { destroyObject } from '~/utils/gameobjectUtils';
+import { emitDustParticles } from './dustParticleEmitter';
 
 type TProps = {
   pos: Phaser.Math.Vector2;
@@ -34,6 +35,7 @@ export class Player implements IGameObject {
   grabbedObjectConstraint: MatterJS.ConstraintType;
   spineObject: SpineGameObject;
   spineOffset = new Phaser.Math.Vector2(0, 13);
+  dustParticleOffset = new Phaser.Math.Vector2(0, this.bodyRadius / 2);
   speed = 7;
   scale = 0.5;
   state: PlayerState;
@@ -196,6 +198,9 @@ export class Player implements IGameObject {
     if (this.state === 'killed') return;
     if (velocity.x !== 0) {
       this.setState('walk');
+      if (this.isOnGround()) {
+        emitDustParticles(this.scene, this.body.position.x, this.body.position.y + this.dustParticleOffset.y);
+      }
       let velocityX = velocity.x * this.speed;
 
       // TODO (johnedvard) also check if actually on top of platform (not below or on the sides)
