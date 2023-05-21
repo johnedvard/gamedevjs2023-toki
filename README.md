@@ -1,5 +1,7 @@
 ## Toki
 
+Toky only plays well in Chrome, not Safari.
+
 Toki, a gamedev entry for the [gamedevjs 2023 gamejam](https://itch.io/jam/gamedevjs-2023/rate/2035033). This game is still being worked on. Check out this tag, [gamedevjs2023](https://github.com/johnedvard/gamedevjs2023-toki/tree/gamedevjs2023), to see the code in the state it was submitted to the game jam.
 
 https://github.com/johnedvard/gamedevjs2023-toki/assets/656024/e1095267-3a70-4a05-8735-4ceb187b7244
