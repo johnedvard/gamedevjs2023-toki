@@ -34,6 +34,8 @@ import {
   createHooksFromSvg,
 } from '~/utils/vectorUtils';
 
+type TCreateLevel = { levelId: string; fromLevelId: string };
+
 const parser = new DOMParser();
 // TODO (johnedvard) read automatically from folder instead
 const levelIds = ['levelTutorial', 'level0', 'level1', 'level2', 'level3'];
@@ -74,11 +76,11 @@ export class Level extends Phaser.Scene {
     this.graphicsBack = this.add.graphics().setDepth(DepthGroup.back - 1);
   }
 
-  create({ levelId = 'levelTutorial' }: { levelId: string }): void {
+  create({ levelId = 'levelTutorial', fromLevelId }: TCreateLevel): void {
     this.stopListeningForEvents();
     this.collectedCapsules = 0;
     this.levelId = levelId;
-    this.createLevel(this.levelId);
+    this.createLevel({ levelId, fromLevelId });
     setTimeout(() => {
       // using timeout to step once, make sure Level Scene is actually paused
       if (levelId === 'levelTutorial' && !this.hasDisplayedTutroialDialog) {
@@ -92,6 +94,7 @@ export class Level extends Phaser.Scene {
     });
     this.listenForEvents();
   }
+
   createLandskape() {
     // group parallaxPaths
     this.groupFront = this.add.group();
@@ -162,12 +165,17 @@ export class Level extends Phaser.Scene {
     });
   }
 
-  createLevel(levelId: string) {
+  createLevel({ levelId, fromLevelId }: TCreateLevel) {
     this.player?.destroy();
     const svgText = levelSvgTexts[levelId];
     const levelState = this.createLevelFromSvg(this, svgText);
+    let pos = levelState.start;
     this.createLandskape();
-    this.player = new Player(this, { pos: levelState.start });
+    // Spawn player on the position of the door the player entered
+    // TODO (johnedvard) Improve the spawn point logic
+    const cameFromDoor = this.doors.find((d) => levelId === 'level0' && d.goToLevelId === fromLevelId);
+    if (cameFromDoor) pos = new Phaser.Math.Vector2(cameFromDoor.body.position.x, cameFromDoor.body.position.y);
+    this.player = new Player(this, { pos });
   }
 
   createLevelFromSvg(scene: Scene, svgText: string): LevelState {
@@ -227,7 +235,8 @@ export class Level extends Phaser.Scene {
     this.platforms.length = 0;
     this.hooks?.forEach((b) => b?.destroy());
     this.hooks.length = 0;
-    this.create({ levelId });
+
+    this.create({ levelId, fromLevelId: this.levelId });
   }
 
   onGoToLevel = ({ levelId }: { levelId: string }) => {
