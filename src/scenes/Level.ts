@@ -61,6 +61,9 @@ export class Level extends Phaser.Scene {
   hasDisplayedGameClearDialog = false;
   hasDisplayedTutroialDialog = false;
 
+  groupFront: GameObjects.Group;
+  groupBack: GameObjects.Group;
+
   preload(): void {
     loadGame();
     // this.matter.add.mouseSpring(); // TODO (johnedvard) remove if production. Enable through option in debug menu
@@ -88,6 +91,50 @@ export class Level extends Phaser.Scene {
       }
     });
     this.listenForEvents();
+  }
+  createLandskape() {
+    // group parallaxPaths
+    this.groupFront = this.add.group();
+    this.groupBack = this.add.group();
+    // TODO (johnedvard) use array instead of copying
+    this.graphicsBack.clear();
+    this.graphics.clear();
+    this.graphicsFront.clear();
+
+    this.svgPaths.forEach(({ path, strokeWidth, color, fill, attributes }) => {
+      if (color != null) {
+        this.graphics.lineStyle(strokeWidth, color, 1);
+        this.graphicsBack.lineStyle(strokeWidth, color, 1);
+        this.graphicsFront.lineStyle(strokeWidth, color, 1);
+      } else {
+        this.graphics.lineStyle(0, 0, 0);
+        this.graphicsBack.lineStyle(0, 0, 0);
+        this.graphicsFront.lineStyle(0, 0, 0);
+      }
+      if (fill != null) {
+        this.graphics.fillStyle(fill, 1);
+        this.graphicsBack.fillStyle(fill, 1);
+        this.graphicsFront.fillStyle(fill, 1);
+      } else {
+        this.graphics.fillStyle(0, 0);
+        this.graphicsBack.fillStyle(0, 0);
+        this.graphicsFront.fillStyle(0, 0);
+      }
+      // TODO (johnedvard) figure out why fillPath doesn't work
+      if (attributes?.isParallaxBack) {
+        this.graphicsBack.fillPoints(path.getPoints());
+        path.draw(this.graphicsBack);
+        this.groupBack.add(this.graphicsBack);
+      } else if (attributes?.isParallaxFront) {
+        this.graphicsFront.fillPoints(path.getPoints());
+        path.draw(this.graphicsFront);
+        this.groupFront.add(this.graphicsFront);
+      } else {
+        this.graphics.fillPoints(path.getPoints());
+        path.draw(this.graphics);
+        this.graphics.translateCanvas(0, 0);
+      }
+    });
   }
 
   update(time: number, delta: number): void {
@@ -119,7 +166,7 @@ export class Level extends Phaser.Scene {
     this.player?.destroy();
     const svgText = levelSvgTexts[levelId];
     const levelState = this.createLevelFromSvg(this, svgText);
-
+    this.createLandskape();
     this.player = new Player(this, { pos: levelState.start });
   }
 
@@ -156,52 +203,11 @@ export class Level extends Phaser.Scene {
 
   updateLandscape() {
     if (!this.svgPaths) return;
-    // TODO (johnedvard) use array instead of copying
-    this.graphicsBack.clear();
-    this.graphics.clear();
-    this.graphicsFront.clear();
-    // group parallaxPaths
-    const groupFront = this.add.group();
-    const groupBack = this.add.group();
 
-    this.svgPaths.forEach(({ path, strokeWidth, color, fill, attributes }) => {
-      if (color != null) {
-        this.graphics.lineStyle(strokeWidth, color, 1);
-        this.graphicsBack.lineStyle(strokeWidth, color, 1);
-        this.graphicsFront.lineStyle(strokeWidth, color, 1);
-      } else {
-        this.graphics.lineStyle(0, 0, 0);
-        this.graphicsBack.lineStyle(0, 0, 0);
-        this.graphicsFront.lineStyle(0, 0, 0);
-      }
-      if (fill != null) {
-        this.graphics.fillStyle(fill, 1);
-        this.graphicsBack.fillStyle(fill, 1);
-        this.graphicsFront.fillStyle(fill, 1);
-      } else {
-        this.graphics.fillStyle(0, 0);
-        this.graphicsBack.fillStyle(0, 0);
-        this.graphicsFront.fillStyle(0, 0);
-      }
-      // TODO (johnedvard) figure out why fillPath doesn't work
-      if (attributes?.isParallaxBack) {
-        this.graphicsBack.fillPoints(path.getPoints());
-        path.draw(this.graphicsBack);
-        groupBack.add(this.graphicsBack);
-      } else if (attributes?.isParallaxFront) {
-        this.graphicsFront.fillPoints(path.getPoints());
-        path.draw(this.graphicsFront);
-        groupFront.add(this.graphicsFront);
-      } else {
-        this.graphics.fillPoints(path.getPoints());
-        path.draw(this.graphics);
-        this.graphics.translateCanvas(0, 0);
-      }
-    });
     const parallaxFactorFront = this.cameras.main.scrollX / 4;
     const parallaxFactorBack = (this.cameras.main.scrollX / 10) * -1;
-    groupFront.shiftPosition(parallaxFactorFront, 0);
-    groupBack.shiftPosition(parallaxFactorBack, 0);
+    this.groupFront?.shiftPosition(parallaxFactorFront, 0);
+    this.groupBack?.shiftPosition(parallaxFactorBack, 0);
   }
   restartLevel({ levelId }: { levelId: string }) {
     this.player?.destroy();

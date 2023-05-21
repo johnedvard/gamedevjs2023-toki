@@ -136,6 +136,7 @@ export class Player implements IGameObject {
   }
 
   private isOnGround() {
+    if (!this.body) return false;
     const allObjectsInProximity = this.scene.matter.intersectBody(this.proximityCircle);
     for (let obj of allObjectsInProximity) {
       const other = <MatterJS.BodyType>obj;
@@ -156,7 +157,7 @@ export class Player implements IGameObject {
     const startPosX = pos.x;
     const startPosY = pos.y;
 
-    this.body = this.scene.matter.add.polygon(startPosX, startPosY, 3, 37, {
+    this.body = this.scene.matter.add.polygon(startPosX, startPosY, 2, 25, {
       frictionAir: 0.03,
       label: BodyTypeLabel.player,
       mass: 5,
@@ -164,7 +165,7 @@ export class Player implements IGameObject {
       frictionStatic: 0.1,
       restitution: 0,
       angle: Math.PI / 2,
-      chamfer: [25, 0, 25],
+      chamfer: [0, 0],
     });
 
     this.scene.matter.body.setInertia(this.body, Infinity); // prevent body from rotating
@@ -301,6 +302,7 @@ export class Player implements IGameObject {
   };
 
   onAttachedTo = ({ body }) => {
+    if (this.attachedToPlatform === body) return;
     this.attachedToPlatform = body;
   };
 

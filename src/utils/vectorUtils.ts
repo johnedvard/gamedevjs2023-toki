@@ -93,7 +93,7 @@ export const createCollisionBoxesFromPaths = (scene: Scene, svgPaths: SvgPath[])
       );
     }
   });
-  scene.matter.bounds.create(boxes);
+  scene?.matter?.bounds?.create(boxes);
   return boxes;
 };
 

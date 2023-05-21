@@ -95,6 +95,7 @@ export class Door implements IGameObject {
   }
   update(time: number, delta: number) {}
   openDoor = () => {
+    if (!this.body) return;
     const allObjectsInProximity = this.scene.matter.intersectBody(this.body);
     for (let obj of allObjectsInProximity) {
       const other = <MatterJS.BodyType>obj;

@@ -59,7 +59,7 @@ export class Boot extends Phaser.Scene {
   }
   create(): void {
     this.setPixelArtFilterOnAssets();
-    this.createShaders();
+    // this.createShaders();
 
     // TODO (johnedvard) start desired scene based on env build variable?
 

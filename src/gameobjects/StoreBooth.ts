@@ -59,6 +59,7 @@ export class StoreBooth implements IGameObject {
   }
 
   private onOpenStore = () => {
+    if (!this.body) return;
     const allObjectsInProximity = this.scene.matter.intersectBody(this.body);
 
     for (let obj of allObjectsInProximity) {
