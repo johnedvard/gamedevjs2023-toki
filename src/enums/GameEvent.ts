@@ -13,4 +13,5 @@ export enum GameEvent {
   offPlatform = 'offPlatform',
   grabObject = 'grabObject',
   throwObject = 'throwObject',
+  releaseObject = 'releaseObject',
 }

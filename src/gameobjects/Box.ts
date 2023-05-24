@@ -30,7 +30,7 @@ export class Box implements IGameObject {
     const startPosX = pos.x;
     const startPosY = pos.y;
 
-    this.body = this.scene.matter.add.rectangle(startPosX, startPosY, this.width - 1, this.height - 1, {
+    this.body = this.scene.matter.add.rectangle(startPosX, startPosY, this.width, this.height, {
       frictionAir: 0.05,
       friction: 0.5,
       label: BodyTypeLabel.box,
@@ -41,7 +41,7 @@ export class Box implements IGameObject {
   private initSpineObject(pos: Phaser.Math.Vector2) {
     this.spineObject = this.scene.add.spine(pos.x, pos.y, 'box', 'idle', true).setDepth(DepthGroup.box);
     const scale = this.width / this.spineObject.width;
-    this.spineObject.setScale(scale);
+    this.spineObject.setScale(scale - 0.07);
   }
 
   updateSpineObject() {

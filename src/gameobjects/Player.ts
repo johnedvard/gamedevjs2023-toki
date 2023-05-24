@@ -241,10 +241,21 @@ export class Player implements IGameObject {
     this.grabbedObjectConstraint = this.scene.matter.add.constraint(this.aboveHeadBody, this.grabbedObject.body, 0, 50);
   };
 
+  releaseGrabbedObject() {
+    if (!this.grabbedObject) return;
+    this.scene.matter.world.removeConstraint(this.grabbedObjectConstraint);
+    emit(GameEvent.releaseObject, { object: this.grabbedObject });
+    this.grabbedObjectConstraint = null;
+    this.grabbedObject = null;
+  }
   throwGrabbedObject() {
     if (!this.grabbedObject) return;
     this.scene.matter.world.removeConstraint(this.grabbedObjectConstraint);
     emit(GameEvent.throwObject, { object: this.grabbedObject });
+    let angle = Math.PI + Math.PI / 4;
+    if (this.direction > 0) angle = -Math.PI / 4;
+    const force = new Phaser.Math.Vector2(Math.cos(angle), Math.sin(angle)).scale(0.5);
+    this.scene.matter.applyForce(this.grabbedObject.body, force);
     this.grabbedObjectConstraint = null;
     this.grabbedObject = null;
   }
@@ -268,7 +279,7 @@ export class Player implements IGameObject {
 
     emit(GameEvent.timeLock, { body: closestBody });
     playLaserBeam();
-    if (closestBody === this.grabbedObject?.body) this.throwGrabbedObject();
+    if (closestBody === this.grabbedObject?.body) this.releaseGrabbedObject();
 
     // TODO (johnedvard) Add some particle effects to the endPos if we found a body
     endPos = getClosestEndPos(closestBody, startPos, endPos, direction);
