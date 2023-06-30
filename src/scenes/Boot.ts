@@ -8,6 +8,7 @@ export class Boot extends Phaser.Scene {
   renderer: Phaser.Renderer.WebGL.WebGLRenderer;
 
   preload(): void {
+    this.load.setPath('assets/toki');
     // TODO (johnedvard) use an asset loader and constants for the names
     this.load.bitmapFont('atari', 'bitmap/atari-classic.png', 'bitmap/atari-classic.xml');
 

@@ -1,6 +1,6 @@
 import { Game } from 'phaser';
 import { SceneKey } from './enums/SceneKey';
-import { on } from './utils/eventEmitterUtils';
+import { off, on } from './utils/eventEmitterUtils';
 import { GameEvent } from './enums/GameEvent';
 
 let game: Game;
@@ -48,4 +48,12 @@ export const initSceneHandler = (g: Game) => {
   on(GameEvent.closeStore, closeStore);
   on(GameEvent.startDialog, startDialog);
   on(GameEvent.endDialog, endDialog);
+};
+
+export const destroySceneHandler = () => {
+  off(GameEvent.openStore, openStore);
+  off(GameEvent.closeStore, closeStore);
+  off(GameEvent.startDialog, startDialog);
+  off(GameEvent.endDialog, endDialog);
+  game = null;
 };

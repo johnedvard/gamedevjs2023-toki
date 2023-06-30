@@ -129,6 +129,7 @@ export class Door implements IGameObject {
   stopListeningForEvents() {
     off(ControllerEvent.up, this.openDoor);
   }
+
   private listenForEvents() {
     on(ControllerEvent.up, this.openDoor);
   }

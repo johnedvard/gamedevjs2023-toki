@@ -12,10 +12,12 @@ import { UserInterface } from '~/scenes/UserInterface';
 import { Level } from './scenes/Level';
 import { SceneInput } from './scenes/SceneInput';
 import { StoreInterface } from './scenes/StoreInterface';
-import { initSceneHandler } from './sceneHandler';
+import { destroySceneHandler, initSceneHandler } from './sceneHandler';
 import { initContract } from './near/nearConnection';
 import { MatterGravityFixPlugin } from './plugins/MatterGravityFixPlugin';
 import { DialogInterface } from './scenes/DialogInterface';
+import { emit } from './utils/eventEmitterUtils';
+import { GameEvent } from './enums/GameEvent';
 
 const addScenes = (game: Game) => {
   game.scene.add(SceneKey.Preload, Preload);
@@ -30,9 +32,10 @@ const addScenes = (game: Game) => {
 };
 
 export class Toki {
+  game: Game;
   constructor() {
     initContract();
-    const game = new Game({
+    this.game = new Game({
       type: Phaser.WEBGL,
       canvas: getCanvas(),
       width: 2560, // 16:9 ratio
@@ -70,8 +73,14 @@ export class Toki {
         autoCenter: Phaser.Scale.CENTER_BOTH,
       },
     });
-    addScenes(game);
-    initSceneHandler(game);
-    game.scene.start(SceneKey.SceneInput);
+    addScenes(this.game);
+    initSceneHandler(this.game);
+    this.game.scene.start(SceneKey.SceneInput);
+  }
+  destroyGame() {
+    emit(GameEvent.destroyGame);
+    destroySceneHandler();
+    this.game.destroy(true);
+    this.game = null;
   }
 }

@@ -14,4 +14,5 @@ export enum GameEvent {
   grabObject = 'grabObject',
   throwObject = 'throwObject',
   releaseObject = 'releaseObject',
+  destroyGame = 'destroyGame',
 }

@@ -68,6 +68,7 @@ export class Level extends Phaser.Scene {
 
   preload(): void {
     loadGame();
+    this.load.setPath('assets/toki');
     // this.matter.add.mouseSpring(); // TODO (johnedvard) remove if production. Enable through option in debug menu
     this.loadLevels(levelIds);
 
@@ -217,7 +218,7 @@ export class Level extends Phaser.Scene {
     this.groupFront?.shiftPosition(parallaxFactorFront, 0);
     this.groupBack?.shiftPosition(parallaxFactorBack, 0);
   }
-  restartLevel({ levelId }: { levelId: string }) {
+  destroyLevel() {
     this.player?.destroy();
     this.storeBooth?.destroy();
     this.collisionBoxes?.forEach((b) => this.matter.world.remove(b));
@@ -235,6 +236,9 @@ export class Level extends Phaser.Scene {
     this.platforms.length = 0;
     this.hooks?.forEach((b) => b?.destroy());
     this.hooks.length = 0;
+  }
+  restartLevel({ levelId }: { levelId: string }) {
+    this.destroyLevel();
 
     this.create({ levelId, fromLevelId: this.levelId });
   }
@@ -258,16 +262,22 @@ export class Level extends Phaser.Scene {
   onRestartLevel = () => {
     this.restartLevel({ levelId: this.levelId });
   };
+  onDestroyGame = () => {
+    this.destroyLevel();
+  };
+
   listenForEvents() {
     on(GameEvent.goToLevel, this.onGoToLevel);
     on(GameEvent.collectTimeCapsule, this.onTimeCapsuleCollected);
     on(GameEvent.restartLevel, this.onRestartLevel);
+    on(GameEvent.destroyGame, this.onDestroyGame);
   }
 
   stopListeningForEvents() {
     off(GameEvent.goToLevel, this.onGoToLevel);
     off(GameEvent.collectTimeCapsule, this.onTimeCapsuleCollected);
     off(GameEvent.restartLevel, this.onRestartLevel);
+    off(GameEvent.destroyGame, this.onDestroyGame);
   }
 
   checkIfGameCleared() {

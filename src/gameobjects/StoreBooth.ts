@@ -94,8 +94,8 @@ export class StoreBooth implements IGameObject {
 
   destroy() {
     destroyObject(this.scene, this);
-    this.overlordSpine.destroy();
-    this.speechBubble.destroy();
+    if (this.speechBubble) this.speechBubble.destroy();
+    if (this.overlordSpine) this.overlordSpine.destroy();
     this.spineObject = null;
     this.overlordSpine = null;
     this.speechBubble = null;

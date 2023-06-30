@@ -18,6 +18,12 @@ export default defineConfig({
     },
   },
   build: {
+    lib: {
+      entry: path.resolve(__dirname, './src/lib.ts'),
+      name: 'Toki',
+      // the proper extensions will be added
+      fileName: 'toki',
+    },
     commonjsOptions: {
       include: [],
     },

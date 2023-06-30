@@ -4,15 +4,23 @@ import { SceneKey } from './enums/SceneKey';
 
 let continueTxt: GameObjects.BitmapText;
 let newGameTxt: GameObjects.BitmapText;
-let settingsGameTxt: GameObjects.BitmapText;
-let quitGameTxt: GameObjects.BitmapText;
 let chevron: GameObjects.Triangle;
 let chevronScaleDir: number = 1;
+let scene: Scene;
 const menuItems = [];
 const margin = 40;
 const chevronOffset = 13;
 
-export const displayMainMenuItems = (scene: Scene): { txt: GameObjects.BitmapText; sceneName: string }[] => {
+const onContinuePointerUp = () => {
+  scene.scene.start(SceneKey.Level, { levelId: 'level0' });
+};
+const onNewGamePointerUp = () => {
+  scene.scene.start(SceneKey.NewGameIntro);
+};
+
+export const displayMainMenuItems = (myScene: Scene): { txt: GameObjects.BitmapText; sceneName: string }[] => {
+  menuItems.length = 0;
+  scene = myScene;
   const center = new Math.Vector2(scene.cameras.main.centerX, scene.cameras.main.centerY);
   if (hasSaveFile()) {
     continueTxt = scene.add
@@ -20,9 +28,7 @@ export const displayMainMenuItems = (scene: Scene): { txt: GameObjects.BitmapTex
       .setAlpha(1)
       .setOrigin(0.5, 1)
       .setInteractive();
-    continueTxt.on('pointerup', () => {
-      scene.scene.start(SceneKey.Level, { levelId: 'level0' });
-    });
+    continueTxt.on('pointerup', onContinuePointerUp);
     menuItems.push({ txt: continueTxt, sceneName: SceneKey.Level, args: { levelId: 'level0' } });
   }
   newGameTxt = scene.add
@@ -30,19 +36,8 @@ export const displayMainMenuItems = (scene: Scene): { txt: GameObjects.BitmapTex
     .setAlpha(1)
     .setOrigin(0.5, 1)
     .setInteractive();
-  newGameTxt.on('pointerup', () => {
-    scene.scene.start(SceneKey.NewGameIntro);
-  });
+  newGameTxt.on('pointerup', onNewGamePointerUp);
   menuItems.push({ txt: newGameTxt, sceneName: SceneKey.NewGameIntro });
-  // settingsGameTxt = scene.add
-  //   .bitmapText(center.x, center.y + margin * menuItems.length, 'atari', 'Settings', 28)
-  //   .setAlpha(1)
-  //   .setOrigin(0.5, 1)
-  //   .setInteractive();
-  // settingsGameTxt.on('pointerup', () => {
-  //   scene.scene.start(SceneKey.Settings);
-  // });
-  // menuItems.push({ txt: settingsGameTxt, sceneName: SceneKey.Settings });
   return menuItems;
 };
 
@@ -60,4 +55,15 @@ export const highlightSelectedMenu = (scene: Scene, delta: number, { index }: { 
   }
 
   chevron.setScale(chevron.scaleX, chevron.scaleY + (delta * chevronScaleDir) / 750);
+};
+
+export const destroyMenu = () => {
+  newGameTxt.off('pointerup', onContinuePointerUp);
+  continueTxt.off('pointerup', onNewGamePointerUp);
+  continueTxt.destroy();
+  newGameTxt.destroy();
+  chevron.destroy();
+  continueTxt = null;
+  newGameTxt = null;
+  chevron = null;
 };

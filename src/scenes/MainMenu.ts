@@ -1,6 +1,8 @@
 import { Input, GameObjects } from 'phaser';
 import { gamepadIndex } from '~/utils/gamepadUtils';
-import { displayMainMenuItems, highlightSelectedMenu } from '~/menu';
+import { displayMainMenuItems, highlightSelectedMenu, destroyMenu } from '~/menu';
+import { off, on } from '~/utils/eventEmitterUtils';
+import { GameEvent } from '~/enums/GameEvent';
 
 export class MainMenu extends Phaser.Scene {
   selectedMenuIndex = 0;
@@ -27,40 +29,50 @@ export class MainMenu extends Phaser.Scene {
     this.scene.start(sceneName, { ...menuItem.args });
   }
 
-  listenForInput() {
-    this.input.gamepad.on('down', (_pad: Input.Gamepad.Gamepad, button: Input.Gamepad.Button) => {
-      switch (button.index) {
-        case gamepadIndex.dpadup:
-          this.setPrevMenuIndex();
-          break;
-        case gamepadIndex.dpaddown:
-          this.setNextMenuIndex();
-          break;
-      }
-    });
+  onGamepadDown = (_pad: Input.Gamepad.Gamepad, button: Input.Gamepad.Button) => {
+    switch (button.index) {
+      case gamepadIndex.dpadup:
+        this.setPrevMenuIndex();
+        break;
+      case gamepadIndex.dpaddown:
+        this.setNextMenuIndex();
+        break;
+    }
+  };
 
-    this.input.keyboard.on('keydown', (evt: KeyboardEvent) => {
-      switch (evt?.code) {
-        case 'ArrowUp':
-        case 'KeyW':
-          this.setPrevMenuIndex();
-          break;
-        case 'ArrowDown':
-        case 'KeyS':
-          this.setNextMenuIndex();
-          break;
-        case 'Enter':
-        case 'Space':
-          this.selectMenu(this.selectedMenuIndex);
-          break;
-      }
-    });
+  onKeyboardDown = (evt: KeyboardEvent) => {
+    switch (evt?.code) {
+      case 'ArrowUp':
+      case 'KeyW':
+        this.setPrevMenuIndex();
+        break;
+      case 'ArrowDown':
+      case 'KeyS':
+        this.setNextMenuIndex();
+        break;
+      case 'Enter':
+      case 'Space':
+        this.selectMenu(this.selectedMenuIndex);
+        break;
+    }
+  };
+  listenForInput() {
+    this.input.gamepad.on('down', this.onGamepadDown);
+    this.input.keyboard.on('keydown', this.onKeyboardDown);
+    on(GameEvent.destroyGame, this.onDestroyGame);
   }
 
   create(): void {
     this.menuItems = displayMainMenuItems(this);
     this.listenForInput();
   }
+
+  onDestroyGame = () => {
+    destroyMenu();
+    this.input.gamepad.off('down', this.onGamepadDown);
+    this.input.keyboard.off('keydown', this.onKeyboardDown);
+    off(GameEvent.destroyGame, this.onDestroyGame);
+  };
 
   update(time: number, delta: number): void {
     highlightSelectedMenu(this, delta, { index: this.selectedMenuIndex });
