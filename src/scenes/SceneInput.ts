@@ -1,7 +1,7 @@
 import { Input, Scene } from 'phaser';
 import { ControllerEvent } from '~/enums/ControllerEvent';
 import { GameEvent } from '~/enums/GameEvent';
-import { emit } from '~/utils/eventEmitterUtils';
+import { emit, off, on } from '~/utils/eventEmitterUtils';
 import { gamepadIndex, leftstick } from '~/utils/gamepadUtils';
 
 /**
@@ -16,7 +16,9 @@ export class SceneInput extends Scene {
     this.createKeyboardControl();
     this.createGamepadControl();
     this.createMouseControl();
+    on(GameEvent.destroyGame, this.onDestroyGame);
   }
+
   update(time: number, delta: number): void {
     this.updateKeyboardControls();
     this.updateGamepadControls();
@@ -27,13 +29,11 @@ export class SceneInput extends Scene {
     this.handleMouseControl();
   };
 
-  handleMouseControl = () => {
-    this.input.on('pointerdown', (pointer: Phaser.Input.Pointer) => {
-      if (pointer.primaryDown) {
-        const pos = new Phaser.Math.Vector2(pointer.worldX, pointer.worldY);
-        emit(ControllerEvent.shoot, { pos });
-      }
-    });
+  onPointerDown = (pointer: Phaser.Input.Pointer) => {
+    if (pointer.primaryDown) {
+      const pos = new Phaser.Math.Vector2(pointer.worldX, pointer.worldY);
+      emit(ControllerEvent.shoot, { pos });
+    }
   };
 
   createKeyboardControl = () => {
@@ -46,47 +46,43 @@ export class SceneInput extends Scene {
     this.handleKeyboardListener();
   };
 
-  handleKeyboardListener = () => {
-    this.input.keyboard.on('keydown', (evt: KeyboardEvent) => {
-      switch (evt?.code) {
-        case 'KeyE':
-          const pos = new Phaser.Math.Vector2(this.input.activePointer.worldX, this.input.activePointer.worldY);
-          emit(ControllerEvent.action, { pos });
-          break;
-        case 'Space':
-          emit(ControllerEvent.jump);
-          break;
-        case 'KeyI':
-          emit(ControllerEvent.inventory);
-          break;
-        case 'KeyW':
-        case 'ArrowUp':
-          emit(ControllerEvent.up);
-          break;
-        case 'KeyR':
-          emit(GameEvent.restartLevel);
-          break;
-      }
-    });
+  onKeyboardDown = (evt: KeyboardEvent) => {
+    switch (evt?.code) {
+      case 'KeyE':
+        const pos = new Phaser.Math.Vector2(this.input.activePointer.worldX, this.input.activePointer.worldY);
+        emit(ControllerEvent.action, { pos });
+        break;
+      case 'Space':
+        emit(ControllerEvent.jump);
+        break;
+      case 'KeyI':
+        emit(ControllerEvent.inventory);
+        break;
+      case 'KeyW':
+      case 'ArrowUp':
+        emit(ControllerEvent.up);
+        break;
+      case 'KeyR':
+        emit(GameEvent.restartLevel);
+        break;
+    }
   };
 
-  handleGamepaddListener = () => {
-    this.input.gamepad.on('down', (_pad: Input.Gamepad.Gamepad, button: Input.Gamepad.Button) => {
-      switch (button.index) {
-        case gamepadIndex.west:
-          emit(ControllerEvent.shoot);
-          break;
-        case gamepadIndex.south:
-          emit(ControllerEvent.jump);
-          break;
-        case gamepadIndex.north:
-          emit(ControllerEvent.inventory);
-          break;
-        case gamepadIndex.up:
-          emit(ControllerEvent.up);
-          break;
-      }
-    });
+  onGamepadDown = (_pad: Input.Gamepad.Gamepad, button: Input.Gamepad.Button) => {
+    switch (button.index) {
+      case gamepadIndex.west:
+        emit(ControllerEvent.shoot);
+        break;
+      case gamepadIndex.south:
+        emit(ControllerEvent.jump);
+        break;
+      case gamepadIndex.north:
+        emit(ControllerEvent.inventory);
+        break;
+      case gamepadIndex.up:
+        emit(ControllerEvent.up);
+        break;
+    }
   };
 
   // TODO (johnedvard) support more controls for each scene
@@ -131,5 +127,28 @@ export class SceneInput extends Scene {
     if (!isDeadzone) {
       emit(ControllerEvent.move, { velocity });
     }
+  };
+
+  onDestroyGame = () => {
+    this.removeListeners();
+  };
+
+  handleKeyboardListener = () => {
+    this.input.keyboard.on('keydown', this.onKeyboardDown);
+  };
+
+  handleMouseControl = () => {
+    this.input.on('pointerdown', this.onPointerDown);
+  };
+
+  handleGamepaddListener = () => {
+    this.input.gamepad.on('down', this.onGamepadDown);
+  };
+
+  removeListeners = () => {
+    this.input.keyboard.off('keydown', this.onKeyboardDown);
+    this.input.off('pointerdown', this.onPointerDown);
+    this.input.gamepad.off('down', this.onGamepadDown);
+    off(GameEvent.destroyGame, this.onDestroyGame);
   };
 }
