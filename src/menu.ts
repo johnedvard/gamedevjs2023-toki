@@ -58,11 +58,11 @@ export const highlightSelectedMenu = (scene: Scene, delta: number, { index }: { 
 };
 
 export const destroyMenu = () => {
-  newGameTxt.off('pointerup', onContinuePointerUp);
-  continueTxt.off('pointerup', onNewGamePointerUp);
-  continueTxt.destroy();
-  newGameTxt.destroy();
-  chevron.destroy();
+  newGameTxt?.off('pointerup', onContinuePointerUp);
+  continueTxt?.off('pointerup', onNewGamePointerUp);
+  continueTxt?.destroy();
+  newGameTxt?.destroy();
+  chevron?.destroy();
   continueTxt = null;
   newGameTxt = null;
   chevron = null;

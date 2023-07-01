@@ -82,15 +82,14 @@ export const createCollisionBoxesFromPaths = (scene: Scene, svgPaths: SvgPath[])
       const p0 = allPoints[i];
       const p1 = allPoints[i + 1];
       const { l0, l1 } = getParallellLine(p0, p1, offset);
-      boxes.push(
-        scene.matter.add.fromVertices((p1.x + p0.x) / 2, (p1.y + p0.y) / 2, [p0, l0, l1, p1], {
-          isStatic: true,
-          label: BodyTypeLabel.collisionWall,
-          ignoreGravity: true,
-          friction: 0,
-          frictionStatic: 0,
-        })
-      );
+      const boxBodyType = scene?.matter?.add?.fromVertices((p1.x + p0.x) / 2, (p1.y + p0.y) / 2, [p0, l0, l1, p1], {
+        isStatic: true,
+        label: BodyTypeLabel.collisionWall,
+        ignoreGravity: true,
+        friction: 0,
+        frictionStatic: 0,
+      });
+      boxes.push(boxBodyType);
     }
   });
   scene?.matter?.bounds?.create(boxes);
