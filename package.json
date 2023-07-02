@@ -4,11 +4,13 @@
   "version": "1.0.0",
   "main": "main.ts",
   "author": "johnedvard",
+  "type": "module",
   "scripts": {
     "start": "vite",
     "start:mainnet": "vite --mode dev",
     "build:testnet": "tsc && vite build --mode testnet",
     "build:mainnet": "tsc && vite build --mode mainnet",
+    "build:lib": "tsc && vite build --config vite.config.lib.ts --mode mainnet",
     "preview": "vite preview",
     "server": "tsc server/main.ts && node server/main.js"
   },
