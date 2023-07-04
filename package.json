@@ -2,7 +2,17 @@
   "name": "gamedevjs2023-toki",
   "private": false,
   "version": "1.0.0",
-  "main": "main.ts",
+  "files": [
+    "dist"
+  ],
+  "main": "./dist/toki.umd.cjs",
+  "module": "./dist/toki.js",
+  "exports": {
+    ".": {
+      "import": "./dist/toki.js",
+      "require": "./dist/toki.cjs"
+    }
+  },
   "author": "johnedvard",
   "type": "module",
   "scripts": {
