@@ -1,4 +1,5 @@
-import { Scene } from 'phaser';
+import { Scene, Curves } from 'phaser';
+
 import svgToPhaserPath from 'svg-to-phaser-path';
 
 import { BodyTypeLabel } from '~/enums/BodyTypeLabel';
@@ -48,7 +49,8 @@ export const createPathsFromSvg = (svgDoc: Document): SvgPath[] => {
 
   pathEls.forEach((el) => {
     const jsonPath = svgToPhaserPath(el.getAttribute('d'));
-    const path = new Phaser.Curves.Path(jsonPath);
+    const path = new Curves.Path();
+    path.fromJSON(jsonPath);
     const color: number = rgbTohex(el.style.stroke);
     const fill: number = rgbTohex(el.style.fill);
     const attributes: SvgPathAttributes = {};
@@ -184,7 +186,8 @@ export const createPlatformsFromSvg = (scene: Scene, svgDoc: Document): Platform
     if (!el.getAttribute('serif:id')?.match('{platform}')) continue;
     const pathToFollowEl = el.parentElement.querySelector('[id*=patrolRoute]');
     const jsonPath = svgToPhaserPath(pathToFollowEl.getAttribute('d'));
-    const pathToFollow = new Phaser.Curves.Path(jsonPath);
+    const pathToFollow = new Curves.Path();
+    pathToFollow.fromJSON(jsonPath);
     const pos = getPosFromSvgRect(el);
     const height = getHeightFromSvgRect(el);
     const width = getWidthFromSvgRect(el);
@@ -200,7 +203,8 @@ export const createHooksFromSvg = (scene: Scene, svgDoc: Document): Hook[] => {
     if (!el.getAttribute('serif:id')?.match('{hook}')) continue;
     const pathToFollowEl = el.parentElement.querySelector('[id*=patrolRoute]');
     const jsonPath = svgToPhaserPath(pathToFollowEl.getAttribute('d'));
-    const pathToFollow = new Phaser.Curves.Path(jsonPath);
+    const pathToFollow = new Curves.Path();
+    pathToFollow.fromJSON(jsonPath);
     const pos = getPosFromSvgCircle(el);
     hooks.push(new Hook(scene, { pos, pathToFollow: pathToFollow }));
   }

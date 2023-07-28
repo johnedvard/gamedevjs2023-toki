@@ -1,6 +1,5 @@
-import { Scene } from 'phaser';
+import { Scene, Curves } from 'phaser';
 import { DepthGroup } from '~/enums/DepthGroup';
-import { IGameObject } from '~/interfaces/IGameObject';
 
 type TProps = {
   pos: Phaser.Math.Vector2;
@@ -13,7 +12,7 @@ export class SpeechBubble {
   pos: Phaser.Math.Vector2;
   width: number;
   height: number;
-  path: Phaser.Curves.Path;
+  path: Curves.Path;
 
   constructor(private scene: Scene, { pos, width, height }: TProps) {
     this.pos = pos;
@@ -26,29 +25,29 @@ export class SpeechBubble {
   createSpeechBubble() {
     const control1 = this.height / 10;
     const control2 = this.width / 5;
-    this.path = new Phaser.Curves.Path();
+    this.path = new Curves.Path();
     let startPoint = new Phaser.Math.Vector2(this.pos.x, this.pos.y);
     let controlPoint1 = new Phaser.Math.Vector2(this.pos.x + control2, this.pos.y - control2 / 5);
     let endPoint = new Phaser.Math.Vector2(this.pos.x + this.width, this.pos.y);
-    let curve = new Phaser.Curves.QuadraticBezier(startPoint, controlPoint1, endPoint);
+    let curve = new Curves.QuadraticBezier(startPoint, controlPoint1, endPoint);
     this.path.add(curve);
 
     startPoint = endPoint;
     controlPoint1 = new Phaser.Math.Vector2(endPoint.x + control1, endPoint.y + control1);
     endPoint = new Phaser.Math.Vector2(this.pos.x + this.width, this.pos.y + this.height);
-    curve = new Phaser.Curves.QuadraticBezier(startPoint, controlPoint1, endPoint);
+    curve = new Curves.QuadraticBezier(startPoint, controlPoint1, endPoint);
     this.path.add(curve);
 
     startPoint = endPoint;
     controlPoint1 = new Phaser.Math.Vector2(endPoint.x - control2, endPoint.y + control2 / 5);
     endPoint = new Phaser.Math.Vector2(this.pos.x, this.pos.y + this.height);
-    curve = new Phaser.Curves.QuadraticBezier(startPoint, controlPoint1, endPoint);
+    curve = new Curves.QuadraticBezier(startPoint, controlPoint1, endPoint);
     this.path.add(curve);
 
     startPoint = endPoint;
     controlPoint1 = new Phaser.Math.Vector2(endPoint.x - control1, endPoint.y - control1);
     endPoint = new Phaser.Math.Vector2(this.pos.x, this.pos.y);
-    curve = new Phaser.Curves.QuadraticBezier(startPoint, controlPoint1, endPoint);
+    curve = new Curves.QuadraticBezier(startPoint, controlPoint1, endPoint);
     this.path.add(curve);
   }
   update(time: number, delta: number) {

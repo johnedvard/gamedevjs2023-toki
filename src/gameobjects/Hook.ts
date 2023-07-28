@@ -1,4 +1,4 @@
-import { GameObjects, Scene } from 'phaser';
+import { Scene } from 'phaser';
 import { BodyTypeLabel } from '~/enums/BodyTypeLabel';
 import { DepthGroup } from '~/enums/DepthGroup';
 import { GameEvent } from '~/enums/GameEvent';
@@ -6,7 +6,6 @@ import { IGameObject } from '~/interfaces/IGameObject';
 import { off, on } from '~/utils/eventEmitterUtils';
 import { commonTimeLock, stopCompletely } from '~/utils/gameUtils';
 import { destroyObject } from '~/utils/gameobjectUtils';
-import { playLockObject, playUnLockObject } from '~/utils/soundUtils';
 
 type TProps = {
   pos: Phaser.Math.Vector2;

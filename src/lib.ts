@@ -8,4 +8,5 @@ export const initGame = () => {
 
 export const destroyGame = () => {
   if (toki) toki.destroyGame();
+  toki = null;
 };
